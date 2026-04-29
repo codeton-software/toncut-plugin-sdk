@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33529.622
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManagedCoreProbe", "..\csharp-managed\ManagedCoreProbe.csproj", "{209FD681-9270-32CE-B236-8AA1DE04CB85}"
+EndProject
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "ContractProbe.Native", "ContractProbe.vcxproj", "{A20D785D-BACB-8F41-A3B7-392AA7D03B78}"
+	ProjectSection(ProjectDependencies) = postProject
+		{209FD681-9270-32CE-B236-8AA1DE04CB85} = {209FD681-9270-32CE-B236-8AA1DE04CB85}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{209FD681-9270-32CE-B236-8AA1DE04CB85}.Debug|Win32.ActiveCfg = Debug|x86
+		{209FD681-9270-32CE-B236-8AA1DE04CB85}.Debug|Win32.Build.0 = Debug|x86
+		{209FD681-9270-32CE-B236-8AA1DE04CB85}.Release|Win32.ActiveCfg = Release|x86
+		{209FD681-9270-32CE-B236-8AA1DE04CB85}.Release|Win32.Build.0 = Release|x86
+		{A20D785D-BACB-8F41-A3B7-392AA7D03B78}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A20D785D-BACB-8F41-A3B7-392AA7D03B78}.Debug|Win32.Build.0 = Debug|Win32
+		{A20D785D-BACB-8F41-A3B7-392AA7D03B78}.Release|Win32.ActiveCfg = Release|Win32
+		{A20D785D-BACB-8F41-A3B7-392AA7D03B78}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

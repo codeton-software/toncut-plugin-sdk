@@ -1,0 +1,42 @@
+{
+  "lanes": {
+    "delphi": {
+      "displayName": "Delphi",
+      "kind": "pascal-full",
+      "projectType": "delphi-native",
+      "probeProjectName": "ContractProbe"
+    },
+    "cppbuilder": {
+      "displayName": "C++Builder",
+      "kind": "cpp-header-subset",
+      "projectType": "cppbuilder-native",
+      "probeProjectName": "ContractProbe"
+    },
+    "msvc": {
+      "displayName": "MSVC",
+      "kind": "cpp-header-subset",
+      "projectType": "msvc-native",
+      "probeProjectName": "ContractProbe"
+    },
+    "csharp": {
+      "displayName": "C#",
+      "kind": "csharp-native-plus-managed",
+      "projectType": "csharp-split",
+      "probeProjectName": "ContractProbe",
+      "managedCore": {
+        "assemblyName": "TonCutCsv.Managed.Probe",
+        "projectName": "ManagedCoreProbe",
+        "checks": [
+          {
+            "id": "csv-parse-decode",
+            "description": "Parses and decodes the shared CSV fixture without throwing."
+          },
+          {
+            "id": "csv-encode-roundtrip",
+            "description": "Encodes decoded records and keeps the required header and row count."
+          }
+        ]
+      }
+    }
+  }
+}

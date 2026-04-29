@@ -1,0 +1,28 @@
+{
+  "checkedAt": "",
+  "notes": "",
+  "starterExamples": {
+    "csvImport": {
+      "status": "pending",
+      "notes": ""
+    },
+    "csvExportRoundTrip": {
+      "status": "pending",
+      "notes": ""
+    },
+    "pltSingleSheetExport": {
+      "status": "pending",
+      "notes": ""
+    }
+  },
+  "runtimeSmoke": {
+    "probePluginsLoaded": {
+      "status": "pending",
+      "notes": ""
+    },
+    "managedProbePassed": {
+      "status": "pending",
+      "notes": ""
+    }
+  }
+}

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{C085B0D4-E6D8-D395-FFD6-BF4138CA26D0}</ProjectGuid>
+    <MainSource>ContractProbeEntryPoint.cpp</MainSource>
+    <ProjectVersion>23.0</ProjectVersion>
+    <FrameworkType>None</FrameworkType>
+    <Config Condition="'$(Config)'==''">Release</Config>
+    <Platform Condition="'$(Platform)'==''">Win32</Platform>
+    <AppType>Library</AppType>
+    <TargetName>ContractProbe</TargetName>
+    <TargetExt>.plg</TargetExt>
+    <Base>true</Base>
+    <IncludePath>$(MSBuildProjectDirectory);..\..\..\..\include\cpp;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Config)'=='Debug'"><CfgType>Debug</CfgType><FinalOutputDir>.\bin\$(Platform)\$(Config)</FinalOutputDir><IntermediateOutputDir>.\obj\$(Platform)\$(Config)</IntermediateOutputDir></PropertyGroup>
+  <PropertyGroup Condition="'$(Config)'=='Release'"><CfgType>Release</CfgType><FinalOutputDir>.\bin\$(Platform)\$(Config)</FinalOutputDir><IntermediateOutputDir>.\obj\$(Platform)\$(Config)</IntermediateOutputDir></PropertyGroup>
+  <ItemGroup><CppCompile Include="ContractProbeEntryPoint.cpp" /><CppCompile Include="ContractProbePlugin.cpp" /><CppCompile Include="ContractProbeTouch.cpp" /></ItemGroup>
+  <ItemGroup><None Include="ContractProbePlugin.hpp" /><None Include="ContractProbeTouch.hpp" /><None Include="ContractProbe.def" /></ItemGroup>
+  <Import Project="$(BDS)\Bin\CodeGear.Cpp.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Cpp.Targets')" />
+  <Import Project="$(BDS)\Bin\Borland.Cpp.Targets" Condition="Exists('$(BDS)\Bin\Borland.Cpp.Targets')" />
+</Project>

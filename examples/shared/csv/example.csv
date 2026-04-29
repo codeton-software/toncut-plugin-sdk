@@ -1,0 +1,4 @@
+RecordType,ProjectTitle,MaterialTitle,MaterialKind,MaterialWidth,MaterialThickness,Length,Width,Quantity,Identifier,Description
+FORMAT,Wardrobe Job,Birch plywood 18 mm,mk2D,0,18,1500,1000,2,P-001,Tall side panel
+FORMAT,Wardrobe Job,Birch plywood 18 mm,mk2D,0,18,980,450,4,P-002,Adjustable shelf
+SHEET,,Birch plywood 18 mm,mk2D,0,18,3200,2400,2,S-001,Raw stock sheet

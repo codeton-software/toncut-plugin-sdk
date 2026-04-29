@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33529.622
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{BC8A1FFA-BEE3-4634-8014-F334798102B3}") = "ContractProbe", "ContractProbe.vcxproj", "{3A69E825-DE46-A19A-06D8-00ACD98739A9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3A69E825-DE46-A19A-06D8-00ACD98739A9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3A69E825-DE46-A19A-06D8-00ACD98739A9}.Debug|Win32.Build.0 = Debug|Win32
+		{3A69E825-DE46-A19A-06D8-00ACD98739A9}.Release|Win32.ActiveCfg = Release|Win32
+		{3A69E825-DE46-A19A-06D8-00ACD98739A9}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

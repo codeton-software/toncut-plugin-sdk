@@ -1,0 +1,120 @@
+{
+  "generatedAt": "2026-03-25T09:58:20.947Z",
+  "fixtures": {
+    "sampleCsv": "../examples/shared/csv/example.csv",
+    "manualOutputDir": "generated/runtime/manual-output",
+    "expectedCsvExport": "generated/runtime/manual-output/manual-export.csv",
+    "expectedPltExport": "generated/runtime/manual-output/manual-result.plt"
+  },
+  "artifacts": [
+    {
+      "id": "probe-delphi-debug",
+      "category": "probe",
+      "lane": "delphi",
+      "label": "Delphi ContractProbe Debug plugin",
+      "path": "generated/probes/delphi/Win32/Debug/ContractProbe.plg"
+    },
+    {
+      "id": "probe-msvc-debug",
+      "category": "probe",
+      "lane": "msvc",
+      "label": "MSVC ContractProbe Debug plugin",
+      "path": "generated/probes/msvc/bin/Debug/ContractProbe.plg"
+    },
+    {
+      "id": "probe-csharp-native-debug",
+      "category": "probe",
+      "lane": "csharp",
+      "label": "C# native ContractProbe Debug plugin",
+      "path": "generated/probes/csharp/bin/Debug/ContractProbe.plg"
+    },
+    {
+      "id": "probe-csharp-managed-debug",
+      "category": "managed-probe",
+      "lane": "csharp",
+      "label": "ManagedCoreProbe Debug executable",
+      "path": "generated/probes/csharp-managed/bin/Debug/ManagedCoreProbe.exe"
+    },
+    {
+      "id": "harness-delphi-debug",
+      "category": "harness",
+      "lane": "delphi",
+      "label": "Delphi ContractHostHarness Debug executable",
+      "path": "generated/harness/delphi/Win32/Debug/ContractHostHarness.exe"
+    },
+    {
+      "id": "starter-delphi-debug",
+      "category": "starter",
+      "lane": "delphi",
+      "label": "Delphi CsvImportExport Debug plugin",
+      "path": "../examples/delphi/CsvImportExport/Win32/Debug/CsvImportExportDelphi.plg"
+    },
+    {
+      "id": "starter-msvc-debug",
+      "category": "starter",
+      "lane": "msvc",
+      "label": "MSVC CsvImportExport Debug plugin",
+      "path": "../examples/msvc/CsvImportExport/bin/Debug/CsvImportExportMsvc.plg"
+    },
+    {
+      "id": "starter-csharp-native-debug",
+      "category": "starter",
+      "lane": "csharp",
+      "label": "C# CsvImportExport Debug native plugin",
+      "path": "../examples/csharp/CsvImportExport/bin/Debug/CsvImportExportCSharp.plg"
+    },
+    {
+      "id": "starter-csharp-managed-debug",
+      "category": "starter-managed",
+      "lane": "csharp",
+      "label": "C# TonCutCsv.Managed Debug library",
+      "path": "../examples/csharp/CsvImportExport/bin/Debug/TonCutCsv.Managed.dll"
+    }
+  ],
+  "buildCommands": [
+    {
+      "id": "build-probe-delphi",
+      "label": "Build Delphi ContractProbe",
+      "command": "msbuild generated\\probes\\delphi\\ContractProbe.dproj /p:Config=Debug /p:Platform=Win32"
+    },
+    {
+      "id": "build-harness-delphi",
+      "label": "Build Delphi ContractHostHarness",
+      "command": "msbuild generated\\harness\\delphi\\ContractHostHarness.dproj /p:Config=Debug /p:Platform=Win32"
+    },
+    {
+      "id": "build-probe-msvc",
+      "label": "Build MSVC ContractProbe",
+      "command": "msbuild generated\\probes\\msvc\\ContractProbe.sln /p:Configuration=Debug /p:Platform=Win32"
+    },
+    {
+      "id": "build-probe-csharp",
+      "label": "Build C# ContractProbe solution",
+      "command": "msbuild generated\\probes\\csharp\\ContractProbe.sln /restore /p:Configuration=Debug /p:Platform=Win32"
+    },
+    {
+      "id": "build-starter-delphi",
+      "label": "Build Delphi starter example",
+      "command": "msbuild ..\\examples\\delphi\\CsvImportExport\\CsvImportExport.dproj /p:Config=Debug /p:Platform=Win32"
+    },
+    {
+      "id": "build-starter-msvc",
+      "label": "Build MSVC starter example",
+      "command": "msbuild ..\\examples\\msvc\\CsvImportExport\\CsvImportExport.sln /p:Configuration=Debug /p:Platform=Win32"
+    },
+    {
+      "id": "build-starter-csharp",
+      "label": "Build C# starter example",
+      "command": "msbuild ..\\examples\\csharp\\CsvImportExport\\CsvImportExport.sln /restore /p:Configuration=Debug /p:Platform=Win32"
+    }
+  ],
+  "scripts": {
+    "manualCheckScript": "generated/runtime/run_manual_checks.py",
+    "manualResultsTemplate": "generated/runtime/manual-results.template.json",
+    "manualResultsFile": "generated/runtime/manual-results.json",
+    "manualGuide": "generated/runtime/manual-checklist.md",
+    "artifactStatus": "generated/runtime/artifact-status.json",
+    "manualRuntimeReport": "generated/runtime/manual-runtime-report.json",
+    "manualLogsDir": "generated/runtime/logs"
+  }
+}

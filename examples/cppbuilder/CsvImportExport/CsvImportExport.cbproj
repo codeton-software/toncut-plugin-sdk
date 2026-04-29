@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{AB873D61-08CB-48E5-923C-F94411897BB1}</ProjectGuid>
+    <MainSource>CsvImportExportPlugin.cpp</MainSource>
+    <ProjectVersion>23.0</ProjectVersion>
+    <FrameworkType>None</FrameworkType>
+    <Config Condition="'$(Config)'==''">Release</Config>
+    <Platform Condition="'$(Platform)'==''">Win32</Platform>
+    <AppType>Library</AppType>
+    <TargetName>CsvImportExportCppBuilder</TargetName>
+    <TargetExt>.plg</TargetExt>
+    <Base>true</Base>
+    <SdkRoot>$(MSBuildProjectDirectory)\..\..\..\</SdkRoot>
+    <SdkCppIncludeDir>$(SdkRoot)include\cpp</SdkCppIncludeDir>
+    <SdkSharedCppDir>$(SdkRoot)examples\shared\cpp</SdkSharedCppDir>
+    <CppBuilderProjectIncludePath>$(MSBuildProjectDirectory);$(SdkSharedCppDir);$(SdkCppIncludeDir)</CppBuilderProjectIncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Config)'=='Debug'">
+    <CfgType>Debug</CfgType>
+    <FinalOutputDir>.\bin\$(Platform)\$(Config)</FinalOutputDir>
+    <IntermediateOutputDir>.\obj\$(Platform)\$(Config)</IntermediateOutputDir>
+    <IncludePath>$(CppBuilderProjectIncludePath);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Config)'=='Release'">
+    <CfgType>Release</CfgType>
+    <FinalOutputDir>.\bin\$(Platform)\$(Config)</FinalOutputDir>
+    <IntermediateOutputDir>.\obj\$(Platform)\$(Config)</IntermediateOutputDir>
+    <IncludePath>$(CppBuilderProjectIncludePath);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemGroup>
+    <CppCompile Include="CsvImportExportPlugin.cpp" />
+    <CppCompile Include="..\..\shared\cpp\CsvCodec.cpp" />
+    <CppCompile Include="..\..\shared\cpp\CsvImportExportPluginBase.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\shared\cpp\CsvCodec.hpp" />
+    <None Include="..\..\shared\cpp\CsvImportExportPluginBase.hpp" />
+    <None Include="..\..\..\include\cpp\TonCutPluginSdk.hpp" />
+  </ItemGroup>
+  <Import Project="$(BDS)\Bin\CodeGear.Cpp.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Cpp.Targets')" />
+  <Import Project="$(BDS)\Bin\Borland.Cpp.Targets" Condition="Exists('$(BDS)\Bin\Borland.Cpp.Targets')" />
+</Project>
