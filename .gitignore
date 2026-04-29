@@ -23,3 +23,11 @@ tests/generated/runtime/manual-runtime-report.json
 tests/generated/runtime/manual-results.json
 tests/**/__pycache__/
 tests/**/*.pyc
+tests/*.exe
+tests/**/*.exe
+
+# Anywhere
+**/__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
