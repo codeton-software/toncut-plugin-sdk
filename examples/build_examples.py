@@ -238,6 +238,30 @@ def discover_rsvars_path() -> str | None:
     return None
 
 
+@lru_cache(maxsize=1)
+def discover_cppbuilder_rsvars_path() -> str | None:
+    bds_root = os.environ.get("BDS")
+    if bds_root:
+        bin_dir = Path(bds_root) / "bin"
+        rsvars_candidate = bin_dir / "rsvars.bat"
+        compiler_candidate = bin_dir / "bcc32.exe"
+        if rsvars_candidate.exists() and compiler_candidate.exists():
+            return str(rsvars_candidate)
+
+    install_roots = [
+        Path(r"C:\Program Files (x86)\Embarcadero"),
+        Path(r"C:\Program Files\Embarcadero"),
+    ]
+    for root in install_roots:
+        if not root.exists():
+            continue
+        candidates = sorted(root.glob(r"Studio\*\bin\rsvars.bat"), reverse=True)
+        for candidate in candidates:
+            if candidate.with_name("bcc32.exe").exists():
+                return str(candidate)
+    return None
+
+
 def resolve_tool_path(executable: str) -> str | None:
     direct_path = shutil.which(executable)
     if direct_path:
@@ -262,11 +286,18 @@ def is_rad_studio_msbuild_command(command: str) -> bool:
     return Path(project_path).suffix.lower() in {".dproj", ".groupproj", ".cbproj"}
 
 
+def is_cppbuilder_msbuild_command(command: str) -> bool:
+    project_path = msbuild_project_path(command)
+    if not project_path:
+        return False
+    return Path(project_path).suffix.lower() in {".groupproj", ".cbproj"}
+
+
 def ensure_build_target(command: str) -> str:
     lowered = command.lower()
     if " /t:" in lowered or " /target" in lowered:
         return command
-    return f"{command} /t:Build"
+    return f"{command} /t:Rebuild"
 
 
 def resolve_command(command: str) -> str:
@@ -282,13 +313,17 @@ def resolve_command(command: str) -> str:
 
 
 def prepare_command(command: str) -> str:
+    build_command = ensure_build_target(command) if msbuild_project_path(command) else command
     if is_rad_studio_msbuild_command(command):
-        rsvars_path = discover_rsvars_path()
-        rad_command = ensure_build_target(command)
+        rsvars_path = (
+            discover_cppbuilder_rsvars_path()
+            if is_cppbuilder_msbuild_command(command)
+            else discover_rsvars_path()
+        )
         if rsvars_path:
-            return f'call "{rsvars_path}" >nul && {rad_command}'
-        return rad_command
-    return resolve_command(command)
+            return f'call "{rsvars_path}" >nul && {build_command}'
+        return build_command
+    return resolve_command(build_command)
 
 
 def run_command(command: str) -> None:
@@ -309,6 +344,13 @@ def missing_command_tools(commands: list[dict[str, str]]) -> list[str]:
             if discover_rsvars_path() is None and "rad-studio-rsvars" not in seen:
                 seen.add("rad-studio-rsvars")
                 missing.append("rsvars.bat")
+            if (
+                is_cppbuilder_msbuild_command(item["command"])
+                and discover_cppbuilder_rsvars_path() is None
+                and "cppbuilder-compiler" not in seen
+            ):
+                seen.add("cppbuilder-compiler")
+                missing.append("bcc32.exe")
             continue
         executable = command_executable(item["command"])
         normalized = executable.lower()

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-25T09:58:20.947Z",
+  "generatedAt": "2026-09-01T21:36:35.356Z",
   "fixtures": {
     "sampleCsv": "../examples/shared/csv/example.csv",
     "manualOutputDir": "generated/runtime/manual-output",
@@ -13,6 +13,13 @@
       "lane": "delphi",
       "label": "Delphi ContractProbe Debug plugin",
       "path": "generated/probes/delphi/Win32/Debug/ContractProbe.plg"
+    },
+    {
+      "id": "probe-cppbuilder-debug",
+      "category": "probe",
+      "lane": "cppbuilder",
+      "label": "C++Builder ContractProbe Debug plugin",
+      "path": "generated/probes/cppbuilder/bin/Win32/Debug/ContractProbe.plg"
     },
     {
       "id": "probe-msvc-debug",
@@ -50,6 +57,13 @@
       "path": "../examples/delphi/CsvImportExport/Win32/Debug/CsvImportExportDelphi.plg"
     },
     {
+      "id": "starter-cppbuilder-debug",
+      "category": "starter",
+      "lane": "cppbuilder",
+      "label": "C++Builder CsvImportExport Debug plugin",
+      "path": "../examples/cppbuilder/CsvImportExport/bin/Win32/Debug/CsvImportExportCppBuilder.plg"
+    },
+    {
       "id": "starter-msvc-debug",
       "category": "starter",
       "lane": "msvc",
@@ -83,6 +97,11 @@
       "command": "msbuild generated\\harness\\delphi\\ContractHostHarness.dproj /p:Config=Debug /p:Platform=Win32"
     },
     {
+      "id": "build-probe-cppbuilder",
+      "label": "Build C++Builder ContractProbe",
+      "command": "msbuild generated\\probes\\cppbuilder\\ContractProbe.groupproj /p:Config=Debug /p:Platform=Win32"
+    },
+    {
       "id": "build-probe-msvc",
       "label": "Build MSVC ContractProbe",
       "command": "msbuild generated\\probes\\msvc\\ContractProbe.sln /p:Configuration=Debug /p:Platform=Win32"
@@ -96,6 +115,11 @@
       "id": "build-starter-delphi",
       "label": "Build Delphi starter example",
       "command": "msbuild ..\\examples\\delphi\\CsvImportExport\\CsvImportExport.dproj /p:Config=Debug /p:Platform=Win32"
+    },
+    {
+      "id": "build-starter-cppbuilder",
+      "label": "Build C++Builder starter example",
+      "command": "msbuild ..\\examples\\cppbuilder\\CsvImportExport\\CsvImportExport.groupproj /p:Config=Debug /p:Platform=Win32"
     },
     {
       "id": "build-starter-msvc",
@@ -116,5 +140,6 @@
     "artifactStatus": "generated/runtime/artifact-status.json",
     "manualRuntimeReport": "generated/runtime/manual-runtime-report.json",
     "manualLogsDir": "generated/runtime/logs"
-  }
+  },
+  "generationFingerprint": "99b3ee79df8fa1e7626d1a9812821ee948a4e4d91d586de3fcdd80c3b1ab998c"
 }

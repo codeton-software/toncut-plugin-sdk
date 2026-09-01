@@ -26,13 +26,24 @@ extern "C" __declspec(dllexport) void __stdcall TcpInitializeV2(
   }
   *aResult = nullptr;
 
-  auto* plugin = new CsvImportExportPluginBase(kPluginName, kPluginTitle);
-  TTcpResult initResult = cprFailed;
-  BstrValue regRoot(aRegRoot == nullptr ? L"" : std::wstring(aRegRoot));
-  plugin->Initialize(regRoot.get(), aLanguageId, aTonCut, &initResult);
-  if (initResult != cprOK) {
-    plugin->Release();
-    return;
+  CsvImportExportPluginBase* plugin = nullptr;
+  try {
+    plugin = new CsvImportExportPluginBase(kPluginName, kPluginTitle);
+    BstrValue regRoot(aRegRoot == nullptr ? L"" : std::wstring(aRegRoot));
+    if (!regRoot) {
+      plugin->Release();
+      return;
+    }
+    TTcpResult initResult = cprFailed;
+    const HRESULT hr = plugin->Initialize(regRoot.get(), aLanguageId, aTonCut, &initResult);
+    if (FAILED(hr) || initResult != cprOK) {
+      plugin->Release();
+      return;
+    }
+    *aResult = plugin;
+  } catch (...) {
+    if (plugin != nullptr) {
+      plugin->Release();
+    }
   }
-  *aResult = plugin;
 }

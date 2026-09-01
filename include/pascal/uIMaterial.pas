@@ -10,11 +10,12 @@ uses
   uIStandardSheets,
   uINotifyEvent,
   uIIdChangeEvent,
-  uIStandardSheetChangeEvent;
+  uIStandardSheetChangeEvent,
+  uITcAlgorithmData;
 
 type
   IMaterial = interface
-    ['{E46E486D-1A55-4C92-A743-064A692AC230}']
+    ['{5C81D3A6-7E42-4B19-8F63-2D9B5A14C708}']
 
     function GetId(): Int64; safecall;
     procedure SetId(aId: Int64); safecall;
@@ -85,6 +86,12 @@ type
     function GetMinLongerRecycleSize(): Cardinal; safecall;
     procedure SetMinLongerRecycleSize(aSize: Cardinal); safecall;
 
+    function GetMaxShorterRecycleSize(): Cardinal; safecall;
+    procedure SetMaxShorterRecycleSize(aSize: Cardinal); safecall;
+
+    function GetMaxLongerRecycleSize(): Cardinal; safecall;
+    procedure SetMaxLongerRecycleSize(aSize: Cardinal); safecall;
+
     function GetPrefShorterRecycleSize(): Cardinal; safecall;
     procedure SetPrefShorterRecycleSize(aSize: Cardinal); safecall;
 
@@ -93,11 +100,14 @@ type
 
     function GetEffectiveMinShorterRecycleSize(): Cardinal; safecall;
     function GetEffectiveMinLongerRecycleSize(): Cardinal; safecall;
+    function GetEffectiveMaxShorterRecycleSize(): Cardinal; safecall;
+    function GetEffectiveMaxLongerRecycleSize(): Cardinal; safecall;
     function GetEffectivePrefShorterRecycleSize(): Cardinal; safecall;
     function GetEffectivePrefLongerRecycleSize(): Cardinal; safecall;
 
     function GetKerf(): Cardinal; safecall;
     procedure SetKerf(aKerf: Cardinal); safecall;
+    function GetMinEdgeDistance(): IRectangle; safecall;
 
     function GetAllowEdgeCuts(): Boolean; safecall;
     procedure SetAllowEdgeCuts(aAllow: Boolean); safecall;
@@ -155,6 +165,7 @@ type
 
     function GetCustomData(): WideString; safecall;
     procedure SetCustomData(const aData: WideString); safecall;
+    function GetAlgorithmData(): ITcAlgorithmData; safecall;
 
     function GetStandardSheets(): IStandardSheets; safecall;
 
@@ -196,15 +207,20 @@ type
     property ReuseWaste: Boolean read GetReuseWaste write SetReuseWaste;
     property MinShorterRecycleSize: Cardinal read GetMinShorterRecycleSize write SetMinShorterRecycleSize;
     property MinLongerRecycleSize: Cardinal read GetMinLongerRecycleSize write SetMinLongerRecycleSize;
+    property MaxShorterRecycleSize: Cardinal read GetMaxShorterRecycleSize write SetMaxShorterRecycleSize;
+    property MaxLongerRecycleSize: Cardinal read GetMaxLongerRecycleSize write SetMaxLongerRecycleSize;
     property PrefShorterRecycleSize: Cardinal read GetPrefShorterRecycleSize write SetPrefShorterRecycleSize;
     property PrefLongerRecycleSize: Cardinal read GetPrefLongerRecycleSize write SetPrefLongerRecycleSize;
 
     property EffectiveMinShorterRecycleSize: Cardinal read GetEffectiveMinShorterRecycleSize;
     property EffectiveMinLongerRecycleSize: Cardinal read GetEffectiveMinLongerRecycleSize;
+    property EffectiveMaxShorterRecycleSize: Cardinal read GetEffectiveMaxShorterRecycleSize;
+    property EffectiveMaxLongerRecycleSize: Cardinal read GetEffectiveMaxLongerRecycleSize;
     property EffectivePrefShorterRecycleSize: Cardinal read GetEffectivePrefShorterRecycleSize;
     property EffectivePrefLongerRecycleSize: Cardinal read GetEffectivePrefLongerRecycleSize;
 
     property Kerf: Cardinal read GetKerf write SetKerf;
+    property MinEdgeDistance: IRectangle read GetMinEdgeDistance;
     property AllowEdgeCuts: Boolean read GetAllowEdgeCuts write SetAllowEdgeCuts;
     property RecycleEdgingOn: Boolean read GetRecycleEdgingOn write SetRecycleEdgingOn;
     property RecycleEdging: Cardinal read GetRecycleEdging write SetRecycleEdging;
@@ -233,6 +249,8 @@ type
     property CutShiftVertLimit: Integer read GetCutShiftVertLimit write SetCutShiftVertLimit;
 
     property CustomData: WideString read GetCustomData write SetCustomData;
+    // Mutable, typed access to the unit-aware algorithm data owned by this material.
+    property AlgorithmData: ITcAlgorithmData read GetAlgorithmData;
 
     property StandardSheets: IStandardSheets read GetStandardSheets;
 

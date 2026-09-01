@@ -24,6 +24,9 @@ type
     function GetNeedShift(): Boolean; safecall;
 
     function CalcLength(): Double; safecall;
+    // Appended after the published method prefix to preserve the existing IID's
+    // vtable slots.
+    function GetShiftDistance(): Integer; safecall;
 
     property Kind: TCutKind read GetKind;
 
@@ -38,6 +41,7 @@ type
     property TarYp: Integer read GetTarYp;
 
     property NeedShift: Boolean read GetNeedShift;
+    property ShiftDistance: Integer read GetShiftDistance;
   end;
 
 implementation

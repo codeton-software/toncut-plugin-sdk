@@ -17,7 +17,6 @@ void TouchISolutionCut(toncut::ISolutionCut* aValue);
 void TouchISolutionCuts(toncut::ISolutionCuts* aValue);
 void TouchISolutionSheet(toncut::ISolutionSheet* aValue);
 void TouchITcEnumExtensionsCallback(toncut::ITcEnumExtensionsCallback* aValue);
-void TouchITcPlotterInfo(toncut::ITcPlotterInfo* aValue);
 void TouchITcPlugin(toncut::ITcPlugin* aValue);
 void TouchITonCut(toncut::ITonCut* aValue);
 void TouchAllSupportedInterfaces(toncut::ITonCut* aTonCut);

@@ -1,14 +1,14 @@
 # Manual SDK Test Checklist
 
-Skipped lanes: C++Builder.
-
 ## Build
 
 - Build Delphi ContractProbe: `msbuild generated\probes\delphi\ContractProbe.dproj /p:Config=Debug /p:Platform=Win32`
 - Build Delphi ContractHostHarness: `msbuild generated\harness\delphi\ContractHostHarness.dproj /p:Config=Debug /p:Platform=Win32`
+- Build C++Builder ContractProbe: `msbuild generated\probes\cppbuilder\ContractProbe.groupproj /p:Config=Debug /p:Platform=Win32`
 - Build MSVC ContractProbe: `msbuild generated\probes\msvc\ContractProbe.sln /p:Configuration=Debug /p:Platform=Win32`
 - Build C# ContractProbe solution: `msbuild generated\probes\csharp\ContractProbe.sln /restore /p:Configuration=Debug /p:Platform=Win32`
 - Build Delphi starter example: `msbuild ..\examples\delphi\CsvImportExport\CsvImportExport.dproj /p:Config=Debug /p:Platform=Win32`
+- Build C++Builder starter example: `msbuild ..\examples\cppbuilder\CsvImportExport\CsvImportExport.groupproj /p:Config=Debug /p:Platform=Win32`
 - Build MSVC starter example: `msbuild ..\examples\msvc\CsvImportExport\CsvImportExport.sln /p:Configuration=Debug /p:Platform=Win32`
 - Build C# starter example: `msbuild ..\examples\csharp\CsvImportExport\CsvImportExport.sln /restore /p:Configuration=Debug /p:Platform=Win32`
 

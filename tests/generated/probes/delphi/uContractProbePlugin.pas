@@ -76,7 +76,7 @@ procedure TContractProbePlugin.SetUiScale(aValue: Single); begin FUiScale := aVa
 function TContractProbePlugin.GetTonCut(): ITonCut; begin Result := FTonCut; end;
 function TContractProbePlugin.GetFeatures(): TTcpFeatures; begin Result := [feImport, feExport, feSaveResultToFile]; end;
 function TContractProbePlugin.GetPlotterInfo(): ITcPlotterInfo; begin Result := nil; end;
-function TContractProbePlugin.Initialize(const aRegRoot: WideString; aLanguageId: Integer; aTonCut: ITonCut): TTcpResult; begin FRegRoot := aRegRoot; FLanguageId := aLanguageId; FTonCut := aTonCut; TouchAllSupportedInterfaces(aTonCut); Result := cprOK; end;
+function TContractProbePlugin.Initialize(const aRegRoot: WideString; aLanguageId: Integer; aTonCut: ITonCut): TTcpResult; begin FRegRoot := aRegRoot; FLanguageId := aLanguageId; FTonCut := aTonCut; Result := cprOK; end;
 function TContractProbePlugin.Finalize(): TTcpResult; begin Result := cprOK; end;
 function TContractProbePlugin.Configure(aWindow: THandle): TTcpResult; begin Result := cprOK; end;
 function TContractProbePlugin.About(aWindow: THandle): TTcpResult; begin Result := cprOK; end;

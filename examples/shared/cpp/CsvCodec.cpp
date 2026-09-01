@@ -1,11 +1,41 @@
 #include "CsvCodec.hpp"
 
 #include <algorithm>
+#include <cerrno>
+#include <climits>
+#include <cstdlib>
 #include <cwctype>
+#include <limits>
 
 namespace toncut {
 
 namespace {
+
+class ScopedHandle final {
+public:
+  explicit ScopedHandle(HANDLE value) noexcept : value_(value) {
+  }
+
+  ~ScopedHandle() {
+    if (value_ != INVALID_HANDLE_VALUE) {
+      ::CloseHandle(value_);
+    }
+  }
+
+  ScopedHandle(const ScopedHandle&) = delete;
+  ScopedHandle& operator=(const ScopedHandle&) = delete;
+
+  HANDLE Get() const noexcept {
+    return value_;
+  }
+
+  bool IsValid() const noexcept {
+    return value_ != INVALID_HANDLE_VALUE;
+  }
+
+private:
+  HANDLE value_;
+};
 
 std::wstring Trim(const std::wstring& value) {
   std::size_t start = 0;
@@ -22,14 +52,22 @@ std::wstring Trim(const std::wstring& value) {
 }
 
 bool TryParseUnsigned(const std::wstring& value, unsigned& result) {
+  result = 0;
   const std::wstring trimmed = Trim(value);
-  if (trimmed.empty()) {
+  if (trimmed.empty() || trimmed.front() == L'-') {
     return false;
   }
 
+  errno = 0;
   wchar_t* end = nullptr;
   const unsigned long parsed = std::wcstoul(trimmed.c_str(), &end, 10);
-  if (end == nullptr || *end != L'\0') {
+  if (
+    end == trimmed.c_str() ||
+    end == nullptr ||
+    *end != L'\0' ||
+    errno == ERANGE ||
+    parsed > UINT_MAX
+  ) {
     return false;
   }
 
@@ -37,52 +75,121 @@ bool TryParseUnsigned(const std::wstring& value, unsigned& result) {
   return true;
 }
 
-std::wstring FromUtf8(const std::string& bytes) {
-  if (bytes.empty()) {
-    return L"";
+bool ReadAll(HANDLE file, void* data, std::size_t size) {
+  auto* next = static_cast<unsigned char*>(data);
+  while (size > 0) {
+    const DWORD requested = static_cast<DWORD>(
+      (std::min)(size, static_cast<std::size_t>((std::numeric_limits<DWORD>::max)()))
+    );
+    DWORD read = 0;
+    if (::ReadFile(file, next, requested, &read, nullptr) == 0 || read == 0 || read > requested) {
+      return false;
+    }
+    next += read;
+    size -= read;
   }
-
-  const int size = ::MultiByteToWideChar(CP_UTF8, 0, bytes.data(), static_cast<int>(bytes.size()), nullptr, 0);
-  std::wstring result(size, L'\0');
-  ::MultiByteToWideChar(CP_UTF8, 0, bytes.data(), static_cast<int>(bytes.size()), result.data(), size);
-  return result;
+  return true;
 }
 
-std::string ToUtf8(const std::wstring& value) {
-  if (value.empty()) {
-    return {};
+bool WriteAll(HANDLE file, const void* data, std::size_t size) {
+  const auto* next = static_cast<const unsigned char*>(data);
+  while (size > 0) {
+    const DWORD requested = static_cast<DWORD>(
+      (std::min)(size, static_cast<std::size_t>((std::numeric_limits<DWORD>::max)()))
+    );
+    DWORD written = 0;
+    if (::WriteFile(file, next, requested, &written, nullptr) == 0 || written == 0 || written > requested) {
+      return false;
+    }
+    next += written;
+    size -= written;
+  }
+  return true;
+}
+
+bool FromUtf8(const std::string& bytes, std::wstring& result) {
+  result.clear();
+  if (bytes.empty()) {
+    return true;
+  }
+  if (bytes.size() > static_cast<std::size_t>(INT_MAX)) {
+    return false;
   }
 
-  const int size = ::WideCharToMultiByte(CP_UTF8, 0, value.data(), static_cast<int>(value.size()), nullptr, 0, nullptr, nullptr);
-  std::string result(size, '\0');
-  ::WideCharToMultiByte(CP_UTF8, 0, value.data(), static_cast<int>(value.size()), result.data(), size, nullptr, nullptr);
-  return result;
+  const int inputSize = static_cast<int>(bytes.size());
+  const int size = ::MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, bytes.data(), inputSize, nullptr, 0);
+  if (size <= 0) {
+    return false;
+  }
+  result.resize(static_cast<std::size_t>(size));
+  return ::MultiByteToWideChar(
+    CP_UTF8,
+    MB_ERR_INVALID_CHARS,
+    bytes.data(),
+    inputSize,
+    result.data(),
+    size
+  ) == size;
+}
+
+bool ToUtf8(const std::wstring& value, std::string& result) {
+  result.clear();
+  if (value.empty()) {
+    return true;
+  }
+  if (value.size() > static_cast<std::size_t>(INT_MAX)) {
+    return false;
+  }
+
+  const int inputSize = static_cast<int>(value.size());
+  const int size = ::WideCharToMultiByte(CP_UTF8, 0, value.data(), inputSize, nullptr, 0, nullptr, nullptr);
+  if (size <= 0) {
+    return false;
+  }
+  result.resize(static_cast<std::size_t>(size));
+  return ::WideCharToMultiByte(
+    CP_UTF8,
+    0,
+    value.data(),
+    inputSize,
+    result.data(),
+    size,
+    nullptr,
+    nullptr
+  ) == size;
 }
 
 bool ReadFileBytes(const std::wstring& path, std::string& bytes, std::wstring& error) {
-  HANDLE file = ::CreateFileW(path.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-  if (file == INVALID_HANDLE_VALUE) {
+  const ScopedHandle file(::CreateFileW(
+    path.c_str(),
+    GENERIC_READ,
+    FILE_SHARE_READ,
+    nullptr,
+    OPEN_EXISTING,
+    FILE_ATTRIBUTE_NORMAL,
+    nullptr
+  ));
+  if (!file.IsValid()) {
     error = L"Failed to open CSV file.";
     return false;
   }
 
   LARGE_INTEGER size {};
-  if (::GetFileSizeEx(file, &size) == 0) {
+  if (::GetFileSizeEx(file.Get(), &size) == 0) {
     error = L"Failed to read CSV file size.";
-    ::CloseHandle(file);
+    return false;
+  }
+  if (size.QuadPart < 0 || size.QuadPart > INT_MAX) {
+    error = L"CSV file is too large to decode safely.";
     return false;
   }
 
   bytes.resize(static_cast<std::size_t>(size.QuadPart));
-  DWORD read = 0;
-  const BOOL ok = bytes.empty() ? TRUE : ::ReadFile(file, bytes.data(), static_cast<DWORD>(bytes.size()), &read, nullptr);
-  ::CloseHandle(file);
-  if (ok == 0) {
+  const bool ok = ReadAll(file.Get(), bytes.data(), bytes.size());
+  if (!ok) {
     error = L"Failed to read CSV file.";
     return false;
   }
-
-  bytes.resize(read);
   return true;
 }
 
@@ -141,7 +248,7 @@ std::wstring CellByName(
   const std::wstring& name
 ) {
   for (std::size_t i = 0; i < header.size(); ++i) {
-    if (_wcsicmp(header[i].c_str(), name.c_str()) == 0) {
+    if (_wcsicmp(Trim(header[i]).c_str(), name.c_str()) == 0) {
       if (i < row.size()) {
         return Trim(row[i]);
       }
@@ -171,7 +278,11 @@ bool ParseUtf8CsvFile(const std::wstring& path, std::vector<std::vector<std::wst
     bytes.erase(0, 3);
   }
 
-  const std::wstring text = FromUtf8(bytes);
+  std::wstring text;
+  if (!FromUtf8(bytes, text)) {
+    error = L"CSV file is too large or contains invalid UTF-8.";
+    return false;
+  }
   std::vector<std::wstring> row;
   std::wstring field;
   bool inQuotes = false;
@@ -347,7 +458,11 @@ std::wstring EncodeCsvRows(const std::vector<CsvRowRecord>& records) {
 }
 
 bool WriteUtf8CsvFile(const std::wstring& path, const std::wstring& content, std::wstring& error) {
-  const std::string utf8 = ToUtf8(content);
+  std::string utf8;
+  if (!ToUtf8(content, utf8)) {
+    error = L"CSV text is too large or cannot be encoded as UTF-8.";
+    return false;
+  }
   HANDLE file = ::CreateFileW(path.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
   if (file == INVALID_HANDLE_VALUE) {
     error = L"Failed to open output CSV file.";
@@ -355,14 +470,13 @@ bool WriteUtf8CsvFile(const std::wstring& path, const std::wstring& content, std
   }
 
   const unsigned char bom[] = {0xEF, 0xBB, 0xBF};
-  DWORD written = 0;
-  BOOL ok = ::WriteFile(file, bom, sizeof(bom), &written, nullptr);
-  if (ok != 0 && !utf8.empty()) {
-    ok = ::WriteFile(file, utf8.data(), static_cast<DWORD>(utf8.size()), &written, nullptr);
+  bool ok = WriteAll(file, bom, sizeof(bom)) && WriteAll(file, utf8.data(), utf8.size());
+  if (ok && ::FlushFileBuffers(file) == 0) {
+    ok = false;
   }
-  ::CloseHandle(file);
+  const BOOL closed = ::CloseHandle(file);
 
-  if (ok == 0) {
+  if (!ok || closed == 0) {
     error = L"Failed to write output CSV file.";
     return false;
   }

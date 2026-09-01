@@ -11,7 +11,7 @@ uses
 
 type
   ISolutionSheet = interface
-    ['{15810B79-2824-4D23-8EF5-19D6BA6A2606}']
+    ['{CFC00E48-9137-4606-8384-3DAFE174A058}']
 
     function GetSheet(): ISheet; safecall;
     function GetSolutionFormats(): ISolutionFormats; safecall;
@@ -19,6 +19,9 @@ type
     function GetSolutionCuts(): ISolutionCuts; safecall;
 
     function GetQuantity(): Integer; safecall;
+    function GetTechnologicalWasteField(): TField; safecall;
+    function GetEdgingWasteField(): TField; safecall;
+    function GetKerfWasteField(): TField; safecall;
 
     function GetIndex(): Integer; safecall;
     function GetRotation(): Integer; safecall;
@@ -50,6 +53,9 @@ type
     property SolutionCuts: ISolutionCuts read GetSolutionCuts;
 
     property Quantity: Integer read GetQuantity;
+    property TechnologicalWasteField: TField read GetTechnologicalWasteField;
+    property EdgingWasteField: TField read GetEdgingWasteField;
+    property KerfWasteField: TField read GetKerfWasteField;
 
     property Index: Integer read GetIndex;
     property Rotation: Integer read GetRotation;

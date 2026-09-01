@@ -7,8 +7,23 @@ extern "C" __declspec(dllexport) void __stdcall TcpInitializeV2(
   toncut::ITonCut* aTonCut
 ) {
   if (aResult == nullptr) return;
-  auto* plugin = new contract_probe::ContractProbePlugin();
-  toncut::TTcpResult initResult = toncut::cprOK;
-  plugin->Initialize(::SysAllocString(aRegRoot == nullptr ? L"" : aRegRoot), aLanguageId, aTonCut, &initResult);
-  *aResult = plugin;
+  *aResult = nullptr;
+  contract_probe::ContractProbePlugin* plugin = nullptr;
+  try {
+    plugin = new contract_probe::ContractProbePlugin();
+    toncut::BstrValue regRoot(aRegRoot == nullptr ? L"" : std::wstring(aRegRoot));
+    if (!regRoot) {
+      plugin->Release();
+      return;
+    }
+    toncut::TTcpResult initResult = toncut::cprFailed;
+    const HRESULT hr = plugin->Initialize(regRoot.get(), aLanguageId, aTonCut, &initResult);
+    if (FAILED(hr) || initResult != toncut::cprOK) {
+      plugin->Release();
+      return;
+    }
+    *aResult = plugin;
+  } catch (...) {
+    if (plugin != nullptr) plugin->Release();
+  }
 }

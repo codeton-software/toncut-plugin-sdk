@@ -1,4 +1,69 @@
 {
+  "cppProjection": {
+    "opaqueInterfaces": [
+      "IBand",
+      "IBands",
+      "IDevice",
+      "IDevices",
+      "IMaterialChangeEvent",
+      "INotifyEvent",
+      "IProjectChangeEvent",
+      "IResults",
+      "IShape",
+      "ISheetDefect",
+      "ISolutionFormats",
+      "ISolutionWastes",
+      "IStandardSheet",
+      "ITemplates",
+      "ITcPlotterInfo"
+    ],
+    "ownershipOnlyInterfaces": [
+      "IBand",
+      "IBands",
+      "IDevice",
+      "IDevices",
+      "IMaterialChangeEvent",
+      "INotifyEvent",
+      "IProjectChangeEvent",
+      "IResults",
+      "IShape",
+      "ISheetDefect",
+      "ISolutionFormats",
+      "ISolutionWastes",
+      "IStandardSheet",
+      "ITemplates",
+      "ITcPlotterInfo"
+    ],
+    "methodAliases": {
+      "IFormats": {
+        "8": { "pascal": "IndexOf", "cpp": "IndexOfByObject" },
+        "9": { "pascal": "IndexOf", "cpp": "IndexOfById" },
+        "10": { "pascal": "IndexOf", "cpp": "IndexOfByList" },
+        "11": { "pascal": "IndexOf", "cpp": "IndexOfByOther" }
+      },
+      "IMaterials": {
+        "6": { "pascal": "IndexOf", "cpp": "IndexOfByObject" },
+        "7": { "pascal": "IndexOf", "cpp": "IndexOfById" },
+        "12": { "pascal": "CheckUniqueName", "cpp": "CheckUniqueNameByMaterial" }
+      },
+      "IProjects": {
+        "5": { "pascal": "IndexOf", "cpp": "IndexOfByObject" },
+        "6": { "pascal": "IndexOf", "cpp": "IndexOfById" },
+        "11": { "pascal": "CheckUniqueName", "cpp": "CheckUniqueNameByProject" }
+      },
+      "ISheets": {
+        "5": { "pascal": "IndexOf", "cpp": "IndexOfByObject" },
+        "6": { "pascal": "IndexOf", "cpp": "IndexOfById" },
+        "7": { "pascal": "IndexOf", "cpp": "IndexOfByOther" }
+      },
+      "ITonCut": {
+        "20": { "pascal": "FormatLength", "cpp": "FormatLengthFromInt" },
+        "21": { "pascal": "FormatLength", "cpp": "FormatLengthFromExtended" },
+        "24": { "pascal": "HumanReadableField", "cpp": "HumanReadableFieldFromInt64" },
+        "25": { "pascal": "HumanReadableField", "cpp": "HumanReadableFieldFromExtended" }
+      }
+    }
+  },
   "lanes": {
     "delphi": {
       "displayName": "Delphi",

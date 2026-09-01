@@ -7,9 +7,15 @@ Run these commands from the `SDK/tests` directory. If you start in `SDK`, use `p
 ## Commands
 
 - `python tools/run_sdk_tests.py contract`
-  Regenerates the contract manifest, language support matrix, probe sources, IDE wrapper files, runtime manifest, and summary report.
+  Validates that every translated C++ interface is a documented opaque view or
+  an exact Pascal vtable prefix, then regenerates the contract manifest,
+  language support matrix, probe sources, IDE wrapper files, runtime manifest,
+  and summary report. Unsafe skipped or reordered methods fail the command.
+- `python -m unittest tools.test_sdk_test_lib`
+  Runs focused contract-generator regressions, including the prior unsafe
+  `ISolutionSheet` non-prefix projection.
 - `python tools/run_sdk_tests.py build`
-  Prints the manual build commands for probes, harness, and starter examples. Add `--skip-cppbuilder` if C++Builder is not installed. Add `--dry-run` to force print-only output even if `TONCUT_SDK_TESTS_DRY_RUN=0` is set. Use `--execute` or set `TONCUT_SDK_TESTS_DRY_RUN=0` to run the commands. The runner auto-discovers Visual Studio `MSBuild.exe` with `vswhere.exe` when it is installed but not on `PATH`, and it auto-loads RAD Studio `rsvars.bat` for Delphi/C++Builder projects.
+  Prints fresh-rebuild commands for probes, harness, and starter examples. Add `--skip-cppbuilder` if C++Builder is not installed. Add `--dry-run` to force print-only output even if `TONCUT_SDK_TESTS_DRY_RUN=0` is set. Use `--execute` or set `TONCUT_SDK_TESTS_DRY_RUN=0` to run the commands. The runner auto-discovers Visual Studio `MSBuild.exe` with `vswhere.exe` when it is installed but not already on `PATH`, and it auto-loads RAD Studio `rsvars.bat` for Delphi/C++Builder projects.
 - `python tools/run_sdk_tests.py runtime`
   Discovers built artifacts, writes `generated/runtime/artifact-status.json`, and prints the next manual runtime commands. Add `--skip-cppbuilder` to stop treating C++Builder outputs as required.
 - `python tools/run_sdk_tests.py report`
@@ -42,3 +48,17 @@ Run these commands from the `SDK/tests` directory. If you start in `SDK`, use `p
 - `generated/runtime/manual-runtime-report.json` after running the manual Python runner
 - `generated/runtime/logs/` after running the manual Python runner
 - `generated/runtime/manual-results.json` after copying the template and recording verdicts
+
+`generated/language-support.json` is the machine-readable support boundary.
+For every non-Delphi lane, whole interfaces absent from the C++ header appear
+in `unsupportedInterfaces`. Projected-interface entries include
+`unsupportedMethods` (Pascal slot, name, and signature),
+`supportedPropertyAccessors`, and accessor-aware `unsupportedProperties`.
+Ownership-only `IUnknown` pointer types are kept out of callable support counts
+and recorded separately in `ownershipOnlyInterfaces`/`opaquePointerTypes` while
+also remaining in `unsupportedInterfaces`.
+For C#, those native entries live under `nativeShimSupportedInterfaces`; the
+separate `directManagedSupportedInterfaces` list is empty because the managed
+core does not directly project the Pascal COM interfaces. Its native opaque
+ownership types use `nativeShimOwnershipOnlyInterfaces` and
+`nativeShimOpaquePointerTypes`.

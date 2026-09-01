@@ -40,7 +40,7 @@ class CsvImportExportPluginBase : public ITcPlugin {
   HRESULT STDMETHODCALLTYPE RestoreConfig(BSTR aBackup, TConfigurationParts aScope, TTcpResult* result) override;
   HRESULT STDMETHODCALLTYPE EnumExtensions(TTcpExtensionType aType, ITcEnumExtensionsCallback* aEnumCb, TTcpResult* result) override;
   HRESULT STDMETHODCALLTYPE IsMyFile(BSTR aFileName, TTcpResult* result) override;
-  HRESULT STDMETHODCALLTYPE LoadFile(HWND aWindow, BSTR aFileName, IUnknown* aDevices, IMaterials* aMaterials, IUnknown* aBands, IProjects* aProjects, IFormats* aFormats, ISheets* aSheets, TTcpResult* result) override;
+  HRESULT STDMETHODCALLTYPE LoadFile(HWND aWindow, BSTR aFileName, IDevices* aDevices, IMaterials* aMaterials, IBands* aBands, IProjects* aProjects, IFormats* aFormats, ISheets* aSheets, TTcpResult* result) override;
   HRESULT STDMETHODCALLTYPE SaveFile(HWND aWindow, BSTR aFileName, IFormats* aFormats, ISheets* aSheets, TTcpResult* result) override;
   HRESULT STDMETHODCALLTYPE SaveResult(HWND aWindow, BSTR aFileName, ISolutionSheet* aSolutionSheet, TTcpResult* result) override;
   HRESULT STDMETHODCALLTYPE BatchSaveResult(HWND aWindow, TTcpSaveTarget aSaveTarget, BSTR aPath, ISolution* aSolution, TTcpResult* result) override;

@@ -131,14 +131,15 @@ var
 
 begin
   rows := TList<TCsvRow>.Create;
-  currentRow := TList<string>.Create;
   try
-    currentField := '';
-    inQuotes := False;
-    i := 1;
-    while i <= Length(AText) do
-      begin
-        case AText[i] of
+    currentRow := TList<string>.Create;
+    try
+      currentField := '';
+      inQuotes := False;
+      i := 1;
+      while i <= Length(AText) do
+        begin
+          case AText[i] of
           '"':
             begin
               if inQuotes and (i < Length(AText)) and (AText[i + 1] = '"') then
@@ -178,24 +179,26 @@ begin
                   FlushRow();
                 end;
             end;
-        else
-          currentField := currentField + AText[i];
+          else
+            currentField := currentField + AText[i];
+          end;
+          Inc(i);
         end;
-        Inc(i);
-      end;
 
-    if inQuotes then
-      raise Exception.Create('CSV parser error: unmatched quote.');
+      if inQuotes then
+        raise Exception.Create('CSV parser error: unmatched quote.');
 
-    if (currentField <> '') or (currentRow.Count > 0) then
-      begin
-        FlushField();
-        FlushRow();
-      end;
+      if (currentField <> '') or (currentRow.Count > 0) then
+        begin
+          FlushField();
+          FlushRow();
+        end;
 
-    Result := rows.ToArray();
+      Result := rows.ToArray();
+    finally
+      currentRow.Free;
+    end;
   finally
-    currentRow.Free;
     rows.Free;
   end;
 end;
@@ -221,7 +224,7 @@ var
   i: Integer;
 begin
   for i := 0 to Length(AHeader) - 1 do
-    if SameText(AHeader[i], AName) then
+    if SameText(Trim(AHeader[i]), AName) then
       begin
         if i < Length(ARow) then
           Exit(Trim(ARow[i]));

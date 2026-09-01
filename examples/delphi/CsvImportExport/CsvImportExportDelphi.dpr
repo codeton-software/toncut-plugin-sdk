@@ -6,6 +6,7 @@ uses
   System.SysUtils,
   Winapi.Windows,
   System.Classes,
+  uITcPluginCommon,
   uITonCut,
   uITcPlugin,
   uCsvImportExportPlugin in 'uCsvImportExportPlugin.pas',
@@ -18,9 +19,17 @@ function TcpInitializeV2(
   aLanguageId: Integer;
   aTonCut: ITonCut
 ): ITcPlugin; stdcall;
+var
+  Plugin: ITcPlugin;
 begin
-  Result := TCsvImportExportPlugin.Create;
-  Result.Initialize(aRegRoot, aLanguageId, aTonCut);
+  Result := nil;
+  try
+    Plugin := TCsvImportExportPlugin.Create;
+    if Plugin.Initialize(aRegRoot, aLanguageId, aTonCut) = cprOK then
+      Result := Plugin;
+  except
+    Result := nil;
+  end;
 end;
 
 exports

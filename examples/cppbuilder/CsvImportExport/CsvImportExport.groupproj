@@ -6,6 +6,9 @@
   <Target Name="Build">
     <MSBuild Projects="@(Projects)" Targets="Build" Properties="Config=$(Config);Platform=$(Platform)" />
   </Target>
+  <Target Name="Rebuild">
+    <MSBuild Projects="@(Projects)" Targets="Rebuild" Properties="Config=$(Config);Platform=$(Platform)" />
+  </Target>
   <Target Name="Make">
     <MSBuild Projects="@(Projects)" Targets="Make" Properties="Config=$(Config);Platform=$(Platform)" />
   </Target>

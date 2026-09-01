@@ -145,7 +145,10 @@ end;
 
 function ToCsvMillimeters(const AValue: Cardinal): Cardinal;
 begin
-  Result := (AValue + (cLengthMultiplier div 2)) div cLengthMultiplier;
+  Result := Cardinal(
+    (UInt64(AValue) + UInt64(cLengthMultiplier div 2)) div
+    UInt64(cLengthMultiplier)
+  );
 end;
 
 function TCsvImportExportPlugin.FindMaterialByTitle(
@@ -449,6 +452,7 @@ var
   quantity: Cardinal;
   projectCache: TDictionary<string, IProject>;
   materialCache: TDictionary<string, IMaterial>;
+  headerResult: TTcpResult;
 begin
   if FTonCut = nil then
     Exit(cprNotInitialized);
@@ -456,22 +460,27 @@ begin
   if (aProjects = nil) or (aMaterials = nil) or (aFormats = nil) or (aSheets = nil) then
     Exit(cprFailed);
 
-  if ValidateHeader(aFileName) <> cprOK then
-    Exit(cprNo);
+  headerResult := ValidateHeader(aFileName);
+  if headerResult <> cprOK then
+    Exit(headerResult);
 
   try
     text := TFile.ReadAllText(aFileName, TEncoding.UTF8);
     table := ParseCsvText(text);
+    if (Length(table) = 0) or not HasRequiredHeader(table[0]) then
+      Exit(cprNo);
     projectCache := TDictionary<string, IProject>.Create;
-    materialCache := TDictionary<string, IMaterial>.Create;
     try
+      materialCache := TDictionary<string, IMaterial>.Create;
       try
         aProjects.BeginUpdate();
-        aFormats.BeginUpdate();
-        aSheets.BeginUpdate();
         try
-          for i := 1 to Length(table) - 1 do
-            begin
+          aFormats.BeginUpdate();
+          try
+            aSheets.BeginUpdate();
+            try
+              for i := 1 to Length(table) - 1 do
+                begin
               row := table[i];
               if Length(row) = 0 then
                 Continue;
@@ -479,6 +488,8 @@ begin
               recordType := UpperCase(CellByName(table[0], row, 'RecordType'));
               if recordType = '' then
                 Continue;
+              if (recordType <> 'FORMAT') and (recordType <> 'SHEET') then
+                Exit(cprFailed);
 
               if not TryParseMaterialKind(CellByName(table[0], row, 'MaterialKind'), materialKind) then
                 Exit(cprFailed);
@@ -495,6 +506,8 @@ begin
                 quantity := 1;
               if quantity = 0 then
                 quantity := 1;
+              if (recordType = 'SHEET') and (quantity > Cardinal(MaxInt)) then
+                Exit(cprFailed);
               if not TryFromCsvMillimeters(materialWidth, materialWidth) then
                 Exit(cprFailed);
               if not TryFromCsvMillimeters(materialThickness, materialThickness) then
@@ -557,17 +570,21 @@ begin
                 end
               else
                 Exit(cprFailed);
+                end;
+            finally
+              aSheets.EndUpdate();
             end;
+          finally
+            aFormats.EndUpdate();
+          end;
         finally
-          aSheets.EndUpdate();
-          aFormats.EndUpdate();
           aProjects.EndUpdate();
         end;
       finally
-        projectCache.Free;
+        materialCache.Free;
       end;
     finally
-      materialCache.Free;
+      projectCache.Free;
     end;
 
     Result := cprOK;
@@ -670,17 +687,22 @@ var
 begin
   commands := TStringList.Create;
   try
-    if not ExportSolutionSheetAsPlt(aSolutionSheet, commands) then
-      Exit(cprFailed);
-
-    commands.SaveToFile(aFileName, TEncoding.ASCII);
-    if aSolutionSheet <> nil then
-      aSolutionSheet.IsSaved := True;
-    Result := cprOK;
-  except
-    Result := cprException;
+    try
+      if not ExportSolutionSheetAsPlt(aSolutionSheet, commands) then
+        Result := cprFailed
+      else
+        begin
+          commands.SaveToFile(aFileName, TEncoding.ASCII);
+          if aSolutionSheet <> nil then
+            aSolutionSheet.IsSaved := True;
+          Result := cprOK;
+        end;
+    except
+      Result := cprException;
+    end;
+  finally
+    commands.Free;
   end;
-  commands.Free;
 end;
 
 function TCsvImportExportPlugin.BatchSaveResult(

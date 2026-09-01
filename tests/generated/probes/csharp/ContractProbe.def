@@ -1,3 +1,3 @@
-LIBRARY "ContractProbe"
+LIBRARY "ContractProbe.plg"
 EXPORTS
   TcpInitializeV2

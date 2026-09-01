@@ -7,11 +7,12 @@ uses
   uICommon,
   uIRectangle,
   uINotifyEvent,
-  uIIdChangeEvent;
+  uIIdChangeEvent,
+  uITcAlgorithmData;
 
 type
   IDevice = interface
-    ['{D4776023-5049-43E8-A210-9BA3443F70DB}']
+    ['{2A6F1B84-9C37-4E52-B1D6-4F8A0C97E361}']
 
     function Clone(): IDevice; safecall;
     procedure Assign(const aOther: IDevice); safecall;
@@ -40,8 +41,11 @@ type
     function GetMaxStripeWidth(): Integer; safecall;
     procedure SetMaxStripeWidth(aMaxWidth: Integer); safecall;
 
-    function GetMinCutWidth(): Cardinal; safecall;
-    procedure SetMinCutWidth(aWidth: Cardinal); safecall;
+    function GetMinCutSize(): Cardinal; safecall;
+    procedure SetMinCutSize(aSize: Cardinal); safecall;
+    function GetMinCutDistance(): Cardinal; safecall;
+    procedure SetMinCutDistance(aDistance: Cardinal); safecall;
+    function GetMinEdgeDistance(): IRectangle; safecall;
 
     function GetEdgingCuts(): TEdgingCuts; safecall;
     procedure SetEdgingCuts(aEdgingCuts: TEdgingCuts); safecall;
@@ -98,6 +102,7 @@ type
 
     function GetCustomData(): WideString; safecall;
     procedure SetCustomData(const aData: WideString); safecall;
+    function GetAlgorithmData(): ITcAlgorithmData; safecall;
 
     function GetOnChange(): INotifyEvent; safecall;
     function GetOnIdChange(): IIdChangeEvent; safecall;
@@ -115,7 +120,9 @@ type
     property StripCuts: TStripCutting read GetStripCuts write SetStripCuts;
     property MaxStripeWidth: Integer read GetMaxStripeWidth write SetMaxStripeWidth;
 
-    property MinCutWidth: Cardinal read GetMinCutWidth write SetMinCutWidth;
+    property MinCutSize: Cardinal read GetMinCutSize write SetMinCutSize;
+    property MinCutDistance: Cardinal read GetMinCutDistance write SetMinCutDistance;
+    property MinEdgeDistance: IRectangle read GetMinEdgeDistance;
     property EdgingCuts: TEdgingCuts read GetEdgingCuts write SetEdgingCuts;
     property OriginEdgingCuts: TOriginEdgingCuts read GetOriginEdgingCuts write SetOriginEdgingCuts;
     property MaxCutDepthOn: Boolean read GetMaxCutDepthOn write SetMaxCutDepthOn;
@@ -139,6 +146,8 @@ type
     property SegmentRotationCost: TTcPrice read GetSegmentRotationCost write SetSegmentRotationCost;
 
     property CustomData: WideString read GetCustomData write SetCustomData;
+    // Mutable, typed access to the unit-aware algorithm data owned by this device.
+    property AlgorithmData: ITcAlgorithmData read GetAlgorithmData;
 
     property OnChange: INotifyEvent read GetOnChange;
     property OnIdChange: IIdChangeEvent read GetOnIdChange;

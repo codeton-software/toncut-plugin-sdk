@@ -5,6 +5,7 @@ interface
 uses
   uICommon,
   uIShape,
+  uISheetDefects,
   uIMaterial;
 
 type
@@ -20,12 +21,16 @@ type
     function GetIdentifier(): WideString; safecall;
 
     function GetShapePathAsString(): WideString; safecall;
+    // Appended after the published method prefix to preserve the existing IID's
+    // vtable slots.
+    function GetHoles(): ISheetDefects; safecall;
 
     property X: Cardinal read GetX;
     property Y: Cardinal read GetY;
     property Length: Cardinal read GetLength;
     property Width: Cardinal read GetWidth;
     property Shape  : IShape read GetShape;
+    property Holes  : ISheetDefects read GetHoles;
     property Field  : TField read GetField;
     property Identifier : WideString read GetIdentifier;
   end;

@@ -39,6 +39,8 @@ The shipped SDK assumes the TonCut Win32 ABI used by the Delphi plugins, includi
 
 ## Testing
 
+- Run the focused generator regressions from `SDK/tests` with
+  `python -m unittest tools.test_sdk_test_lib`.
 - Run the driver from `SDK/tests`, for example `python tools/run_sdk_tests.py build --skip-cppbuilder --dry-run`.
 - From the `SDK` root, use `python tests/tools/run_sdk_tests.py build --skip-cppbuilder --dry-run`.
 - The test runner can auto-discover Visual Studio `MSBuild.exe` and auto-load RAD Studio `rsvars.bat` when those toolchains are installed but not already on `PATH`.

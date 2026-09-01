@@ -18,6 +18,13 @@ PLUGIN_ENTRIES = json.loads(r'''[
     "path": "generated/probes/delphi/Win32/Debug/ContractProbe.plg"
   },
   {
+    "id": "probe-cppbuilder-debug",
+    "label": "C++Builder ContractProbe Debug plugin",
+    "lane": "cppbuilder",
+    "category": "probe",
+    "path": "generated/probes/cppbuilder/bin/Win32/Debug/ContractProbe.plg"
+  },
+  {
     "id": "probe-msvc-debug",
     "label": "MSVC ContractProbe Debug plugin",
     "lane": "msvc",

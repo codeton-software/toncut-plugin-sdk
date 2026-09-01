@@ -11,11 +11,12 @@ uses
   uIBanding,
   uIGrinds,
   uINotifyEvent,
-  uIIdChangeEvent;
+  uIIdChangeEvent,
+  uITcAlgorithmData;
 
 type
   IFormat = interface
-    ['{BE7AB51A-91E7-4DD8-A02F-F9034260EE28}']
+    ['{9B47E250-1F63-4A8D-97C2-6E05B3D81A94}']
 
     function GetId(): Int64; safecall;
     procedure SetId(aId: Int64); safecall;
@@ -93,6 +94,7 @@ type
 
     function GetCustomData(): WideString; safecall;
     procedure SetCustomData(const aData: WideString); safecall;
+    function GetAlgorithmData(): ITcAlgorithmData; safecall;
 
     function GetEffectivePriority(): Integer; safecall;
 
@@ -153,6 +155,8 @@ type
     property StorageCost: TTcPrice read GetStorageCost write SetStorageCost;
 
     property CustomData: WideString read GetCustomData write SetCustomData;
+    // Mutable, typed access to the unit-aware algorithm data owned by this format.
+    property AlgorithmData: ITcAlgorithmData read GetAlgorithmData;
 
     property EffectivePriority: Integer read GetEffectivePriority;
 

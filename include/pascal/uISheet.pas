@@ -9,11 +9,12 @@ uses
   uISheetDefects,
   uINotifyEvent,
   uIIdChangeEvent,
-  uISheetDefectChangeEvent;
+  uISheetDefectChangeEvent,
+  uITcAlgorithmData;
 
 type
   ISheet = interface
-    ['{31B70BE9-EDD4-4827-9814-B87430269306}']
+    ['{3D92A70F-6B18-45C4-A8E1-7C204F6B9D35}']
 
     function GetId(): Int64; safecall;
     procedure SetId(aId: Int64); safecall;
@@ -43,6 +44,7 @@ type
     procedure SetMaterial(const aMaterial: IMaterial); safecall;
 
     function GetEdging(): IRectangle; safecall;
+    function GetMinEdgeDistance(): IRectangle; safecall;
 
     function GetPriority(): TStockPriority; safecall;
     procedure SetPriority(aPriority: TStockPriority); safecall;
@@ -60,8 +62,10 @@ type
 
     function GetCustomData(): WideString; safecall;
     procedure SetCustomData(const aData: WideString); safecall;
+    function GetAlgorithmData(): ITcAlgorithmData; safecall;
 
     function GetDefects(): ISheetDefects; safecall;
+    function GetHoles(): ISheetDefects; safecall;
 
     function GetAvailableQuantity(): Cardinal; safecall;
     function GetField(): TField; safecall;
@@ -91,6 +95,7 @@ type
     property Description: WideString read GetDescription write SetDescription;
     property Material: IMaterial read GetMaterial write SetMaterial;
     property Edging: IRectangle read GetEdging;
+    property MinEdgeDistance: IRectangle read GetMinEdgeDistance;
     property Priority: TStockPriority read GetPriority write SetPriority;
 
     property CutShiftHorzLimit: Integer read GetCutShiftHorzLimit write SetCutShiftHorzLimit;
@@ -101,8 +106,11 @@ type
     property ExtractionCost: TTcPrice read GetExtractionCost write SetExtractionCost;
 
     property CustomData: WideString read GetCustomData write SetCustomData;
+    // Mutable, typed access to the unit-aware algorithm data owned by this sheet.
+    property AlgorithmData: ITcAlgorithmData read GetAlgorithmData;
 
     property Defects: ISheetDefects read GetDefects;
+    property Holes: ISheetDefects read GetHoles;
 
     property AvailableQuantity: Cardinal read GetAvailableQuantity;
     property Field: TField read GetField;

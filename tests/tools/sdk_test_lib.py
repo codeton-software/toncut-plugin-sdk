@@ -35,6 +35,12 @@ def read_text(file_path: Path, *, bom: bool = False) -> str:
 
 def write_text(file_path: Path, content: str) -> None:
     ensure_dir(file_path.parent)
+    if file_path.exists():
+        try:
+            if file_path.read_text(encoding="utf-8") == content:
+                return
+        except (OSError, UnicodeError):
+            pass
     file_path.write_text(content, encoding="utf-8")
 
 
@@ -48,6 +54,45 @@ def iso_timestamp() -> str:
         .isoformat(timespec="milliseconds")
         .replace("+00:00", "Z")
     )
+
+
+def contract_generation_fingerprint(skipped_lanes: set[str] | None = None) -> str:
+    input_paths = [
+        Path(__file__).resolve(),
+        SUPPORT_CONFIG_PATH,
+        SDK_ROOT / "include" / "cpp" / "TonCutPluginSdk.hpp",
+        *sorted((SDK_ROOT / "include" / "pascal").glob("*.pas")),
+    ]
+    digest = hashlib.sha256()
+    digest.update(b"toncut-sdk-contract-v1\0")
+    for input_path in input_paths:
+        relative_path = input_path.relative_to(SDK_ROOT).as_posix()
+        digest.update(relative_path.encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(input_path.read_bytes())
+        digest.update(b"\0")
+    for lane in sorted(skipped_lanes or set()):
+        digest.update(b"skip-lane\0")
+        digest.update(lane.encode("utf-8"))
+        digest.update(b"\0")
+    return digest.hexdigest()
+
+
+def stable_generation_timestamp(generation_fingerprint: str) -> str:
+    previous_manifest_path = GENERATED_ROOT / "contract-manifest.json"
+    if previous_manifest_path.exists():
+        try:
+            previous_manifest = json.loads(read_text(previous_manifest_path))
+        except (OSError, json.JSONDecodeError):
+            previous_manifest = None
+        if (
+            isinstance(previous_manifest, dict)
+            and previous_manifest.get("generationFingerprint")
+            == generation_fingerprint
+            and isinstance(previous_manifest.get("generatedAt"), str)
+        ):
+            return previous_manifest["generatedAt"]
+    return iso_timestamp()
 
 
 def to_windows_path(value: str) -> str:
@@ -116,8 +161,7 @@ def strip_pascal_directives(signature: str) -> str:
         signature,
         flags=re.IGNORECASE,
     )
-    value = re.sub(r";\s*;", ";", value)
-    value = re.sub(r";+$", "", value)
+    value = re.sub(r"(?:;\s*)+$", "", value)
     return value.strip()
 
 
@@ -131,8 +175,7 @@ def parse_pascal_parameters(text: str | None) -> list[dict[str, Any]]:
             continue
         match = re.match(r"^(?:(const|var|out)\s+)?(.+?)\s*:\s*(.+)$", trimmed, re.IGNORECASE)
         if not match:
-            result.append({"name": trimmed, "modifier": None, "type": "Variant"})
-            continue
+            raise ValueError(f"Unable to parse Pascal parameter declaration: {trimmed}")
         modifier = match.group(1).lower() if match.group(1) else None
         names = [item.strip() for item in match.group(2).split(",") if item.strip()]
         type_name = normalize_whitespace(re.sub(r"\s*=\s*.+$", "", match.group(3)))
@@ -149,15 +192,10 @@ def parse_pascal_method(signature: str) -> dict[str, Any]:
         re.IGNORECASE,
     )
     if not match:
-        return {
-            "kind": "method",
-            "signature": clean,
-            "name": clean,
-            "procedureKind": "procedure",
-            "returnType": None,
-            "parameters": [],
-        }
+        raise ValueError(f"Unable to parse Pascal method declaration: {clean}")
     procedure_kind = match.group(1).lower()
+    if procedure_kind == "function" and not match.group(4):
+        raise ValueError(f"Pascal function has no parsed result type: {clean}")
     return {
         "kind": "method",
         "signature": clean,
@@ -176,14 +214,16 @@ def parse_pascal_property(signature: str) -> dict[str, Any]:
     accessor_match = re.search(r"\s+(?:read|write)\b", value, flags=re.IGNORECASE)
     header = value[: accessor_match.start()].strip() if accessor_match else value
     match = re.match(r"^([A-Za-z0-9_]+)(?:\[(.*)\])?\s*:\s*(.+)$", header)
+    if not match:
+        raise ValueError(f"Unable to parse Pascal property declaration: {clean}")
     read_accessor_match = re.search(r"\bread\s+([A-Za-z0-9_]+)", clean, re.IGNORECASE)
     write_accessor_match = re.search(r"\bwrite\s+([A-Za-z0-9_]+)", clean, re.IGNORECASE)
     return {
         "kind": "property",
         "signature": clean,
-        "name": match.group(1) if match else value,
-        "type": normalize_whitespace(match.group(3)) if match else "Variant",
-        "parameters": parse_pascal_parameters(match.group(2) if match else None),
+        "name": match.group(1),
+        "type": normalize_whitespace(match.group(3)),
+        "parameters": parse_pascal_parameters(match.group(2)),
         "readAccessor": read_accessor_match.group(1) if read_accessor_match else None,
         "writeAccessor": write_accessor_match.group(1) if write_accessor_match else None,
         "writable": bool(re.search(r"\bwrite\b", clean, re.IGNORECASE)),
@@ -264,8 +304,6 @@ def parse_pascal_units() -> list[dict[str, Any]]:
                 flush()
             if buffer or re.match(r"^(function|procedure|property)\s+", line, re.IGNORECASE):
                 buffer.append(line)
-                if re.search(r";\s*$", line):
-                    flush()
 
     interfaces.sort(key=lambda item: item["name"])
     return interfaces
@@ -325,12 +363,260 @@ def parse_cpp_header() -> list[dict[str, Any]]:
     return interfaces
 
 
+def strip_pascal_comments(text: str) -> str:
+    value = re.sub(r"\{[\s\S]*?\}", "", text)
+    value = re.sub(r"\(\*[\s\S]*?\*\)", "", value)
+    return re.sub(r"//.*$", "", value, flags=re.MULTILINE)
+
+
+def parse_pascal_enums() -> dict[str, list[str]]:
+    result: dict[str, list[str]] = {}
+    for file_name in ("uICommon.pas", "uITcPluginCommon.pas"):
+        text = strip_pascal_comments(
+            read_text(SDK_ROOT / "include" / "pascal" / file_name)
+        )
+        for match in re.finditer(
+            r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*\(([\s\S]*?)\)\s*;",
+            text,
+            re.MULTILINE,
+        ):
+            names: list[str] = []
+            for item in split_top_level(match.group(2), ","):
+                entry = normalize_whitespace(item)
+                if not entry:
+                    continue
+                name_match = re.match(r"^([A-Za-z_][A-Za-z0-9_]*)", entry)
+                if name_match:
+                    names.append(name_match.group(1))
+            result[match.group(1)] = names
+    return result
+
+
+def parse_pascal_enum_ordinals() -> dict[str, list[int]]:
+    result: dict[str, list[int]] = {}
+    for file_name in ("uICommon.pas", "uITcPluginCommon.pas"):
+        text = strip_pascal_comments(
+            read_text(SDK_ROOT / "include" / "pascal" / file_name)
+        )
+        for match in re.finditer(
+            r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*\(([\s\S]*?)\)\s*;",
+            text,
+            re.MULTILINE,
+        ):
+            ordinals: list[int] = []
+            next_ordinal = 0
+            for item in split_top_level(match.group(2), ","):
+                entry = normalize_whitespace(item)
+                if not entry:
+                    continue
+                value_match = re.match(
+                    r"^[A-Za-z_][A-Za-z0-9_]*(?:\s*=\s*(-?(?:\$[0-9A-Fa-f]+|[0-9]+)))?$",
+                    entry,
+                )
+                if value_match is None:
+                    raise ValueError(
+                        f"Unsupported Pascal enum value declaration in {match.group(1)}: {entry}"
+                    )
+                literal = value_match.group(1)
+                if literal is not None:
+                    next_ordinal = (
+                        -int(literal[2:], 16)
+                        if literal.startswith("-$")
+                        else int(literal[1:], 16)
+                        if literal.startswith("$")
+                        else int(literal)
+                    )
+                ordinals.append(next_ordinal)
+                next_ordinal += 1
+            result[match.group(1)] = ordinals
+    return result
+
+
+def parse_cpp_enums() -> dict[str, dict[str, Any]]:
+    text = read_text(SDK_ROOT / "include" / "cpp" / "TonCutPluginSdk.hpp")
+    result: dict[str, dict[str, Any]] = {}
+    for match in re.finditer(
+        r"enum\s+([A-Za-z_][A-Za-z0-9_]*)\s*:\s*([^\s{]+)\s*\{([\s\S]*?)\};",
+        text,
+    ):
+        names: list[str] = []
+        ordinals: list[int] = []
+        next_ordinal = 0
+        for item in split_top_level(match.group(3), ","):
+            entry = normalize_whitespace(item)
+            if not entry:
+                continue
+            name_match = re.match(
+                r"^([A-Za-z_][A-Za-z0-9_]*)(?:\s*=\s*(-?(?:0x[0-9A-Fa-f]+|[0-9]+)))?$",
+                entry,
+            )
+            if name_match:
+                names.append(name_match.group(1))
+                literal = name_match.group(2)
+                if literal is not None:
+                    next_ordinal = int(literal, 0)
+                ordinals.append(next_ordinal)
+                next_ordinal += 1
+            else:
+                raise ValueError(f"Unsupported C++ enum value declaration: {entry}")
+        result[match.group(1)] = {
+            "underlyingType": normalize_whitespace(match.group(2)),
+            "values": names,
+            "ordinals": ordinals,
+        }
+    return result
+
+
+def parse_cpp_aliases() -> dict[str, str]:
+    text = read_text(SDK_ROOT / "include" / "cpp" / "TonCutPluginSdk.hpp")
+    return {
+        match.group(1): normalize_whitespace(match.group(2))
+        for match in re.finditer(
+            r"^\s*using\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^;]+);",
+            text,
+            re.MULTILINE,
+        )
+    }
+
+
+def parse_pascal_integer_constants() -> dict[str, int]:
+    result: dict[str, int] = {}
+    for file_name in ("uICommon.pas", "uITcPluginCommon.pas"):
+        text = strip_pascal_comments(
+            read_text(SDK_ROOT / "include" / "pascal" / file_name)
+        )
+        for match in re.finditer(
+            r"^\s*(c[A-Za-z0-9_]+)\s*=\s*(-?[0-9]+)\s*;",
+            text,
+            re.MULTILINE,
+        ):
+            result[match.group(1)] = int(match.group(2))
+    return result
+
+
+def parse_cpp_integer_constants() -> dict[str, int]:
+    text = read_text(SDK_ROOT / "include" / "cpp" / "TonCutPluginSdk.hpp")
+    return {
+        match.group(1): int(match.group(2))
+        for match in re.finditer(
+            r"^\s*constexpr\s+[^;=]+?\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(-?[0-9]+)\s*;",
+            text,
+            re.MULTILINE,
+        )
+    }
+
+
+def cpp_integer_type_for_byte_count(byte_count: int) -> str | None:
+    return {
+        1: "std::uint8_t",
+        2: "std::uint16_t",
+        4: "std::uint32_t",
+        8: "std::uint64_t",
+    }.get(byte_count)
+
+
+def cpp_set_type_for_enum(values: list[str]) -> str | None:
+    if not values:
+        return None
+    return cpp_integer_type_for_byte_count(((len(values) - 1) // 8) + 1)
+
+
+def validate_cpp_data_types() -> None:
+    pascal_enums = parse_pascal_enums()
+    pascal_enum_ordinals = parse_pascal_enum_ordinals()
+    cpp_enums = parse_cpp_enums()
+    aliases = parse_cpp_aliases()
+    errors: list[str] = []
+
+    for enum_name, cpp_enum in cpp_enums.items():
+        pascal_values = pascal_enums.get(enum_name)
+        if pascal_values is None:
+            errors.append(f"C++ enum {enum_name} has no Pascal source declaration")
+            continue
+        if cpp_enum["values"] != pascal_values:
+            errors.append(
+                f"C++ enum {enum_name} values/order differ from Pascal: "
+                f"{cpp_enum['values']} != {pascal_values}"
+            )
+        if cpp_enum["ordinals"] != pascal_enum_ordinals.get(enum_name):
+            errors.append(
+                f"C++ enum {enum_name} ordinal values differ from Pascal: "
+                f"{cpp_enum['ordinals']} != {pascal_enum_ordinals.get(enum_name)}"
+            )
+        if cpp_enum["underlyingType"] != "std::uint8_t":
+            errors.append(
+                f"C++ enum {enum_name} must use the default one-byte Delphi enum ABI"
+            )
+
+    alias_expectations = {
+        "TTcpVersion": "std::uint64_t",
+        "DelphiBool": "unsigned char",
+        "TDateTime": "double",
+        "TTcPrice": "double",
+        "TTcWeight": "double",
+        "TTcpFeatures": cpp_set_type_for_enum(pascal_enums["TTcpFeature"]),
+        "TOrnaments": cpp_set_type_for_enum(pascal_enums["TOrnament"]),
+        "TMirrors": cpp_set_type_for_enum(pascal_enums["TMirror"]),
+    }
+    common_text = strip_pascal_comments(
+        read_text(SDK_ROOT / "include" / "pascal" / "uICommon.pas")
+    )
+    configuration_parts_match = re.search(
+        r"TConfigurationParts\s*=\s*set\s+of\s*\(([\s\S]*?)\)\s*;",
+        common_text,
+    )
+    if configuration_parts_match is None:
+        errors.append("Pascal TConfigurationParts set declaration was not found")
+    else:
+        configuration_parts = [
+            normalize_whitespace(item)
+            for item in split_top_level(configuration_parts_match.group(1), ",")
+            if normalize_whitespace(item)
+        ]
+        alias_expectations["TConfigurationParts"] = cpp_set_type_for_enum(
+            configuration_parts
+        )
+
+    for alias_name, expected_type in alias_expectations.items():
+        if expected_type is None:
+            errors.append(f"Pascal storage width for {alias_name} has no C++ scalar mapping")
+        elif aliases.get(alias_name) != expected_type:
+            errors.append(
+                f"C++ alias {alias_name} must be {expected_type}, found "
+                f"{aliases.get(alias_name)}"
+            )
+
+    pascal_constants = parse_pascal_integer_constants()
+    cpp_constants = parse_cpp_integer_constants()
+    for constant_name in ("cEngineVersion", "cLengthMultiplier"):
+        if cpp_constants.get(constant_name) != pascal_constants.get(constant_name):
+            errors.append(
+                f"C++ {constant_name}={cpp_constants.get(constant_name)} differs from "
+                f"Pascal {pascal_constants.get(constant_name)}"
+            )
+
+    cpp_text = read_text(SDK_ROOT / "include" / "cpp" / "TonCutPluginSdk.hpp")
+    if "#pragma pack(push, 8)" not in cpp_text or "#pragma pack(pop)" not in cpp_text:
+        errors.append("C++ header does not preserve Delphi quad-word packing")
+    abi_records = re.findall(r"\bstruct\s+(T[A-Za-z0-9_]+)\s*\{", cpp_text)
+    if abi_records:
+        errors.append(
+            "C++ ABI record validation is not configured for: " + ", ".join(abi_records)
+        )
+
+    if errors:
+        raise ValueError("Unsafe C++ data type projection(s):\n- " + "\n- ".join(errors))
+
+
 def build_manifest(
     pascal_interfaces: list[dict[str, Any]],
     cpp_interfaces: list[dict[str, Any]],
+    *,
+    generated_at: str | None = None,
+    generation_fingerprint: str | None = None,
 ) -> dict[str, Any]:
-    return {
-        "generatedAt": iso_timestamp(),
+    manifest = {
+        "generatedAt": generated_at or iso_timestamp(),
         "sourceRoot": "SDK/include",
         "totals": {
             "interfaceCount": len(pascal_interfaces),
@@ -342,6 +628,9 @@ def build_manifest(
         "interfaces": pascal_interfaces,
         "cppInterfaces": cpp_interfaces,
     }
+    if generation_fingerprint is not None:
+        manifest["generationFingerprint"] = generation_fingerprint
+    return manifest
 
 
 def load_config() -> dict[str, Any]:
@@ -362,50 +651,375 @@ def describe_lane_ids(lanes: set[str] | None = None) -> str:
     )
 
 
+PASCAL_CPP_ABI_TYPES = {
+    "boolean": {"DelphiBool"},
+    "byte": {"std::uint8_t", "unsigned char"},
+    "cardinal": {"unsigned", "std::uint32_t"},
+    "double": {"double"},
+    "integer": {"int", "std::int32_t"},
+    "int64": {"std::int64_t"},
+    "single": {"float"},
+    "tfield": {"std::int64_t", "TField"},
+    "thandle": {"HWND"},
+    "trotation": {"unsigned short", "std::uint16_t"},
+    "uint64": {"std::uint64_t"},
+    "widestring": {"BSTR"},
+    "word": {"unsigned short", "std::uint16_t"},
+}
+
+
+def cpp_abi_type_options(type_name: str, *, indirect: bool = False) -> set[str]:
+    pascal_type = normalize_whitespace(type_name).rstrip(";")
+    if re.fullmatch(r"I[A-Z][A-Za-z0-9_]*", pascal_type):
+        suffix = "**" if indirect else "*"
+        return {f"{pascal_type}{suffix}"}
+
+    base_options = PASCAL_CPP_ABI_TYPES.get(pascal_type.lower(), {pascal_type})
+    if not indirect:
+        return base_options
+    return {f"{item}*" for item in base_options}
+
+
+def expected_cpp_abi_parameters(method: dict[str, Any]) -> list[set[str]]:
+    expected: list[set[str]] = []
+    for parameter in method["parameters"]:
+        type_name = normalize_whitespace(parameter["type"]).rstrip(";")
+        open_array = re.fullmatch(r"array\s+of\s+(.+)", type_name, re.IGNORECASE)
+        if open_array:
+            element_options = cpp_abi_type_options(open_array.group(1))
+            expected.append(
+                {f"{item}*" for item in element_options}
+                | {f"const {item}*" for item in element_options}
+            )
+            expected.append({"int", "std::int32_t"})
+            continue
+        expected.append(
+            cpp_abi_type_options(
+                type_name,
+                indirect=parameter.get("modifier") in {"var", "out"},
+            )
+        )
+
+    if method.get("returnType"):
+        expected.append(cpp_abi_type_options(method["returnType"], indirect=True))
+    return expected
+
+
+def diff_cpp_method_abi(
+    index: int,
+    cpp_method: dict[str, Any],
+    pascal_method: dict[str, Any],
+) -> list[dict[str, Any]]:
+    expected = expected_cpp_abi_parameters(pascal_method)
+    actual = [parameter["type"] for parameter in cpp_method["parameters"]]
+    if len(actual) != len(expected):
+        return [
+            {
+                "index": index,
+                "status": "abi-parameter-count",
+                "cppMethod": cpp_method["name"],
+                "pascalMethod": pascal_method["name"],
+                "expectedParameterCount": len(expected),
+                "cppParameterCount": len(actual),
+            }
+        ]
+
+    diffs: list[dict[str, Any]] = []
+    for parameter_index, (cpp_type, allowed_types) in enumerate(zip(actual, expected)):
+        if cpp_type in allowed_types:
+            continue
+        diffs.append(
+            {
+                "index": index,
+                "parameterIndex": parameter_index,
+                "status": "abi-type-mismatch",
+                "cppMethod": cpp_method["name"],
+                "pascalMethod": pascal_method["name"],
+                "cppType": cpp_type,
+                "expectedTypes": sorted(allowed_types),
+            }
+        )
+    return diffs
+
+
 def diff_cpp_interface_against_pascal(
     cpp_interface: dict[str, Any],
     pascal_interface: dict[str, Any] | None,
+    projection_config: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     if pascal_interface is None:
-        return {"status": "missing", "methodDiffs": []}
-    max_length = max(len(cpp_interface["methods"]), len(pascal_interface["methods"]))
+        return {
+            "status": "unsafe",
+            "safe": False,
+            "projection": "missing-pascal-interface",
+            "methodDiffs": [],
+        }
+
+    projection = projection_config or {}
+    opaque_interfaces = set(projection.get("opaqueInterfaces", []))
+    configured_aliases = projection.get("methodAliases", {}).get(
+        cpp_interface["name"], {}
+    )
+    cpp_methods = cpp_interface["methods"]
+    pascal_methods = pascal_interface["methods"]
+
+    if not cpp_methods and pascal_methods:
+        is_documented_opaque = cpp_interface["name"] in opaque_interfaces
+        return {
+            "status": "opaque" if is_documented_opaque else "unsafe",
+            "safe": is_documented_opaque,
+            "projection": (
+                "documented-opaque" if is_documented_opaque else "undocumented-opaque"
+            ),
+            "cppMethodCount": 0,
+            "pascalMethodCount": len(pascal_methods),
+            "methodDiffs": []
+            if is_documented_opaque
+            else [
+                {
+                    "index": 0,
+                    "status": "undocumented-opaque",
+                    "cppMethod": None,
+                    "pascalMethod": pascal_methods[0]["name"],
+                }
+            ],
+        }
+
     method_diffs: list[dict[str, Any]] = []
-    for index in range(max_length):
-        cpp_method = cpp_interface["methods"][index] if index < len(cpp_interface["methods"]) else None
-        pascal_method = (
-            pascal_interface["methods"][index]
-            if index < len(pascal_interface["methods"])
-            else None
-        )
-        if cpp_method is None or pascal_method is None:
+    accepted_aliases: list[dict[str, Any]] = []
+    for index, cpp_method in enumerate(cpp_methods):
+        if index >= len(pascal_methods):
             method_diffs.append(
                 {
                     "index": index,
-                    "status": "length-mismatch",
-                    "cppMethod": cpp_method["name"] if cpp_method else None,
-                    "pascalMethod": pascal_method["name"] if pascal_method else None,
+                    "status": "extra-cpp-method",
+                    "cppMethod": cpp_method["name"],
+                    "pascalMethod": None,
                 }
             )
             continue
+
+        pascal_method = pascal_methods[index]
         if cpp_method["name"] != pascal_method["name"]:
-            method_diffs.append(
+            alias = configured_aliases.get(str(index))
+            if (
+                isinstance(alias, dict)
+                and alias.get("pascal") == pascal_method["name"]
+                and alias.get("cpp") == cpp_method["name"]
+            ):
+                accepted_aliases.append(
+                    {
+                        "index": index,
+                        "pascalMethod": pascal_method["name"],
+                        "cppMethod": cpp_method["name"],
+                    }
+                )
+            else:
+                method_diffs.append(
+                    {
+                        "index": index,
+                        "status": "non-prefix-method",
+                        "cppMethod": cpp_method["name"],
+                        "pascalMethod": pascal_method["name"],
+                    }
+                )
+                continue
+        method_diffs.extend(diff_cpp_method_abi(index, cpp_method, pascal_method))
+
+    safe = not method_diffs
+    if not safe:
+        status = "unsafe"
+        projection_kind = (
+            "abi-mismatch"
+            if all(item["status"].startswith("abi-") for item in method_diffs)
+            else "non-prefix"
+        )
+    elif len(cpp_methods) == len(pascal_methods):
+        status = "ok"
+        projection_kind = "full"
+    else:
+        status = "prefix"
+        projection_kind = "prefix"
+    return {
+        "status": status,
+        "safe": safe,
+        "projection": projection_kind,
+        "cppMethodCount": len(cpp_methods),
+        "pascalMethodCount": len(pascal_methods),
+        "acceptedAliases": accepted_aliases,
+        "methodDiffs": method_diffs,
+    }
+
+
+def validate_cpp_projections(manifest: dict[str, Any], config: dict[str, Any]) -> None:
+    projection = config.get("cppProjection", {})
+    cpp_by_name = {item["name"]: item for item in manifest["cppInterfaces"]}
+    pascal_by_name = {item["name"]: item for item in manifest["interfaces"]}
+    errors: list[str] = []
+    opaque_interfaces = set(projection.get("opaqueInterfaces", []))
+    ownership_only_interfaces = projection.get("ownershipOnlyInterfaces", [])
+    ownership_only_set = set(ownership_only_interfaces)
+    zero_method_cpp_interfaces = {
+        item["name"] for item in manifest["cppInterfaces"] if not item["methods"]
+    }
+
+    if len(ownership_only_interfaces) != len(ownership_only_set):
+        errors.append("ownership-only interface configuration contains duplicates")
+    for interface_name in ownership_only_interfaces:
+        if interface_name not in opaque_interfaces:
+            errors.append(
+                f"ownership-only interface {interface_name} is not documented opaque"
+            )
+    if ownership_only_set != zero_method_cpp_interfaces:
+        missing = sorted(zero_method_cpp_interfaces - ownership_only_set)
+        extra = sorted(ownership_only_set - zero_method_cpp_interfaces)
+        if missing:
+            errors.append(
+                "zero-method C++ interfaces missing from ownership-only support: "
+                + ", ".join(missing)
+            )
+        if extra:
+            errors.append(
+                "ownership-only interfaces unexpectedly expose C++ methods: "
+                + ", ".join(extra)
+            )
+
+    for interface_name in projection.get("opaqueInterfaces", []):
+        cpp_interface = cpp_by_name.get(interface_name)
+        pascal_interface = pascal_by_name.get(interface_name)
+        if cpp_interface is None or pascal_interface is None:
+            errors.append(
+                f"documented opaque interface {interface_name} is missing from one contract"
+            )
+        elif cpp_interface["methods"]:
+            errors.append(
+                f"documented opaque interface {interface_name} exposes C++ methods"
+            )
+
+    for interface_name, aliases in projection.get("methodAliases", {}).items():
+        cpp_interface = cpp_by_name.get(interface_name)
+        pascal_interface = pascal_by_name.get(interface_name)
+        if cpp_interface is None or pascal_interface is None:
+            errors.append(
+                f"method aliases for {interface_name} reference a missing interface"
+            )
+            continue
+        for raw_index, alias in aliases.items():
+            try:
+                index = int(raw_index)
+            except (TypeError, ValueError):
+                errors.append(
+                    f"method alias {interface_name}[{raw_index}] has a non-integer slot"
+                )
+                continue
+            if (
+                index < 0
+                or index >= len(cpp_interface["methods"])
+                or index >= len(pascal_interface["methods"])
+            ):
+                errors.append(
+                    f"method alias {interface_name}[{index}] references a missing slot"
+                )
+                continue
+            cpp_name = cpp_interface["methods"][index]["name"]
+            pascal_name = pascal_interface["methods"][index]["name"]
+            if not isinstance(alias, dict):
+                errors.append(
+                    f"method alias {interface_name}[{index}] must name Pascal and C++ methods"
+                )
+            elif alias.get("pascal") != pascal_name or alias.get("cpp") != cpp_name:
+                errors.append(
+                    f"stale method alias {interface_name}[{index}]: expected "
+                    f"{pascal_name} -> {cpp_name}"
+                )
+
+    for cpp_interface in manifest["cppInterfaces"]:
+        diff = diff_cpp_interface_against_pascal(
+            cpp_interface,
+            pascal_by_name.get(cpp_interface["name"]),
+            projection,
+        )
+        if diff.get("safe"):
+            continue
+        details = ", ".join(
+            f"slot {item['index']} [{item['status']}]: "
+            f"{item.get('pascalMethod')} -> {item.get('cppMethod')}"
+            for item in diff.get("methodDiffs", [])
+        )
+        errors.append(
+            f"{cpp_interface['name']} is not a safe Pascal vtable prefix"
+            + (f" ({details})" if details else "")
+        )
+
+    if errors:
+        raise ValueError(
+            "Unsafe C++ interface projection(s):\n- " + "\n- ".join(errors)
+        )
+
+
+def build_cpp_interface_support(
+    cpp_interface: dict[str, Any],
+    pascal_interface: dict[str, Any],
+    projection: dict[str, Any],
+) -> dict[str, Any]:
+    cpp_method_count = len(cpp_interface["methods"])
+    exposed_pascal_methods = pascal_interface["methods"][:cpp_method_count]
+    exposed_pascal_names = {method["name"] for method in exposed_pascal_methods}
+    unsupported_properties: list[dict[str, Any]] = []
+    supported_property_accessors: list[str] = []
+
+    for prop in pascal_interface["properties"]:
+        accessors = [
+            accessor
+            for accessor in (prop.get("readAccessor"), prop.get("writeAccessor"))
+            if accessor
+        ]
+        missing_accessors = [
+            accessor for accessor in accessors if accessor not in exposed_pascal_names
+        ]
+        if missing_accessors:
+            unsupported_properties.append(
                 {
-                    "index": index,
-                    "status": "name-mismatch",
-                    "cppMethod": cpp_method["name"],
-                    "pascalMethod": pascal_method["name"],
+                    "name": prop["name"],
+                    "type": prop["type"],
+                    "missingAccessors": missing_accessors,
                 }
             )
+        else:
+            supported_property_accessors.append(prop["name"])
+
     return {
-        "status": "ok" if not method_diffs else "warning",
-        "cppMethodCount": len(cpp_interface["methods"]),
-        "pascalMethodCount": len(pascal_interface["methods"]),
-        "methodDiffs": method_diffs,
+        "name": cpp_interface["name"],
+        "file": cpp_interface["file"],
+        "methodCount": cpp_method_count,
+        "propertyCount": 0,
+        "methods": [method["name"] for method in cpp_interface["methods"]],
+        "properties": [],
+        "supportedPropertyAccessors": supported_property_accessors,
+        "unsupportedMethods": [
+            {
+                "slot": index,
+                "name": method["name"],
+                "signature": method["signature"],
+            }
+            for index, method in enumerate(
+                pascal_interface["methods"][cpp_method_count:],
+                start=cpp_method_count,
+            )
+        ],
+        "unsupportedProperties": unsupported_properties,
+        "diff": diff_cpp_interface_against_pascal(
+            cpp_interface,
+            pascal_interface,
+            projection,
+        ),
     }
 
 
 def build_support(manifest: dict[str, Any], config: dict[str, Any]) -> dict[str, Any]:
     pascal_by_name = {item["name"]: item for item in manifest["interfaces"]}
+    projection = config.get("cppProjection", {})
+    ownership_only_names = set(projection.get("ownershipOnlyInterfaces", []))
     lanes: dict[str, Any] = {}
     for lane_id, lane in config["lanes"].items():
         if lane["kind"] == "pascal-full":
@@ -425,33 +1039,67 @@ def build_support(manifest: dict[str, Any], config: dict[str, Any]) -> dict[str,
                 "unsupportedInterfaces": [],
             }
             continue
-        supported_interfaces = [
-            {
-                "name": item["name"],
-                "file": item["file"],
-                "methodCount": len(item["methods"]),
-                "propertyCount": 0,
-                "methods": [method["name"] for method in item["methods"]],
-                "properties": [],
-                "diff": diff_cpp_interface_against_pascal(item, pascal_by_name.get(item["name"])),
-            }
+        cpp_interface_support = [
+            build_cpp_interface_support(
+                item,
+                pascal_by_name[item["name"]],
+                projection,
+            )
             for item in manifest["cppInterfaces"]
         ]
+        supported_interfaces = [
+            item
+            for item in cpp_interface_support
+            if item["name"] not in ownership_only_names
+        ]
+        ownership_only_interfaces = [
+            item
+            for item in cpp_interface_support
+            if item["name"] in ownership_only_names
+        ]
         supported_names = {item["name"] for item in supported_interfaces}
-        lanes[lane_id] = {
+        unsupported_interfaces = [
+            item["name"]
+            for item in manifest["interfaces"]
+            if item["name"] not in supported_names
+        ]
+        lane_support = {
             **lane,
             "supportedInterfaces": supported_interfaces,
-            "unsupportedInterfaces": [
-                item["name"]
-                for item in manifest["interfaces"]
-                if item["name"] not in supported_names
+            "ownershipOnlyInterfaces": ownership_only_interfaces,
+            "opaquePointerTypes": [
+                item["name"] for item in ownership_only_interfaces
             ],
+            "unsupportedInterfaces": unsupported_interfaces,
         }
-    return {
+        if lane["kind"] == "csharp-native-plus-managed":
+            all_pascal_interfaces = [item["name"] for item in manifest["interfaces"]]
+            lane_support.update(
+                {
+                    "interfaceSupportSurface": "native-shim-only",
+                    "nativeShimSupportedInterfaces": supported_interfaces,
+                    "nativeShimOwnershipOnlyInterfaces": ownership_only_interfaces,
+                    "nativeShimOpaquePointerTypes": [
+                        item["name"] for item in ownership_only_interfaces
+                    ],
+                    "nativeShimUnsupportedInterfaces": unsupported_interfaces,
+                    "directManagedSupportedInterfaces": [],
+                    "directManagedUnsupportedInterfaces": all_pascal_interfaces,
+                    "supportedInterfaces": [],
+                    "ownershipOnlyInterfaces": [],
+                    "opaquePointerTypes": [],
+                    "unsupportedInterfaces": all_pascal_interfaces,
+                }
+            )
+        lanes[lane_id] = lane_support
+    support = {
         "generatedAt": manifest["generatedAt"],
         "totals": manifest["totals"],
         "lanes": lanes,
     }
+    if "generationFingerprint" in manifest:
+        support["generationFingerprint"] = manifest["generationFingerprint"]
+    return support
 
 
 def pascal_sample(type_name: str, seed: str) -> str:
@@ -706,7 +1354,7 @@ procedure TContractProbePlugin.SetUiScale(aValue: Single); begin FUiScale := aVa
 function TContractProbePlugin.GetTonCut(): ITonCut; begin Result := FTonCut; end;
 function TContractProbePlugin.GetFeatures(): TTcpFeatures; begin Result := [feImport, feExport, feSaveResultToFile]; end;
 function TContractProbePlugin.GetPlotterInfo(): ITcPlotterInfo; begin Result := nil; end;
-function TContractProbePlugin.Initialize(const aRegRoot: WideString; aLanguageId: Integer; aTonCut: ITonCut): TTcpResult; begin FRegRoot := aRegRoot; FLanguageId := aLanguageId; FTonCut := aTonCut; TouchAllSupportedInterfaces(aTonCut); Result := cprOK; end;
+function TContractProbePlugin.Initialize(const aRegRoot: WideString; aLanguageId: Integer; aTonCut: ITonCut): TTcpResult; begin FRegRoot := aRegRoot; FLanguageId := aLanguageId; FTonCut := aTonCut; Result := cprOK; end;
 function TContractProbePlugin.Finalize(): TTcpResult; begin Result := cprOK; end;
 function TContractProbePlugin.Configure(aWindow: THandle): TTcpResult; begin Result := cprOK; end;
 function TContractProbePlugin.About(aWindow: THandle): TTcpResult; begin Result := cprOK; end;
@@ -734,15 +1382,24 @@ end.
 
 uses
   Winapi.Windows,
+  uITcPluginCommon,
   uITonCut,
   uITcPlugin,
   uContractProbePlugin in 'uContractProbePlugin.pas',
   uContractProbeTouch in 'uContractProbeTouch.pas';
 
 function TcpInitializeV2(const aRegRoot: PChar; aLanguageId: Integer; aTonCut: ITonCut): ITcPlugin; stdcall;
+var
+  Plugin: ITcPlugin;
 begin
-  Result := TContractProbePlugin.Create;
-  Result.Initialize(aRegRoot, aLanguageId, aTonCut);
+  Result := nil;
+  try
+    Plugin := TContractProbePlugin.Create;
+    if Plugin.Initialize(aRegRoot, aLanguageId, aTonCut) = cprOK then
+      Result := Plugin;
+  except
+    Result := nil;
+  end;
 end;
 
 exports
@@ -777,8 +1434,11 @@ def build_cpp_touch_line(method: dict[str, Any]) -> str:
 
 def generate_cpp_probe(manifest: dict[str, Any], lane: dict[str, Any]) -> dict[str, str]:
     cpp_by_name = {item["name"]: item for item in manifest["cppInterfaces"]}
+    supported_interfaces = lane.get(
+        "nativeShimSupportedInterfaces", lane["supportedInterfaces"]
+    )
     touch_functions: list[str] = []
-    for item in lane["supportedInterfaces"]:
+    for item in supported_interfaces:
         iface = cpp_by_name.get(item["name"])
         if iface is None:
             continue
@@ -806,7 +1466,7 @@ void TouchAllSupportedInterfaces(toncut::ITonCut* aTonCut);
         "__DECLARATIONS__",
         "\n".join(
             f"void Touch{item['name']}(toncut::{item['name']}* aValue);"
-            for item in lane["supportedInterfaces"]
+            for item in supported_interfaces
         ),
     )
 
@@ -818,9 +1478,9 @@ void TouchAllSupportedInterfaces(toncut::ITonCut* aTonCut);
         ("ISolution", "GetSolution"),
     ]
     nested_getters = "\n".join(
-        f"  if (aTonCut != nullptr) {{ toncut::{interface_name}* value = nullptr; aTonCut->{getter_name}((IUnknown**)&value); Touch{interface_name}(value); if (value != nullptr) value->Release(); }}"
+        f"  if (aTonCut != nullptr) {{ toncut::{interface_name}* value = nullptr; aTonCut->{getter_name}(&value); Touch{interface_name}(value); if (value != nullptr) value->Release(); }}"
         for interface_name, getter_name in direct_getters
-        if any(item["name"] == interface_name for item in lane["supportedInterfaces"])
+        if any(item["name"] == interface_name for item in supported_interfaces)
     )
 
     touch_source = """#include "ContractProbeTouch.hpp"
@@ -840,7 +1500,7 @@ __NESTED_GETTERS__
     touch_source = touch_source.replace(
         "__ROOT_TOUCH__",
         "  TouchITonCut(aTonCut);"
-        if any(item["name"] == "ITonCut" for item in lane["supportedInterfaces"])
+        if any(item["name"] == "ITonCut" for item in supported_interfaces)
         else "  (void)aTonCut;",
     )
     touch_source = touch_source.replace("__NESTED_GETTERS__", nested_getters)
@@ -884,7 +1544,7 @@ class ContractProbePlugin : public toncut::ITcPlugin {
   HRESULT STDMETHODCALLTYPE RestoreConfig(BSTR aBackup, toncut::TConfigurationParts aScope, toncut::TTcpResult* result) override;
   HRESULT STDMETHODCALLTYPE EnumExtensions(toncut::TTcpExtensionType aType, toncut::ITcEnumExtensionsCallback* aEnumCb, toncut::TTcpResult* result) override;
   HRESULT STDMETHODCALLTYPE IsMyFile(BSTR aFileName, toncut::TTcpResult* result) override;
-  HRESULT STDMETHODCALLTYPE LoadFile(HWND aWindow, BSTR aFileName, IUnknown* aDevices, toncut::IMaterials* aMaterials, IUnknown* aBands, toncut::IProjects* aProjects, toncut::IFormats* aFormats, toncut::ISheets* aSheets, toncut::TTcpResult* result) override;
+  HRESULT STDMETHODCALLTYPE LoadFile(HWND aWindow, BSTR aFileName, toncut::IDevices* aDevices, toncut::IMaterials* aMaterials, toncut::IBands* aBands, toncut::IProjects* aProjects, toncut::IFormats* aFormats, toncut::ISheets* aSheets, toncut::TTcpResult* result) override;
   HRESULT STDMETHODCALLTYPE SaveFile(HWND aWindow, BSTR aFileName, toncut::IFormats* aFormats, toncut::ISheets* aSheets, toncut::TTcpResult* result) override;
   HRESULT STDMETHODCALLTYPE SaveResult(HWND aWindow, BSTR aFileName, toncut::ISolutionSheet* aSolutionSheet, toncut::TTcpResult* result) override;
   HRESULT STDMETHODCALLTYPE BatchSaveResult(HWND aWindow, toncut::TTcpSaveTarget aSaveTarget, BSTR aPath, toncut::ISolution* aSolution, toncut::TTcpResult* result) override;
@@ -913,11 +1573,20 @@ HRESULT PutBstr(const std::wstring& value, BSTR* result) {
   *result = ::SysAllocStringLen(value.data(), static_cast<UINT>(value.size()));
   return *result == nullptr ? E_OUTOFMEMORY : S_OK;
 }
+HRESULT ReplaceBstr(const std::wstring& value, BSTR* target) {
+  if (target == nullptr) return E_POINTER;
+  toncut::BstrValue replacement(value);
+  if (!replacement) return E_OUTOFMEMORY;
+  BSTR previous = *target;
+  *target = replacement.release();
+  ::SysFreeString(previous);
+  return S_OK;
+}
 }  // namespace
 
 ContractProbePlugin::ContractProbePlugin() : refCount_(1), languageId_(0), uiScale_(1.0f), tonCut_(nullptr) {}
 ContractProbePlugin::~ContractProbePlugin() { if (tonCut_ != nullptr) tonCut_->Release(); }
-HRESULT STDMETHODCALLTYPE ContractProbePlugin::QueryInterface(REFIID, void** object) { if (object == nullptr) return E_POINTER; *object = static_cast<toncut::ITcPlugin*>(this); AddRef(); return S_OK; }
+HRESULT STDMETHODCALLTYPE ContractProbePlugin::QueryInterface(REFIID riid, void** object) { if (object == nullptr) return E_POINTER; *object = nullptr; if (riid != IID_IUnknown) return E_NOINTERFACE; *object = static_cast<toncut::ITcPlugin*>(this); AddRef(); return S_OK; }
 ULONG STDMETHODCALLTYPE ContractProbePlugin::AddRef() { return ++refCount_; }
 ULONG STDMETHODCALLTYPE ContractProbePlugin::Release() { const auto value = --refCount_; if (value == 0) delete this; return value; }
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::GetEngineVersion(int* result) { if (result == nullptr) return E_POINTER; *result = toncut::cEngineVersion; return S_OK; }
@@ -933,17 +1602,17 @@ HRESULT STDMETHODCALLTYPE ContractProbePlugin::SetUiScale(float value) { uiScale
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::GetTonCut(toncut::ITonCut** result) { if (result == nullptr) return E_POINTER; *result = tonCut_; if (*result != nullptr) (*result)->AddRef(); return S_OK; }
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::GetFeatures(toncut::TTcpFeatures* result) { if (result == nullptr) return E_POINTER; *result = toncut::FeatureMask(toncut::feImport) | toncut::FeatureMask(toncut::feExport) | toncut::FeatureMask(toncut::feSaveResultToFile); return S_OK; }
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::GetPlotterInfo(toncut::ITcPlotterInfo** result) { if (result == nullptr) return E_POINTER; *result = nullptr; return S_OK; }
-HRESULT STDMETHODCALLTYPE ContractProbePlugin::Initialize(BSTR aRegRoot, int aLanguageId, toncut::ITonCut* aTonCut, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; regRoot_ = toncut::FromBstr(aRegRoot); languageId_ = aLanguageId; if (tonCut_ != nullptr) tonCut_->Release(); tonCut_ = aTonCut; if (tonCut_ != nullptr) tonCut_->AddRef(); TouchAllSupportedInterfaces(tonCut_); *result = toncut::cprOK; return S_OK; }
+HRESULT STDMETHODCALLTYPE ContractProbePlugin::Initialize(BSTR aRegRoot, int aLanguageId, toncut::ITonCut* aTonCut, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; try { regRoot_ = toncut::FromBstr(aRegRoot); languageId_ = aLanguageId; if (aTonCut != nullptr) aTonCut->AddRef(); if (tonCut_ != nullptr) tonCut_->Release(); tonCut_ = aTonCut; *result = toncut::cprOK; return S_OK; } catch (...) { *result = toncut::cprException; return E_UNEXPECTED; } }
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::Finalize(toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; *result = toncut::cprOK; return S_OK; }
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::Configure(HWND, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; *result = toncut::cprOK; return S_OK; }
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::About(HWND, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; *result = toncut::cprOK; return S_OK; }
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::LoadConfig(BSTR, BSTR, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; *result = toncut::cprOK; return S_OK; }
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::SaveConfig(BSTR, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; *result = toncut::cprOK; return S_OK; }
-HRESULT STDMETHODCALLTYPE ContractProbePlugin::BackupConfig(BSTR* aBackup, toncut::TTcpResult* result) { if (result == nullptr || aBackup == nullptr) return E_POINTER; *result = toncut::cprOK; return PutBstr(L"contract-probe-backup", aBackup); }
+HRESULT STDMETHODCALLTYPE ContractProbePlugin::BackupConfig(BSTR* aBackup, toncut::TTcpResult* result) { if (result == nullptr || aBackup == nullptr) return E_POINTER; const HRESULT hr = ReplaceBstr(L"contract-probe-backup", aBackup); *result = SUCCEEDED(hr) ? toncut::cprOK : toncut::cprFailed; return hr; }
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::RestoreConfig(BSTR, toncut::TConfigurationParts, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; *result = toncut::cprOK; return S_OK; }
-HRESULT STDMETHODCALLTYPE ContractProbePlugin::EnumExtensions(toncut::TTcpExtensionType aType, toncut::ITcEnumExtensionsCallback* aEnumCb, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; if (aEnumCb != nullptr) { BSTR ext = ::SysAllocString(L".probe"); BSTR title = ::SysAllocString(L"Contract Probe"); aEnumCb->Invoke(aType, ext, title); ::SysFreeString(ext); ::SysFreeString(title); } *result = toncut::cprOK; return S_OK; }
+HRESULT STDMETHODCALLTYPE ContractProbePlugin::EnumExtensions(toncut::TTcpExtensionType aType, toncut::ITcEnumExtensionsCallback* aEnumCb, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; if (aEnumCb != nullptr) { toncut::BstrValue ext(L".probe"); toncut::BstrValue title(L"Contract Probe"); if (!ext || !title) { *result = toncut::cprFailed; return E_OUTOFMEMORY; } const HRESULT hr = aEnumCb->Invoke(aType, ext.get(), title.get()); if (FAILED(hr)) { *result = toncut::cprFailed; return hr; } } *result = toncut::cprOK; return S_OK; }
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::IsMyFile(BSTR, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; *result = toncut::cprMaybe; return S_OK; }
-HRESULT STDMETHODCALLTYPE ContractProbePlugin::LoadFile(HWND, BSTR, IUnknown*, toncut::IMaterials*, IUnknown*, toncut::IProjects*, toncut::IFormats*, toncut::ISheets*, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; *result = toncut::cprOK; return S_OK; }
+HRESULT STDMETHODCALLTYPE ContractProbePlugin::LoadFile(HWND, BSTR, toncut::IDevices*, toncut::IMaterials*, toncut::IBands*, toncut::IProjects*, toncut::IFormats*, toncut::ISheets*, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; *result = toncut::cprOK; return S_OK; }
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::SaveFile(HWND, BSTR, toncut::IFormats*, toncut::ISheets*, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; *result = toncut::cprOK; return S_OK; }
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::SaveResult(HWND, BSTR, toncut::ISolutionSheet*, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; *result = toncut::cprOK; return S_OK; }
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::BatchSaveResult(HWND, toncut::TTcpSaveTarget, BSTR, toncut::ISolution*, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; *result = toncut::cprOK; return S_OK; }
@@ -964,10 +1633,25 @@ extern "C" __declspec(dllexport) void __stdcall TcpInitializeV2(
   toncut::ITonCut* aTonCut
 ) {
   if (aResult == nullptr) return;
-  auto* plugin = new contract_probe::ContractProbePlugin();
-  toncut::TTcpResult initResult = toncut::cprOK;
-  plugin->Initialize(::SysAllocString(aRegRoot == nullptr ? L"" : aRegRoot), aLanguageId, aTonCut, &initResult);
-  *aResult = plugin;
+  *aResult = nullptr;
+  contract_probe::ContractProbePlugin* plugin = nullptr;
+  try {
+    plugin = new contract_probe::ContractProbePlugin();
+    toncut::BstrValue regRoot(aRegRoot == nullptr ? L"" : std::wstring(aRegRoot));
+    if (!regRoot) {
+      plugin->Release();
+      return;
+    }
+    toncut::TTcpResult initResult = toncut::cprFailed;
+    const HRESULT hr = plugin->Initialize(regRoot.get(), aLanguageId, aTonCut, &initResult);
+    if (FAILED(hr) || initResult != toncut::cprOK) {
+      plugin->Release();
+      return;
+    }
+    *aResult = plugin;
+  } catch (...) {
+    if (plugin != nullptr) plugin->Release();
+  }
 }
 """
 
@@ -1075,6 +1759,9 @@ def generate_cppbuilder_group_project(project_file_name: str) -> str:
   </ItemGroup>
   <Target Name="Build">
     <MSBuild Projects="@(Projects)" Targets="Build" Properties="Config=$(Config);Platform=$(Platform)" />
+  </Target>
+  <Target Name="Rebuild">
+    <MSBuild Projects="@(Projects)" Targets="Rebuild" Properties="Config=$(Config);Platform=$(Platform)" />
   </Target>
   <Target Name="Make">
     <MSBuild Projects="@(Projects)" Targets="Make" Properties="Config=$(Config);Platform=$(Platform)" />
@@ -1289,6 +1976,15 @@ begin
   Writeln('EnumExtension[', Ord(aType), ']: ', String(aExtension), ' => ', String(aName));
 end;
 
+procedure InitializePluginFromExport;
+var
+  InitializedPlugin: ITcPlugin;
+begin
+  InitializedPlugin := InitFn('Software\\TonCut\\ContractHarness', 1033, nil);
+  Plugin := InitializedPlugin;
+  InitializedPlugin := nil;
+end;
+
 function ResultAllowed(aResult: TTcpResult; const aAllowed: array of TTcpResult): Boolean;
 var
   allowed: TTcpResult;
@@ -1332,8 +2028,9 @@ begin
 
   PrintResult('LoadConfig', aPlugin.LoadConfig('Software\\TonCut\\ContractHarness', 'manual'), [cprOK]);
   PrintResult('SaveConfig', aPlugin.SaveConfig('Software\\TonCut\\ContractHarness'), [cprOK]);
-  Backup := '';
-  PrintResult('BackupConfig', aPlugin.BackupConfig(Backup), [cprOK]);
+  Backup := 'caller-owned-preexisting-backup';
+  PrintResult('BackupConfig.ReplaceExisting', aPlugin.BackupConfig(Backup), [cprOK]);
+  PrintResult('BackupConfig.ReplaceReturned', aPlugin.BackupConfig(Backup), [cprOK]);
   Writeln('BackupConfig value length: ', Length(Backup));
   PrintResult('RestoreConfig', aPlugin.RestoreConfig(Backup, []), [cprOK]);
   PrintResult('Configure', aPlugin.Configure(0), [cprOK, cprNotImplemented]);
@@ -1410,53 +2107,63 @@ begin
 end;
 
 begin
+  System.ExitCode := 0;
   try
     HadFailure := False;
     if ParamCount = 0 then
     begin
-      Writeln('Usage: ContractHostHarness <plugin-path> [sample-csv-path] [output-dir]');
-      Halt(2);
+      Writeln(ErrOutput, 'Usage: ContractHostHarness <plugin-path> [sample-csv-path] [output-dir]');
+      System.ExitCode := 2;
     end;
+    if ParamCount > 0 then
+    begin
+      LibraryHandle := LoadLibrary(PChar(ParamStr(1)));
+      if LibraryHandle = 0 then
+        RaiseLastOSError;
 
-    LibraryHandle := LoadLibrary(PChar(ParamStr(1)));
-    if LibraryHandle = 0 then
-      RaiseLastOSError;
+      try
+        @InitFn := GetProcAddress(LibraryHandle, 'TcpInitializeV2');
+        if not Assigned(InitFn) then
+          raise Exception.Create('TcpInitializeV2 not found.');
 
-    try
-      @InitFn := GetProcAddress(LibraryHandle, 'TcpInitializeV2');
-      if not Assigned(InitFn) then
-        raise Exception.Create('TcpInitializeV2 not found.');
+        InitializePluginFromExport;
+        if not Assigned(Plugin) then
+          raise Exception.Create('Initialization returned nil.');
 
-      Plugin := InitFn('Software\\TonCut\\ContractHarness', 1033, nil);
-      if not Assigned(Plugin) then
-        raise Exception.Create('Initialization returned nil.');
-
-      Writeln('Loaded plugin: ', String(Plugin.Name));
-      if ParamCount >= 2 then
-        SampleCsvPath := ParamStr(2)
-      else
+        Writeln('Loaded plugin: ', String(Plugin.Name));
+        if ParamCount >= 2 then
+          SampleCsvPath := ParamStr(2)
+        else
+          SampleCsvPath := '';
+        if ParamCount >= 3 then
+          OutputDir := ParamStr(3)
+        else
+          OutputDir := ExtractFilePath(ParamStr(1));
+        RunPluginSmoke(Plugin, SampleCsvPath, OutputDir);
+        PrintResult('Finalize', Plugin.Finalize, [cprOK]);
+        if HadFailure then
+          System.ExitCode := 1;
+      finally
+        EnumCollector := nil;
+        Plugin := nil;
+        Backup := '';
         SampleCsvPath := '';
-      if ParamCount >= 3 then
-        OutputDir := ParamStr(3)
-      else
-        OutputDir := ExtractFilePath(ParamStr(1));
-      RunPluginSmoke(Plugin, SampleCsvPath, OutputDir);
-      PrintResult('Finalize', Plugin.Finalize, [cprOK]);
-      if HadFailure then
-        Halt(1);
-      Halt(0);
-    finally
-      EnumCollector := nil;
-      Plugin := nil;
-      if LibraryHandle <> 0 then
-        FreeLibrary(LibraryHandle);
-      LibraryHandle := 0;
+        OutputDir := '';
+        InitFn := nil;
+        if LibraryHandle <> 0 then
+          FreeLibrary(LibraryHandle);
+      end;
     end;
   except
     on E: Exception do
     begin
       Writeln(ErrOutput, 'Harness exception: ', E.ClassName, ': ', E.Message);
-      Halt(1);
+      System.ExitCode := 1;
+    end;
+    else
+    begin
+      Writeln(ErrOutput, 'Harness exception: Unknown exception');
+      System.ExitCode := 1;
     end;
   end;
 end.
@@ -1472,7 +2179,7 @@ def render_summary(manifest: dict[str, Any], support: dict[str, Any]) -> str:
         f"- Pascal interfaces: {manifest['totals']['interfaceCount']}",
         f"- Pascal methods: {manifest['totals']['methodCount']}",
         f"- Pascal properties: {manifest['totals']['propertyCount']}",
-        f"- C++ subset interfaces: {manifest['totals']['cppInterfaceCount']}",
+        f"- C++ header interface types: {manifest['totals']['cppInterfaceCount']}",
         f"- C++ subset methods: {manifest['totals']['cppMethodCount']}",
         "",
     ]
@@ -1481,14 +2188,36 @@ def render_summary(manifest: dict[str, Any], support: dict[str, Any]) -> str:
         lines.append("")
         lines.append(f"- Strategy: {lane['kind']}")
         lines.append(f"- Supported interfaces: {len(lane['supportedInterfaces'])}")
+        if "ownershipOnlyInterfaces" in lane:
+            lines.append(
+                "- Ownership-only opaque pointer types: "
+                f"{len(lane['ownershipOnlyInterfaces'])}"
+            )
         lines.append(f"- Unsupported Pascal interfaces: {len(lane['unsupportedInterfaces'])}")
+        if "nativeShimSupportedInterfaces" in lane:
+            lines.append(
+                f"- Native-shim interfaces: {len(lane['nativeShimSupportedInterfaces'])}"
+            )
+            lines.append(
+                "- Native-shim ownership-only opaque pointer types: "
+                f"{len(lane['nativeShimOwnershipOnlyInterfaces'])}"
+            )
+            lines.append(
+                "- Direct managed interface projections: "
+                f"{len(lane['directManagedSupportedInterfaces'])}"
+            )
         if lane.get("managedCore"):
             lines.append(f"- Managed core checks: {len(lane['managedCore']['checks'])}")
         lines.append("")
     return "\n".join(lines) + "\n"
 
 
-def build_runtime_manifest(skipped_lanes: set[str] | None = None) -> dict[str, Any]:
+def build_runtime_manifest(
+    skipped_lanes: set[str] | None = None,
+    *,
+    generated_at: str | None = None,
+    generation_fingerprint: str | None = None,
+) -> dict[str, Any]:
     skipped = normalize_lane_ids(skipped_lanes)
     sample_csv = to_posix_path(
         relative_to_tests_path("examples", "shared", "csv", "example.csv")
@@ -1679,8 +2408,8 @@ def build_runtime_manifest(skipped_lanes: set[str] | None = None) -> dict[str, A
         },
     ]
 
-    return {
-        "generatedAt": iso_timestamp(),
+    runtime_manifest = {
+        "generatedAt": generated_at or iso_timestamp(),
         "fixtures": {
             "sampleCsv": sample_csv,
             "manualOutputDir": "generated/runtime/manual-output",
@@ -1707,6 +2436,9 @@ def build_runtime_manifest(skipped_lanes: set[str] | None = None) -> dict[str, A
             "manualLogsDir": "generated/runtime/logs",
         },
     }
+    if generation_fingerprint is not None:
+        runtime_manifest["generationFingerprint"] = generation_fingerprint
+    return runtime_manifest
 
 
 def render_manual_guide(
@@ -1988,9 +2720,23 @@ if __name__ == "__main__":
 
 
 def generate_artifacts(skipped_lanes: set[str] | None = None) -> dict[str, Any]:
-    manifest = build_manifest(parse_pascal_units(), parse_cpp_header())
-    support = build_support(manifest, load_config())
-    runtime_manifest = build_runtime_manifest(skipped_lanes)
+    generation_fingerprint = contract_generation_fingerprint(skipped_lanes)
+    generated_at = stable_generation_timestamp(generation_fingerprint)
+    manifest = build_manifest(
+        parse_pascal_units(),
+        parse_cpp_header(),
+        generated_at=generated_at,
+        generation_fingerprint=generation_fingerprint,
+    )
+    config = load_config()
+    validate_cpp_data_types()
+    validate_cpp_projections(manifest, config)
+    support = build_support(manifest, config)
+    runtime_manifest = build_runtime_manifest(
+        skipped_lanes,
+        generated_at=generated_at,
+        generation_fingerprint=generation_fingerprint,
+    )
 
     ensure_dir(GENERATED_ROOT)
     ensure_dir(PROBES_ROOT)
@@ -2043,7 +2789,7 @@ def generate_artifacts(skipped_lanes: set[str] | None = None) -> dict[str, Any]:
         write_text(lane_dir / "ContractProbeEntryPoint.cpp", cpp["entryPoint"])
         write_text(
             lane_dir / "ContractProbe.def",
-            'LIBRARY "ContractProbe"\nEXPORTS\n  TcpInitializeV2\n',
+            'LIBRARY "ContractProbe.plg"\nEXPORTS\n  TcpInitializeV2\n',
         )
         if lane_id == "cppbuilder":
             write_text(
@@ -2094,21 +2840,52 @@ def generate_artifacts(skipped_lanes: set[str] | None = None) -> dict[str, Any]:
 
     expectations = {
         "generatedAt": manifest["generatedAt"],
-        "lanes": {
-            lane_id: {
-                "supportedInterfaces": [
-                    item["name"] for item in lane["supportedInterfaces"]
-                ],
-                "expectedMethodCount": sum(
-                    item["methodCount"] for item in lane["supportedInterfaces"]
-                ),
-                "expectedPropertyCount": sum(
-                    item["propertyCount"] for item in lane["supportedInterfaces"]
-                ),
-            }
-            for lane_id, lane in support["lanes"].items()
-        },
+        "generationFingerprint": generation_fingerprint,
+        "lanes": {},
     }
+    for lane_id, lane in support["lanes"].items():
+        expected = {
+            "supportedInterfaces": [
+                item["name"] for item in lane["supportedInterfaces"]
+            ],
+            "expectedMethodCount": sum(
+                item["methodCount"] for item in lane["supportedInterfaces"]
+            ),
+            "expectedPropertyCount": sum(
+                item["propertyCount"] for item in lane["supportedInterfaces"]
+            ),
+        }
+        if "ownershipOnlyInterfaces" in lane:
+            expected.update(
+                {
+                    "ownershipOnlyInterfaces": [
+                        item["name"] for item in lane["ownershipOnlyInterfaces"]
+                    ],
+                    "opaquePointerTypes": lane["opaquePointerTypes"],
+                }
+            )
+        if "nativeShimSupportedInterfaces" in lane:
+            expected.update(
+                {
+                    "nativeShimSupportedInterfaces": [
+                        item["name"]
+                        for item in lane["nativeShimSupportedInterfaces"]
+                    ],
+                    "nativeShimExpectedMethodCount": sum(
+                        item["methodCount"]
+                        for item in lane["nativeShimSupportedInterfaces"]
+                    ),
+                    "nativeShimOwnershipOnlyInterfaces": [
+                        item["name"]
+                        for item in lane["nativeShimOwnershipOnlyInterfaces"]
+                    ],
+                    "nativeShimOpaquePointerTypes": lane[
+                        "nativeShimOpaquePointerTypes"
+                    ],
+                    "directManagedSupportedInterfaces": [],
+                }
+            )
+        expectations["lanes"][lane_id] = expected
     write_json(RUNTIME_ROOT / "expectations.json", expectations)
 
     return {

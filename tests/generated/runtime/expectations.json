@@ -1,5 +1,6 @@
 {
-  "generatedAt": "2026-03-25T09:58:20.943Z",
+  "generatedAt": "2026-09-01T21:36:35.356Z",
+  "generationFingerprint": "99b3ee79df8fa1e7626d1a9812821ee948a4e4d91d586de3fcdd80c3b1ab998c",
   "lanes": {
     "delphi": {
       "supportedInterfaces": [
@@ -59,6 +60,7 @@
         "IStandardSheetChangeEvent",
         "IStandardSheetChangeEventHandler",
         "IStandardSheets",
+        "ITcAlgorithmData",
         "ITcEnumExtensionsCallback",
         "ITcPlotterInfo",
         "ITcPlugin",
@@ -68,8 +70,8 @@
         "ITemplates",
         "ITonCut"
       ],
-      "expectedMethodCount": 910,
-      "expectedPropertyCount": 402
+      "expectedMethodCount": 965,
+      "expectedPropertyCount": 426
     },
     "cppbuilder": {
       "supportedInterfaces": [
@@ -86,12 +88,45 @@
         "ISolutionCuts",
         "ISolutionSheet",
         "ITcEnumExtensionsCallback",
-        "ITcPlotterInfo",
         "ITcPlugin",
         "ITonCut"
       ],
-      "expectedMethodCount": 205,
-      "expectedPropertyCount": 0
+      "expectedMethodCount": 224,
+      "expectedPropertyCount": 0,
+      "ownershipOnlyInterfaces": [
+        "IBand",
+        "IBands",
+        "IDevice",
+        "IDevices",
+        "IMaterialChangeEvent",
+        "INotifyEvent",
+        "IProjectChangeEvent",
+        "IResults",
+        "IShape",
+        "ISheetDefect",
+        "ISolutionFormats",
+        "ISolutionWastes",
+        "IStandardSheet",
+        "ITcPlotterInfo",
+        "ITemplates"
+      ],
+      "opaquePointerTypes": [
+        "IBand",
+        "IBands",
+        "IDevice",
+        "IDevices",
+        "IMaterialChangeEvent",
+        "INotifyEvent",
+        "IProjectChangeEvent",
+        "IResults",
+        "IShape",
+        "ISheetDefect",
+        "ISolutionFormats",
+        "ISolutionWastes",
+        "IStandardSheet",
+        "ITcPlotterInfo",
+        "ITemplates"
+      ]
     },
     "msvc": {
       "supportedInterfaces": [
@@ -108,15 +143,53 @@
         "ISolutionCuts",
         "ISolutionSheet",
         "ITcEnumExtensionsCallback",
-        "ITcPlotterInfo",
         "ITcPlugin",
         "ITonCut"
       ],
-      "expectedMethodCount": 205,
-      "expectedPropertyCount": 0
+      "expectedMethodCount": 224,
+      "expectedPropertyCount": 0,
+      "ownershipOnlyInterfaces": [
+        "IBand",
+        "IBands",
+        "IDevice",
+        "IDevices",
+        "IMaterialChangeEvent",
+        "INotifyEvent",
+        "IProjectChangeEvent",
+        "IResults",
+        "IShape",
+        "ISheetDefect",
+        "ISolutionFormats",
+        "ISolutionWastes",
+        "IStandardSheet",
+        "ITcPlotterInfo",
+        "ITemplates"
+      ],
+      "opaquePointerTypes": [
+        "IBand",
+        "IBands",
+        "IDevice",
+        "IDevices",
+        "IMaterialChangeEvent",
+        "INotifyEvent",
+        "IProjectChangeEvent",
+        "IResults",
+        "IShape",
+        "ISheetDefect",
+        "ISolutionFormats",
+        "ISolutionWastes",
+        "IStandardSheet",
+        "ITcPlotterInfo",
+        "ITemplates"
+      ]
     },
     "csharp": {
-      "supportedInterfaces": [
+      "supportedInterfaces": [],
+      "expectedMethodCount": 0,
+      "expectedPropertyCount": 0,
+      "ownershipOnlyInterfaces": [],
+      "opaquePointerTypes": [],
+      "nativeShimSupportedInterfaces": [
         "IFormat",
         "IFormats",
         "IMaterial",
@@ -130,12 +203,45 @@
         "ISolutionCuts",
         "ISolutionSheet",
         "ITcEnumExtensionsCallback",
-        "ITcPlotterInfo",
         "ITcPlugin",
         "ITonCut"
       ],
-      "expectedMethodCount": 205,
-      "expectedPropertyCount": 0
+      "nativeShimExpectedMethodCount": 224,
+      "nativeShimOwnershipOnlyInterfaces": [
+        "IBand",
+        "IBands",
+        "IDevice",
+        "IDevices",
+        "IMaterialChangeEvent",
+        "INotifyEvent",
+        "IProjectChangeEvent",
+        "IResults",
+        "IShape",
+        "ISheetDefect",
+        "ISolutionFormats",
+        "ISolutionWastes",
+        "IStandardSheet",
+        "ITcPlotterInfo",
+        "ITemplates"
+      ],
+      "nativeShimOpaquePointerTypes": [
+        "IBand",
+        "IBands",
+        "IDevice",
+        "IDevices",
+        "IMaterialChangeEvent",
+        "INotifyEvent",
+        "IProjectChangeEvent",
+        "IResults",
+        "IShape",
+        "ISheetDefect",
+        "ISolutionFormats",
+        "ISolutionWastes",
+        "IStandardSheet",
+        "ITcPlotterInfo",
+        "ITemplates"
+      ],
+      "directManagedSupportedInterfaces": []
     }
   }
 }

@@ -37,7 +37,7 @@ class ContractProbePlugin : public toncut::ITcPlugin {
   HRESULT STDMETHODCALLTYPE RestoreConfig(BSTR aBackup, toncut::TConfigurationParts aScope, toncut::TTcpResult* result) override;
   HRESULT STDMETHODCALLTYPE EnumExtensions(toncut::TTcpExtensionType aType, toncut::ITcEnumExtensionsCallback* aEnumCb, toncut::TTcpResult* result) override;
   HRESULT STDMETHODCALLTYPE IsMyFile(BSTR aFileName, toncut::TTcpResult* result) override;
-  HRESULT STDMETHODCALLTYPE LoadFile(HWND aWindow, BSTR aFileName, IUnknown* aDevices, toncut::IMaterials* aMaterials, IUnknown* aBands, toncut::IProjects* aProjects, toncut::IFormats* aFormats, toncut::ISheets* aSheets, toncut::TTcpResult* result) override;
+  HRESULT STDMETHODCALLTYPE LoadFile(HWND aWindow, BSTR aFileName, toncut::IDevices* aDevices, toncut::IMaterials* aMaterials, toncut::IBands* aBands, toncut::IProjects* aProjects, toncut::IFormats* aFormats, toncut::ISheets* aSheets, toncut::TTcpResult* result) override;
   HRESULT STDMETHODCALLTYPE SaveFile(HWND aWindow, BSTR aFileName, toncut::IFormats* aFormats, toncut::ISheets* aSheets, toncut::TTcpResult* result) override;
   HRESULT STDMETHODCALLTYPE SaveResult(HWND aWindow, BSTR aFileName, toncut::ISolutionSheet* aSolutionSheet, toncut::TTcpResult* result) override;
   HRESULT STDMETHODCALLTYPE BatchSaveResult(HWND aWindow, toncut::TTcpSaveTarget aSaveTarget, BSTR aPath, toncut::ISolution* aSolution, toncut::TTcpResult* result) override;

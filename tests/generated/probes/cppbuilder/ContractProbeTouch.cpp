@@ -17,7 +17,7 @@ void TouchIFormat(toncut::IFormat* aValue) {
   aValue->GetProcessedQuantity(nullptr);
   aValue->SetProcessedQuantity(1);
   aValue->GetOrnament(nullptr);
-  aValue->SetOrnament(1);
+  aValue->SetOrnament({});
   aValue->GetIdentifier(nullptr);
   aValue->SetIdentifier({});
   aValue->GetDescription(nullptr);
@@ -46,7 +46,7 @@ void TouchIFormats(toncut::IFormats* aValue) {
   aValue->Remove(nullptr);
   aValue->IndexOfByObject(nullptr, nullptr);
   aValue->IndexOfById(1, nullptr);
-  aValue->IndexOfByList(nullptr, nullptr, 1, 1, {}, nullptr, nullptr, nullptr);
+  aValue->IndexOfByList(nullptr, 1, nullptr, 1, 1, {}, nullptr, nullptr, nullptr);
   aValue->IndexOfByOther(nullptr, 1, nullptr, nullptr);
   aValue->Find(1, 1, nullptr, nullptr);
   aValue->GetCount(nullptr);
@@ -189,19 +189,34 @@ void TouchISolutionCuts(toncut::ISolutionCuts* aValue) {
 
 void TouchISolutionSheet(toncut::ISolutionSheet* aValue) {
   if (aValue == nullptr) return;
+  aValue->GetSheet(nullptr);
+  aValue->GetSolutionFormats(nullptr);
+  aValue->GetSolutionWastes(nullptr);
   aValue->GetSolutionCuts(nullptr);
+  aValue->GetQuantity(nullptr);
+  aValue->GetTechnologicalWasteField(nullptr);
+  aValue->GetEdgingWasteField(nullptr);
+  aValue->GetKerfWasteField(nullptr);
+  aValue->GetIndex(nullptr);
+  aValue->GetRotation(nullptr);
+  aValue->GetMirror(nullptr);
+  aValue->GetIsSaved(nullptr);
   aValue->SetIsSaved(1);
+  aValue->GetIsPlotted(nullptr);
+  aValue->SetIsPlotted(1);
+  aValue->GetEffectiveModificator(nullptr, nullptr);
+  aValue->GetOriginPoint(nullptr, nullptr);
+  aValue->CalcPoint(nullptr, nullptr);
+  aValue->UnCalcPoint(nullptr, nullptr);
   aValue->CalcPointF(nullptr, nullptr);
+  aValue->UnCalcPointF(nullptr, nullptr);
+  aValue->GetDirection(nullptr, nullptr);
   aValue->CalcEffectiveLayout(nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
 }
 
 void TouchITcEnumExtensionsCallback(toncut::ITcEnumExtensionsCallback* aValue) {
   if (aValue == nullptr) return;
   aValue->Invoke({}, {}, {});
-}
-
-void TouchITcPlotterInfo(toncut::ITcPlotterInfo* aValue) {
-  if (aValue == nullptr) return;
 }
 
 void TouchITcPlugin(toncut::ITcPlugin* aValue) {
@@ -273,11 +288,11 @@ void TouchITonCut(toncut::ITonCut* aValue) {
 
 void TouchAllSupportedInterfaces(toncut::ITonCut* aTonCut) {
   TouchITonCut(aTonCut);
-  if (aTonCut != nullptr) { toncut::IProjects* value = nullptr; aTonCut->GetProjects((IUnknown**)&value); TouchIProjects(value); if (value != nullptr) value->Release(); }
-  if (aTonCut != nullptr) { toncut::IMaterials* value = nullptr; aTonCut->GetMaterials((IUnknown**)&value); TouchIMaterials(value); if (value != nullptr) value->Release(); }
-  if (aTonCut != nullptr) { toncut::IFormats* value = nullptr; aTonCut->GetFormats((IUnknown**)&value); TouchIFormats(value); if (value != nullptr) value->Release(); }
-  if (aTonCut != nullptr) { toncut::ISheets* value = nullptr; aTonCut->GetSheets((IUnknown**)&value); TouchISheets(value); if (value != nullptr) value->Release(); }
-  if (aTonCut != nullptr) { toncut::ISolution* value = nullptr; aTonCut->GetSolution((IUnknown**)&value); TouchISolution(value); if (value != nullptr) value->Release(); }
+  if (aTonCut != nullptr) { toncut::IProjects* value = nullptr; aTonCut->GetProjects(&value); TouchIProjects(value); if (value != nullptr) value->Release(); }
+  if (aTonCut != nullptr) { toncut::IMaterials* value = nullptr; aTonCut->GetMaterials(&value); TouchIMaterials(value); if (value != nullptr) value->Release(); }
+  if (aTonCut != nullptr) { toncut::IFormats* value = nullptr; aTonCut->GetFormats(&value); TouchIFormats(value); if (value != nullptr) value->Release(); }
+  if (aTonCut != nullptr) { toncut::ISheets* value = nullptr; aTonCut->GetSheets(&value); TouchISheets(value); if (value != nullptr) value->Release(); }
+  if (aTonCut != nullptr) { toncut::ISolution* value = nullptr; aTonCut->GetSolution(&value); TouchISolution(value); if (value != nullptr) value->Release(); }
 }
 
 }  // namespace contract_probe
