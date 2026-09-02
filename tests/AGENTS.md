@@ -21,7 +21,7 @@ Use `--skip-cppbuilder` when C++Builder is not installed.
 3. Refresh runtime manifests:
    `python tools/run_sdk_tests.py runtime --skip-cppbuilder`
 4. Run the unattended checks:
-   `python generated\runtime\run_manual_checks.py`
+   `python generated\runtime\run_manual_checks.py --skip-cppbuilder`
 5. Print the summary:
    `python tools/run_sdk_tests.py report --skip-cppbuilder`
 
@@ -44,6 +44,8 @@ The generated Python runner:
 - returns exit code `1` on any failing managed probe or harness run
 - does not run starter plugins
 - does not expect CSV or PLT output files from the probe-only loop
+- enforces a 60-second timeout per process by default; use
+  `--timeout-seconds <seconds>` only when a slower host requires it
 
 ## Starter Plugins
 

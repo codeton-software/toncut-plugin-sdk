@@ -56,12 +56,15 @@ def iso_timestamp() -> str:
     )
 
 
-def contract_generation_fingerprint(skipped_lanes: set[str] | None = None) -> str:
+def contract_generation_fingerprint() -> str:
     input_paths = [
         Path(__file__).resolve(),
         SUPPORT_CONFIG_PATH,
         SDK_ROOT / "include" / "cpp" / "TonCutPluginSdk.hpp",
         *sorted((SDK_ROOT / "include" / "pascal").glob("*.pas")),
+        *sorted((SDK_ROOT / "examples" / "csharp" / "managed-core").glob("*.cs")),
+        *sorted((SDK_ROOT / "examples" / "csharp" / "managed-core").glob("*.csproj")),
+        SDK_ROOT / "examples" / "shared" / "csv" / "example.csv",
     ]
     digest = hashlib.sha256()
     digest.update(b"toncut-sdk-contract-v1\0")
@@ -70,10 +73,6 @@ def contract_generation_fingerprint(skipped_lanes: set[str] | None = None) -> st
         digest.update(relative_path.encode("utf-8"))
         digest.update(b"\0")
         digest.update(input_path.read_bytes())
-        digest.update(b"\0")
-    for lane in sorted(skipped_lanes or set()):
-        digest.update(b"skip-lane\0")
-        digest.update(lane.encode("utf-8"))
         digest.update(b"\0")
     return digest.hexdigest()
 
@@ -1355,7 +1354,7 @@ function TContractProbePlugin.GetTonCut(): ITonCut; begin Result := FTonCut; end
 function TContractProbePlugin.GetFeatures(): TTcpFeatures; begin Result := [feImport, feExport, feSaveResultToFile]; end;
 function TContractProbePlugin.GetPlotterInfo(): ITcPlotterInfo; begin Result := nil; end;
 function TContractProbePlugin.Initialize(const aRegRoot: WideString; aLanguageId: Integer; aTonCut: ITonCut): TTcpResult; begin FRegRoot := aRegRoot; FLanguageId := aLanguageId; FTonCut := aTonCut; Result := cprOK; end;
-function TContractProbePlugin.Finalize(): TTcpResult; begin Result := cprOK; end;
+function TContractProbePlugin.Finalize(): TTcpResult; begin FTonCut := nil; Result := cprOK; end;
 function TContractProbePlugin.Configure(aWindow: THandle): TTcpResult; begin Result := cprOK; end;
 function TContractProbePlugin.About(aWindow: THandle): TTcpResult; begin Result := cprOK; end;
 function TContractProbePlugin.LoadConfig(const aKey: WideString; const aVersion: WideString): TTcpResult; begin Result := cprOK; end;
@@ -1603,7 +1602,7 @@ HRESULT STDMETHODCALLTYPE ContractProbePlugin::GetTonCut(toncut::ITonCut** resul
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::GetFeatures(toncut::TTcpFeatures* result) { if (result == nullptr) return E_POINTER; *result = toncut::FeatureMask(toncut::feImport) | toncut::FeatureMask(toncut::feExport) | toncut::FeatureMask(toncut::feSaveResultToFile); return S_OK; }
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::GetPlotterInfo(toncut::ITcPlotterInfo** result) { if (result == nullptr) return E_POINTER; *result = nullptr; return S_OK; }
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::Initialize(BSTR aRegRoot, int aLanguageId, toncut::ITonCut* aTonCut, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; try { regRoot_ = toncut::FromBstr(aRegRoot); languageId_ = aLanguageId; if (aTonCut != nullptr) aTonCut->AddRef(); if (tonCut_ != nullptr) tonCut_->Release(); tonCut_ = aTonCut; *result = toncut::cprOK; return S_OK; } catch (...) { *result = toncut::cprException; return E_UNEXPECTED; } }
-HRESULT STDMETHODCALLTYPE ContractProbePlugin::Finalize(toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; *result = toncut::cprOK; return S_OK; }
+HRESULT STDMETHODCALLTYPE ContractProbePlugin::Finalize(toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; if (tonCut_ != nullptr) { tonCut_->Release(); tonCut_ = nullptr; } *result = toncut::cprOK; return S_OK; }
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::Configure(HWND, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; *result = toncut::cprOK; return S_OK; }
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::About(HWND, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; *result = toncut::cprOK; return S_OK; }
 HRESULT STDMETHODCALLTYPE ContractProbePlugin::LoadConfig(BSTR, BSTR, toncut::TTcpResult* result) { if (result == nullptr) return E_POINTER; *result = toncut::cprOK; return S_OK; }
@@ -1929,6 +1928,28 @@ internal static class Program
         {
             Console.Error.WriteLine("Managed core probe decoded zero records.");
             return 1;
+        }
+        var spacedHeader = string.Join(",", CsvSchema.Headers.Select(header => $" {header} "));
+        var normalizationText = spacedHeader + "\\r\\n" +
+            "FORMAT,Project,Material,mk2D,0,18,100,50,0,ID-1,Zero quantity\\r\\n" +
+            "SHEET,,Material,mk2D,0,18,200,100,not-a-number,ID-2,Invalid quantity\\r\\n";
+        var normalizedRecords = CsvCodec.Decode(CsvCodec.Parse(normalizationText));
+        if (normalizedRecords.Count != 2 || normalizedRecords.Any(record => record.Quantity != 1))
+        {
+            Console.Error.WriteLine("Managed header lookup or quantity normalization mismatch.");
+            return 1;
+        }
+
+        var unknownTypeText = string.Join(",", CsvSchema.Headers) + "\\r\\n" +
+            "UNKNOWN,Project,Material,mk2D,0,18,100,50,1,ID-3,Unknown record\\r\\n";
+        try
+        {
+            CsvCodec.Decode(CsvCodec.Parse(unknownTypeText));
+            Console.Error.WriteLine("Managed core accepted an unknown RecordType.");
+            return 1;
+        }
+        catch (InvalidOperationException)
+        {
         }
         Console.WriteLine($"Managed core probe passed with {records.Count} records.");
         return 0;
@@ -2467,6 +2488,12 @@ def render_manual_guide(
         f"- Run the generated runner from the `SDK/tests` directory: `python {to_windows_path(runtime_manifest['scripts']['manualCheckScript'])}`"
     )
     lines.append(
+        "- When C++Builder is unavailable, add `--skip-cppbuilder` to the generated runner as well as the build/runtime/report commands."
+    )
+    lines.append(
+        "- Each probe process has a 60-second timeout by default; override it with `--timeout-seconds <seconds>`."
+    )
+    lines.append(
         "- The generated runner is non-interactive: it executes the managed probe and the native ContractProbe plugins only."
     )
     lines.append(
@@ -2540,18 +2567,22 @@ def generate_manual_check_script(runtime_manifest: dict[str, Any]) -> str:
         if item["category"] == "probe"
     ]
     defaults = {
+        "generatedAt": runtime_manifest.get("generatedAt"),
+        "generationFingerprint": runtime_manifest.get("generationFingerprint"),
         "harnessPath": harness,
         "managedProbePath": managed_probe,
         "sampleCsvPath": runtime_manifest["fixtures"]["sampleCsv"],
         "outputDir": runtime_manifest["fixtures"]["manualOutputDir"],
         "reportPath": runtime_manifest["scripts"]["manualRuntimeReport"],
         "logDir": runtime_manifest["scripts"]["manualLogsDir"],
+        "timeoutSeconds": 60.0,
     }
 
     script = """from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import subprocess
 import sys
@@ -2584,7 +2615,17 @@ def append_exception(log_path: Path, exc: Exception) -> None:
     sys.stderr.write(message)
 
 
-def run_with_logging(command: list[str], log_path: Path) -> int:
+def positive_timeout(value: str) -> float:
+    try:
+        parsed = float(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("timeout must be a number") from exc
+    if not math.isfinite(parsed) or parsed <= 0:
+        raise argparse.ArgumentTypeError("timeout must be a finite number greater than zero")
+    return parsed
+
+
+def run_with_logging(command: list[str], log_path: Path, timeout_seconds: float) -> int:
     ensure_dir(log_path.parent)
     with log_path.open("w", encoding="utf-8", newline="") as stream:
         process = subprocess.Popen(
@@ -2596,12 +2637,21 @@ def run_with_logging(command: list[str], log_path: Path) -> int:
             encoding="utf-8",
             errors="replace",
         )
-        assert process.stdout is not None
-        for line in process.stdout:
-            sys.stdout.write(line)
-            stream.write(line)
-        process.stdout.close()
-        return process.wait()
+        try:
+            output, _ = process.communicate(timeout=timeout_seconds)
+        except subprocess.TimeoutExpired as exc:
+            process.kill()
+            output, _ = process.communicate()
+            if output:
+                sys.stdout.write(output)
+                stream.write(output)
+            raise TimeoutError(
+                f"Process timed out after {timeout_seconds:g} seconds: {command[0]}"
+            ) from exc
+        if output:
+            sys.stdout.write(output)
+            stream.write(output)
+        return process.returncode
 
 
 def main() -> int:
@@ -2612,7 +2662,18 @@ def main() -> int:
     parser.add_argument("--output-dir", default=DEFAULTS["outputDir"])
     parser.add_argument("--report-path", default=DEFAULTS["reportPath"])
     parser.add_argument("--log-dir", default=DEFAULTS["logDir"])
+    parser.add_argument("--skip-cppbuilder", action="store_true")
+    parser.add_argument(
+        "--timeout-seconds",
+        type=positive_timeout,
+        default=DEFAULTS["timeoutSeconds"],
+    )
     args = parser.parse_args()
+
+    skipped_lanes = {"cppbuilder"} if args.skip_cppbuilder else set()
+    plugin_entries = [
+        plugin for plugin in PLUGIN_ENTRIES if plugin["lane"] not in skipped_lanes
+    ]
 
     harness_path = resolve_workspace_path(args.harness_path)
     managed_probe_path = resolve_workspace_path(args.managed_probe_path)
@@ -2626,12 +2687,16 @@ def main() -> int:
 
     report: dict[str, object] = {
         "checkedAt": iso_timestamp(),
+        "contractGeneratedAt": DEFAULTS["generatedAt"],
+        "generationFingerprint": DEFAULTS["generationFingerprint"],
         "testsRoot": str(TESTS_ROOT),
         "harnessPath": str(harness_path),
         "managedProbePath": str(managed_probe_path),
         "sampleCsvPath": str(sample_csv_path),
         "outputDir": str(output_dir),
         "logDir": str(log_dir),
+        "skippedLanes": sorted(skipped_lanes),
+        "timeoutSeconds": args.timeout_seconds,
         "harnessRuns": [],
         "managedProbe": None,
     }
@@ -2639,7 +2704,9 @@ def main() -> int:
     managed_log_path = log_dir / "managed-core-probe.log"
     if managed_probe_path.exists():
         try:
-            exit_code = run_with_logging([str(managed_probe_path)], managed_log_path)
+            exit_code = run_with_logging(
+                [str(managed_probe_path)], managed_log_path, args.timeout_seconds
+            )
             report["managedProbe"] = {
                 "path": str(managed_probe_path),
                 "logPath": str(managed_log_path),
@@ -2663,7 +2730,7 @@ def main() -> int:
 
     harness_runs = report["harnessRuns"]
     assert isinstance(harness_runs, list)
-    for plugin in PLUGIN_ENTRIES:
+    for plugin in plugin_entries:
         plugin_path = resolve_workspace_path(plugin["path"])
         safe_id = re.sub(r"[^A-Za-z0-9._-]", "_", plugin["id"])
         log_path = log_dir / f"{safe_id}.log"
@@ -2690,6 +2757,7 @@ def main() -> int:
             exit_code = run_with_logging(
                 [str(harness_path), str(plugin_path), str(sample_csv_path), str(output_dir)],
                 log_path,
+                args.timeout_seconds,
             )
             entry["exitCode"] = exit_code
             entry["status"] = "pass" if exit_code == 0 else "fail"
@@ -2719,8 +2787,8 @@ if __name__ == "__main__":
     return script
 
 
-def generate_artifacts(skipped_lanes: set[str] | None = None) -> dict[str, Any]:
-    generation_fingerprint = contract_generation_fingerprint(skipped_lanes)
+def generate_artifacts() -> dict[str, Any]:
+    generation_fingerprint = contract_generation_fingerprint()
     generated_at = stable_generation_timestamp(generation_fingerprint)
     manifest = build_manifest(
         parse_pascal_units(),
@@ -2733,7 +2801,6 @@ def generate_artifacts(skipped_lanes: set[str] | None = None) -> dict[str, Any]:
     validate_cpp_projections(manifest, config)
     support = build_support(manifest, config)
     runtime_manifest = build_runtime_manifest(
-        skipped_lanes,
         generated_at=generated_at,
         generation_fingerprint=generation_fingerprint,
     )
@@ -2750,7 +2817,7 @@ def generate_artifacts(skipped_lanes: set[str] | None = None) -> dict[str, Any]:
     write_json(RUNTIME_ROOT / "runtime-manifest.json", runtime_manifest)
     write_text(
         RUNTIME_ROOT / "manual-checklist.md",
-        render_manual_guide(runtime_manifest, skipped_lanes),
+        render_manual_guide(runtime_manifest),
     )
     write_json(
         RUNTIME_ROOT / "manual-results.template.json", build_manual_results_template()

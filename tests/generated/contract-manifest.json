@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-01T21:36:35.356Z",
+  "generatedAt": "2026-09-02T08:42:18.215Z",
   "sourceRoot": "SDK/include",
   "totals": {
     "interfaceCount": 65,
@@ -22787,5 +22787,5 @@
       ]
     }
   ],
-  "generationFingerprint": "99b3ee79df8fa1e7626d1a9812821ee948a4e4d91d586de3fcdd80c3b1ab998c"
+  "generationFingerprint": "37bf6ec2db783b367d2608d24ffc9b82b7b89f6f990bda68e4e3c0f9155613dc"
 }

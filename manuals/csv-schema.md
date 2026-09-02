@@ -12,15 +12,18 @@ RecordType,ProjectTitle,MaterialTitle,MaterialKind,MaterialWidth,MaterialThickne
 - comma delimiter
 - CRLF line endings
 - required header row
+- header names are matched case-insensitively after trimming surrounding whitespace
 - RFC4180-style quoting
 
 ## Row Rules
 
 - `RecordType=FORMAT` maps to `IFormat`
 - `RecordType=SHEET` maps to `ISheet`
+- any other non-empty `RecordType` rejects the import
 - `ProjectTitle` applies only to `FORMAT` rows
 - `MaterialKind` uses `mk1D`, `mk2D`, or `mkUnknown`
 - `MaterialWidth`, `MaterialThickness`, `Length`, and `Width` are stored in millimeters in the CSV
+- a missing, invalid, or zero `Quantity` defaults to `1`
 - `MaterialWidth` is only significant for `mk1D`; for `mk2D` and `mkUnknown`, the starter plugins ignore it on import and export `0`
 - the starter plugins multiply those millimeter values by `cLengthMultiplier` on import and divide by `cLengthMultiplier` on export
 

@@ -14,6 +14,7 @@ from sdk_test_lib import (
     ROOT,
     RUNTIME_ROOT,
     build_commands,
+    build_runtime_manifest,
     describe_lane_ids,
     generate_artifacts,
     iso_timestamp,
@@ -407,6 +408,32 @@ def summarize_manual_runtime_report(report: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def manual_runtime_report_compatibility_error(
+    report: dict[str, Any],
+    generation_fingerprint: str,
+    skipped_lanes: set[str],
+) -> str | None:
+    report_fingerprint = report.get("generationFingerprint")
+    if report_fingerprint != generation_fingerprint:
+        if not isinstance(report_fingerprint, str) or not report_fingerprint:
+            return "the saved report has no generated-contract fingerprint"
+        return (
+            "the saved report was produced for generated-contract fingerprint "
+            f"{report_fingerprint}, not {generation_fingerprint}"
+        )
+
+    report_skipped_lanes = report.get("skippedLanes")
+    if not isinstance(report_skipped_lanes, list) or not all(
+        isinstance(lane, str) for lane in report_skipped_lanes
+    ):
+        return "the saved report has no valid skipped-lane provenance"
+    if set(report_skipped_lanes) != skipped_lanes:
+        expected = describe_lane_ids(skipped_lanes) or "none"
+        actual = describe_lane_ids(set(report_skipped_lanes)) or "none"
+        return f"the saved report skipped {actual}; this report expects {expected}"
+    return None
+
+
 def collect_manual_status_entries(value: Any, prefix: str = "") -> list[dict[str, str]]:
     if not isinstance(value, dict):
         return []
@@ -457,17 +484,21 @@ def summarize_manual_results(manual_results: dict[str, Any]) -> str:
 
 
 def cmd_contract(skipped_lanes: set[str]) -> None:
-    result = generate_artifacts(skipped_lanes)
+    if skipped_lanes:
+        raise ValueError(
+            "--skip-cppbuilder applies to build, runtime, and report; "
+            "contract artifacts always describe every SDK lane."
+        )
+    result = generate_artifacts()
     manifest = result["manifest"]
     support = result["support"]
     print(
         f"Generated contract artifacts for {manifest['totals']['interfaceCount']} Pascal interfaces and {len(support['lanes'])} lanes."
     )
-    print_skipped_lanes(skipped_lanes)
 
 
 def cmd_build(args: argparse.Namespace, skipped_lanes: set[str]) -> None:
-    generate_artifacts(skipped_lanes)
+    generate_artifacts()
     commands = build_commands(skipped_lanes)
     dry_run, mode_source = resolve_build_mode(args, commands)
 
@@ -493,7 +524,12 @@ def cmd_build(args: argparse.Namespace, skipped_lanes: set[str]) -> None:
 
 
 def cmd_runtime(skipped_lanes: set[str]) -> None:
-    runtime_manifest = generate_artifacts(skipped_lanes)["runtimeManifest"]
+    generated = generate_artifacts()
+    runtime_manifest = build_runtime_manifest(
+        skipped_lanes,
+        generated_at=generated["manifest"]["generatedAt"],
+        generation_fingerprint=generated["manifest"]["generationFingerprint"],
+    )
     status = write_artifact_status(runtime_manifest)
     harness = next(
         (item for item in status["artifacts"] if item["id"] == "harness-delphi-debug"),
@@ -516,7 +552,11 @@ def cmd_runtime(skipped_lanes: set[str]) -> None:
     print(f"Manual results template: {RUNTIME_ROOT / 'manual-results.template.json'}")
     print(f"Manual results file: {RUNTIME_ROOT / 'manual-results.json'}")
     print("")
-    print(f'Run the generated runner: python "{RUNTIME_ROOT / "run_manual_checks.py"}"')
+    runner_options = " --skip-cppbuilder" if "cppbuilder" in skipped_lanes else ""
+    print(
+        f'Run the generated runner: python "{RUNTIME_ROOT / "run_manual_checks.py"}"'
+        f"{runner_options}"
+    )
     print("")
 
     if harness and harness["exists"] and available_plugins:
@@ -545,7 +585,12 @@ def cmd_runtime(skipped_lanes: set[str]) -> None:
 
 
 def cmd_report(skipped_lanes: set[str]) -> None:
-    runtime_manifest = generate_artifacts(skipped_lanes)["runtimeManifest"]
+    generated = generate_artifacts()
+    runtime_manifest = build_runtime_manifest(
+        skipped_lanes,
+        generated_at=generated["manifest"]["generatedAt"],
+        generation_fingerprint=generated["manifest"]["generationFingerprint"],
+    )
     contract_summary_path = REPORTS_ROOT / "contract-summary.md"
     expectations_path = RUNTIME_ROOT / "expectations.json"
     status = write_artifact_status(runtime_manifest)
@@ -560,7 +605,20 @@ def cmd_report(skipped_lanes: set[str]) -> None:
         manual_runtime_report = load_json(manual_runtime_report_path)
         print("")
         print("Manual runtime report:")
-        print(summarize_manual_runtime_report(manual_runtime_report))
+        compatibility_error = manual_runtime_report_compatibility_error(
+            manual_runtime_report,
+            generated["manifest"]["generationFingerprint"],
+            skipped_lanes,
+        )
+        if compatibility_error:
+            runner_options = " --skip-cppbuilder" if "cppbuilder" in skipped_lanes else ""
+            print(f"Stale or incompatible: {compatibility_error}.")
+            print(
+                f'Rerun: python "{RUNTIME_ROOT / "run_manual_checks.py"}"'
+                f"{runner_options}"
+            )
+        else:
+            print(summarize_manual_runtime_report(manual_runtime_report))
     else:
         print("")
         print(f"Manual runtime report not found. Run {RUNTIME_ROOT / 'run_manual_checks.py'}")

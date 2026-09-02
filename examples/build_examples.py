@@ -72,7 +72,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--platform",
         default="Win32",
-        help="Build platform. Default: Win32.",
+        choices=["Win32"],
+        help="Build platform. The TonCut plugin ABI supports Win32 only.",
     )
     execution_mode = parser.add_mutually_exclusive_group()
     execution_mode.add_argument(

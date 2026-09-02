@@ -638,7 +638,7 @@ HRESULT CsvImportExportPluginBase::EnsureMaterial(
     return hr;
   }
   if (isUnique == 0) {
-    return S_OK;
+    return HRESULT_FROM_WIN32(ERROR_ALREADY_EXISTS);
   }
 
   hr = tonCut_->CreateMaterial(
@@ -739,7 +739,7 @@ HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::LoadFile(HWND, BSTR aFileNa
         materialThickness,
         materialCache,
         material);
-      if (FAILED(hr)) {
+      if (FAILED(hr) || !material) {
         *result = cprFailed;
         return S_OK;
       }
@@ -779,7 +779,7 @@ HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::LoadFile(HWND, BSTR aFileNa
         materialThickness,
         materialCache,
         material);
-      if (FAILED(hr)) {
+      if (FAILED(hr) || !material) {
         *result = cprFailed;
         return S_OK;
       }

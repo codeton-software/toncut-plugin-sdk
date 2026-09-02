@@ -19,14 +19,18 @@ Run these commands from the `SDK/tests` directory. If you start in `SDK`, use `p
 - `python tools/run_sdk_tests.py runtime`
   Discovers built artifacts, writes `generated/runtime/artifact-status.json`, and prints the next manual runtime commands. Add `--skip-cppbuilder` to stop treating C++Builder outputs as required.
 - `python tools/run_sdk_tests.py report`
-  Prints the generated summary, runtime expectations, artifact status, and any saved `manual-results.json`. Add `--skip-cppbuilder` to keep the report aligned with a non-C++Builder setup.
+  Prints the generated summary, runtime expectations, artifact status, and any saved `manual-results.json`. Add `--skip-cppbuilder` to keep the report aligned with a non-C++Builder setup. Saved runtime results are accepted only when their contract fingerprint and skipped lanes match the current report request.
+
+Lane skips affect only the selected local build/runtime/report work. The
+checked-in contract, support matrix, runner, and runtime manifest always
+describe all four SDK lanes and remain unchanged by a skipped-lane run.
 
 ## Manual Runtime Flow
 
 1. Run `python tools/run_sdk_tests.py contract` after any SDK or generator change.
 2. Run `python tools/run_sdk_tests.py build --skip-cppbuilder --dry-run` if Embarcadero C++Builder is not installed and you only want the command list. Use `--execute` or set `TONCUT_SDK_TESTS_DRY_RUN=0` only on a machine with the required build toolchains in `PATH`.
 3. Run `python tools/run_sdk_tests.py runtime --skip-cppbuilder` if the build step skipped C++Builder so artifact discovery and runtime guidance stay consistent.
-4. Execute `python generated\runtime\run_manual_checks.py` from the `SDK/tests` directory to run the managed probe and the native ContractProbe `.plg` files through the Delphi harness. This runner is non-interactive and does not open plugin message boxes.
+4. Execute `python generated\runtime\run_manual_checks.py --skip-cppbuilder` from the `SDK/tests` directory when that lane was skipped (omit the option after a complete four-lane build). The runner is non-interactive, applies a 60-second timeout to each process by default, and does not open plugin message boxes.
 5. Review:
    - `generated/runtime/manual-runtime-report.json`
    - `generated/runtime/logs/`

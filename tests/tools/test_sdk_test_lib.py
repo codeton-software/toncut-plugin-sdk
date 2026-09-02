@@ -2,6 +2,7 @@ import sys
 import unittest
 import importlib.util
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 
@@ -22,7 +23,9 @@ from sdk_test_lib import (  # noqa: E402
     validate_cpp_projections,
 )
 from run_sdk_tests import (  # noqa: E402
+    cmd_build,
     ensure_build_target,
+    manual_runtime_report_compatibility_error,
     missing_command_tools,
     prepare_command,
 )
@@ -90,6 +93,30 @@ class CppProjectionValidationTests(unittest.TestCase):
                 ),
                 "msbuild CsvImportExport.sln /p:Configuration=Release /t:Rebuild",
             )
+
+    def test_lane_skip_does_not_rewrite_canonical_artifacts(self) -> None:
+        generate_artifacts()
+        before = {
+            path.relative_to(GENERATED_ROOT).as_posix(): path.read_bytes()
+            for path in GENERATED_ROOT.rglob("*")
+            if path.is_file()
+        }
+        args = SimpleNamespace(dry_run=True, execute=False)
+        with patch("builtins.print"):
+            cmd_build(args, {"cppbuilder"})
+        after = {
+            path.relative_to(GENERATED_ROOT).as_posix(): path.read_bytes()
+            for path in GENERATED_ROOT.rglob("*")
+            if path.is_file()
+        }
+        self.assertEqual(after, before)
+
+    def test_example_build_driver_rejects_non_win32_platforms(self) -> None:
+        parser = sdk_build_examples.build_parser()
+        platform_action = next(
+            action for action in parser._actions if action.dest == "platform"
+        )
+        self.assertEqual(platform_action.choices, ["Win32"])
 
     def test_build_drivers_detect_missing_cppbuilder_compiler(self) -> None:
         commands = [{"command": "msbuild ContractProbe.groupproj"}]
@@ -556,6 +583,128 @@ class CppProjectionValidationTests(unittest.TestCase):
         cell_start = delphi_source.rindex("function CellByName(")
         cell_end = delphi_source.index("function TryParseCardinalField(", cell_start)
         self.assertIn("SameText(Trim(AHeader[i]), AName)", delphi_source[cell_start:cell_end])
+
+        csharp_source = (
+            sdk_root
+            / "examples"
+            / "csharp"
+            / "managed-core"
+            / "CsvCodec.cs"
+        ).read_text(encoding="utf-8")
+        self.assertIn("header[i].Trim()", csharp_source)
+
+    def test_cross_language_import_rejects_null_material_and_unknown_rows(self) -> None:
+        sdk_root = Path(__file__).resolve().parents[2]
+        cpp_source = (
+            sdk_root / "examples" / "shared" / "cpp" / "CsvImportExportPluginBase.cpp"
+        ).read_text(encoding="utf-8")
+        ensure_start = cpp_source.index("CsvImportExportPluginBase::EnsureMaterial(")
+        ensure_end = cpp_source.index("CsvImportExportPluginBase::LoadFile(", ensure_start)
+        self.assertIn(
+            "return HRESULT_FROM_WIN32(ERROR_ALREADY_EXISTS);",
+            cpp_source[ensure_start:ensure_end],
+        )
+        load_start = ensure_end
+        load_end = cpp_source.index("CsvImportExportPluginBase::SaveFile(", load_start)
+        self.assertEqual(
+            cpp_source[load_start:load_end].count("if (FAILED(hr) || !material)"),
+            2,
+        )
+
+        csharp_source = (
+            sdk_root
+            / "examples"
+            / "csharp"
+            / "managed-core"
+            / "CsvCodec.cs"
+        ).read_text(encoding="utf-8")
+        self.assertIn("Unknown RecordType at row", csharp_source)
+        self.assertIn("ParseOptionalPositiveUInt", csharp_source)
+        self.assertIn("|| result == 0", csharp_source)
+
+        generate_artifacts()
+        managed_probe = (
+            sdk_root
+            / "tests"
+            / "generated"
+            / "probes"
+            / "csharp-managed"
+            / "Program.cs"
+        ).read_text(encoding="utf-8")
+        self.assertIn("Zero quantity", managed_probe)
+        self.assertIn("Invalid quantity", managed_probe)
+        self.assertIn("accepted an unknown RecordType", managed_probe)
+        self.assertIn('spacedHeader + "\\r\\n" +', managed_probe)
+        self.assertNotIn('spacedHeader + "\n\n" +', managed_probe)
+
+    def test_generated_runtime_and_probe_lifecycle_are_bounded(self) -> None:
+        generate_artifacts()
+        sdk_root = Path(__file__).resolve().parents[2]
+        runner = (
+            sdk_root / "tests" / "generated" / "runtime" / "run_manual_checks.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn('parser.add_argument("--skip-cppbuilder", action="store_true")', runner)
+        self.assertIn('parser.add_argument(\n        "--timeout-seconds"', runner)
+        self.assertIn("process.communicate(timeout=timeout_seconds)", runner)
+        self.assertIn("except subprocess.TimeoutExpired", runner)
+        self.assertIn("not math.isfinite(parsed)", runner)
+        self.assertIn('"generationFingerprint": DEFAULTS["generationFingerprint"]', runner)
+
+        delphi_probe = (
+            sdk_root
+            / "tests"
+            / "generated"
+            / "probes"
+            / "delphi"
+            / "uContractProbePlugin.pas"
+        ).read_text(encoding="utf-8")
+        self.assertIn(
+            "function TContractProbePlugin.Finalize(): TTcpResult; begin FTonCut := nil;",
+            delphi_probe,
+        )
+        for lane in ("cppbuilder", "msvc", "csharp"):
+            cpp_probe = (
+                sdk_root
+                / "tests"
+                / "generated"
+                / "probes"
+                / lane
+                / "ContractProbePlugin.cpp"
+            ).read_text(encoding="utf-8")
+            finalize_start = cpp_probe.index("ContractProbePlugin::Finalize(")
+            finalize_end = cpp_probe.index(
+                "ContractProbePlugin::Configure(", finalize_start
+            )
+            self.assertIn("tonCut_->Release()", cpp_probe[finalize_start:finalize_end])
+            self.assertIn("tonCut_ = nullptr", cpp_probe[finalize_start:finalize_end])
+
+    def test_runtime_report_rejects_stale_or_mismatched_provenance(self) -> None:
+        current = {
+            "generationFingerprint": "current",
+            "skippedLanes": ["cppbuilder"],
+        }
+        self.assertIsNone(
+            manual_runtime_report_compatibility_error(
+                current, "current", {"cppbuilder"}
+            )
+        )
+        self.assertIn(
+            "no generated-contract fingerprint",
+            manual_runtime_report_compatibility_error({}, "current", set()) or "",
+        )
+        self.assertIn(
+            "not current",
+            manual_runtime_report_compatibility_error(
+                {"generationFingerprint": "old", "skippedLanes": []},
+                "current",
+                set(),
+            )
+            or "",
+        )
+        self.assertIn(
+            "this report expects none",
+            manual_runtime_report_compatibility_error(current, "current", set()) or "",
+        )
 
     def test_sheet_quantity_is_checked_before_signed_assignment(self) -> None:
         sdk_root = Path(__file__).resolve().parents[2]

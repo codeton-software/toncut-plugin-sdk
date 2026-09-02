@@ -113,9 +113,16 @@ public static class CsvCodec
                 continue;
             }
 
+            var normalizedRecordType = recordType.Trim();
+            if (!string.Equals(normalizedRecordType, "FORMAT", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(normalizedRecordType, "SHEET", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new InvalidOperationException($"Unknown RecordType at row {i + 1}: {recordType}");
+            }
+
             records.Add(new CsvRowRecord
             {
-                RecordType = recordType.Trim(),
+                RecordType = normalizedRecordType,
                 ProjectTitle = GetCell(rows[0], row, "ProjectTitle"),
                 MaterialTitle = GetCell(rows[0], row, "MaterialTitle"),
                 MaterialKind = ParseMaterialKind(GetCell(rows[0], row, "MaterialKind")),
@@ -123,7 +130,7 @@ public static class CsvCodec
                 MaterialThickness = ParseUInt(GetCell(rows[0], row, "MaterialThickness")),
                 Length = ParseUInt(GetCell(rows[0], row, "Length")),
                 Width = ParseUInt(GetCell(rows[0], row, "Width")),
-                Quantity = ParseOptionalUInt(GetCell(rows[0], row, "Quantity"), 1),
+                Quantity = ParseOptionalPositiveUInt(GetCell(rows[0], row, "Quantity"), 1),
                 Identifier = GetCell(rows[0], row, "Identifier"),
                 Description = GetCell(rows[0], row, "Description"),
             });
@@ -159,7 +166,7 @@ public static class CsvCodec
     {
         for (var i = 0; i < header.Count; i++)
         {
-            if (string.Equals(header[i], name, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(header[i].Trim(), name, StringComparison.OrdinalIgnoreCase))
             {
                 return i < row.Count ? row[i].Trim() : string.Empty;
             }
@@ -178,14 +185,14 @@ public static class CsvCodec
         return result;
     }
 
-    private static uint ParseOptionalUInt(string value, uint fallback)
+    private static uint ParseOptionalPositiveUInt(string value, uint fallback)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        if (!uint.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out var result) || result == 0)
         {
             return fallback;
         }
 
-        return ParseUInt(value);
+        return result;
     }
 
     private static string ParseMaterialKind(string value)

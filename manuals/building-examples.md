@@ -11,6 +11,7 @@ From `SDK/examples`:
 From `SDK`, use `python examples/build_examples.py ...` instead.
 
 The driver auto-discovers Visual Studio `MSBuild.exe` with `vswhere.exe`, auto-loads RAD Studio `rsvars.bat` for Delphi and C++Builder projects, and supports `--dry-run` plus `TONCUT_SDK_EXAMPLES_DRY_RUN=0` in the same way as the SDK test runner.
+The driver accepts only `--platform Win32`, matching the production plugin ABI.
 
 ## Delphi
 

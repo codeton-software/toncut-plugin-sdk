@@ -24,6 +24,28 @@ internal static class Program
             Console.Error.WriteLine("Managed core probe decoded zero records.");
             return 1;
         }
+        var spacedHeader = string.Join(",", CsvSchema.Headers.Select(header => $" {header} "));
+        var normalizationText = spacedHeader + "\r\n" +
+            "FORMAT,Project,Material,mk2D,0,18,100,50,0,ID-1,Zero quantity\r\n" +
+            "SHEET,,Material,mk2D,0,18,200,100,not-a-number,ID-2,Invalid quantity\r\n";
+        var normalizedRecords = CsvCodec.Decode(CsvCodec.Parse(normalizationText));
+        if (normalizedRecords.Count != 2 || normalizedRecords.Any(record => record.Quantity != 1))
+        {
+            Console.Error.WriteLine("Managed header lookup or quantity normalization mismatch.");
+            return 1;
+        }
+
+        var unknownTypeText = string.Join(",", CsvSchema.Headers) + "\r\n" +
+            "UNKNOWN,Project,Material,mk2D,0,18,100,50,1,ID-3,Unknown record\r\n";
+        try
+        {
+            CsvCodec.Decode(CsvCodec.Parse(unknownTypeText));
+            Console.Error.WriteLine("Managed core accepted an unknown RecordType.");
+            return 1;
+        }
+        catch (InvalidOperationException)
+        {
+        }
         Console.WriteLine($"Managed core probe passed with {records.Count} records.");
         return 0;
     }

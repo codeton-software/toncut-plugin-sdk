@@ -11,6 +11,8 @@ Run these commands from `SDK/examples`. If you start in `SDK`, use `python examp
 - Print commands without executing them: `python build_examples.py --dry-run`
 
 The script auto-discovers Visual Studio `MSBuild.exe` with `vswhere.exe` and auto-loads RAD Studio `rsvars.bat` for Delphi and C++Builder projects.
+It accepts only the production `Win32` platform; the TonCut plugin ABI is not
+compatible with a Win64 build.
 
 ## Example Ids
 

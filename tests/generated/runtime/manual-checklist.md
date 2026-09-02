@@ -16,6 +16,8 @@
 
 - Build the Delphi harness: `msbuild generated\harness\delphi\ContractHostHarness.dproj /p:Config=Debug /p:Platform=Win32`
 - Run the generated runner from the `SDK/tests` directory: `python generated\runtime\run_manual_checks.py`
+- When C++Builder is unavailable, add `--skip-cppbuilder` to the generated runner as well as the build/runtime/report commands.
+- Each probe process has a 60-second timeout by default; override it with `--timeout-seconds <seconds>`.
 - The generated runner is non-interactive: it executes the managed probe and the native ContractProbe plugins only.
 - Or invoke the harness manually per probe plugin: `generated\harness\delphi\Win32\Debug\ContractHostHarness.exe <plugin.plg> ..\examples\shared\csv\example.csv generated\runtime\manual-output`
 - Runtime report JSON: `generated\runtime\manual-runtime-report.json`
