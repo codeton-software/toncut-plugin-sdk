@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-09-02T08:42:18.215Z",
+  "generatedAt": "2026-09-05T03:33:59.606Z",
   "sourceRoot": "SDK/include",
   "totals": {
     "interfaceCount": 65,
     "methodCount": 965,
     "propertyCount": 426,
     "cppInterfaceCount": 30,
-    "cppMethodCount": 224
+    "cppMethodCount": 227
   },
   "interfaces": [
     {
@@ -21459,6 +21459,39 @@
               "type": "int*"
             }
           ]
+        },
+        {
+          "name": "GetNeedShift",
+          "signature": "HRESULT GetNeedShift(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "CalcLength",
+          "signature": "HRESULT CalcLength(double* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "double*"
+            }
+          ]
+        },
+        {
+          "name": "GetShiftDistance",
+          "signature": "HRESULT GetShiftDistance(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
         }
       ]
     },
@@ -22787,5 +22820,5 @@
       ]
     }
   ],
-  "generationFingerprint": "37bf6ec2db783b367d2608d24ffc9b82b7b89f6f990bda68e4e3c0f9155613dc"
+  "generationFingerprint": "0aed21e69a9f4ba925735e2f788b358c2f4668fe2328c7529971e4cce6f5dfed"
 }

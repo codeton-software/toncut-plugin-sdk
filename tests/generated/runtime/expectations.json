@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-09-02T08:42:18.215Z",
-  "generationFingerprint": "37bf6ec2db783b367d2608d24ffc9b82b7b89f6f990bda68e4e3c0f9155613dc",
+  "generatedAt": "2026-09-05T03:33:59.606Z",
+  "generationFingerprint": "0aed21e69a9f4ba925735e2f788b358c2f4668fe2328c7529971e4cce6f5dfed",
   "lanes": {
     "delphi": {
       "supportedInterfaces": [
@@ -91,7 +91,7 @@
         "ITcPlugin",
         "ITonCut"
       ],
-      "expectedMethodCount": 224,
+      "expectedMethodCount": 227,
       "expectedPropertyCount": 0,
       "ownershipOnlyInterfaces": [
         "IBand",
@@ -146,7 +146,7 @@
         "ITcPlugin",
         "ITonCut"
       ],
-      "expectedMethodCount": 224,
+      "expectedMethodCount": 227,
       "expectedPropertyCount": 0,
       "ownershipOnlyInterfaces": [
         "IBand",
@@ -206,7 +206,7 @@
         "ITcPlugin",
         "ITonCut"
       ],
-      "nativeShimExpectedMethodCount": 224,
+      "nativeShimExpectedMethodCount": 227,
       "nativeShimOwnershipOnlyInterfaces": [
         "IBand",
         "IBands",

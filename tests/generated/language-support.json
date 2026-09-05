@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-09-02T08:42:18.215Z",
+  "generatedAt": "2026-09-05T03:33:59.606Z",
   "totals": {
     "interfaceCount": 65,
     "methodCount": 965,
     "propertyCount": 426,
     "cppInterfaceCount": 30,
-    "cppMethodCount": 224
+    "cppMethodCount": 227
   },
   "lanes": {
     "delphi": {
@@ -4780,7 +4780,7 @@
         {
           "name": "ISolutionCut",
           "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
-          "methodCount": 9,
+          "methodCount": 12,
           "propertyCount": 0,
           "methods": [
             "GetKind",
@@ -4791,7 +4791,10 @@
             "GetPosXp",
             "GetPosYp",
             "GetTarXp",
-            "GetTarYp"
+            "GetTarYp",
+            "GetNeedShift",
+            "CalcLength",
+            "GetShiftDistance"
           ],
           "properties": [],
           "supportedPropertyAccessors": [
@@ -4803,46 +4806,17 @@
             "PosXp",
             "PosYp",
             "TarXp",
-            "TarYp"
+            "TarYp",
+            "NeedShift",
+            "ShiftDistance"
           ],
-          "unsupportedMethods": [
-            {
-              "slot": 9,
-              "name": "GetNeedShift",
-              "signature": "function GetNeedShift(): Boolean"
-            },
-            {
-              "slot": 10,
-              "name": "CalcLength",
-              "signature": "function CalcLength(): Double"
-            },
-            {
-              "slot": 11,
-              "name": "GetShiftDistance",
-              "signature": "function GetShiftDistance(): Integer"
-            }
-          ],
-          "unsupportedProperties": [
-            {
-              "name": "NeedShift",
-              "type": "Boolean",
-              "missingAccessors": [
-                "GetNeedShift"
-              ]
-            },
-            {
-              "name": "ShiftDistance",
-              "type": "Integer",
-              "missingAccessors": [
-                "GetShiftDistance"
-              ]
-            }
-          ],
+          "unsupportedMethods": [],
+          "unsupportedProperties": [],
           "diff": {
-            "status": "prefix",
+            "status": "ok",
             "safe": true,
-            "projection": "prefix",
-            "cppMethodCount": 9,
+            "projection": "full",
+            "cppMethodCount": 12,
             "pascalMethodCount": 12,
             "acceptedAliases": [],
             "methodDiffs": []
@@ -10414,7 +10388,7 @@
         {
           "name": "ISolutionCut",
           "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
-          "methodCount": 9,
+          "methodCount": 12,
           "propertyCount": 0,
           "methods": [
             "GetKind",
@@ -10425,7 +10399,10 @@
             "GetPosXp",
             "GetPosYp",
             "GetTarXp",
-            "GetTarYp"
+            "GetTarYp",
+            "GetNeedShift",
+            "CalcLength",
+            "GetShiftDistance"
           ],
           "properties": [],
           "supportedPropertyAccessors": [
@@ -10437,46 +10414,17 @@
             "PosXp",
             "PosYp",
             "TarXp",
-            "TarYp"
+            "TarYp",
+            "NeedShift",
+            "ShiftDistance"
           ],
-          "unsupportedMethods": [
-            {
-              "slot": 9,
-              "name": "GetNeedShift",
-              "signature": "function GetNeedShift(): Boolean"
-            },
-            {
-              "slot": 10,
-              "name": "CalcLength",
-              "signature": "function CalcLength(): Double"
-            },
-            {
-              "slot": 11,
-              "name": "GetShiftDistance",
-              "signature": "function GetShiftDistance(): Integer"
-            }
-          ],
-          "unsupportedProperties": [
-            {
-              "name": "NeedShift",
-              "type": "Boolean",
-              "missingAccessors": [
-                "GetNeedShift"
-              ]
-            },
-            {
-              "name": "ShiftDistance",
-              "type": "Integer",
-              "missingAccessors": [
-                "GetShiftDistance"
-              ]
-            }
-          ],
+          "unsupportedMethods": [],
+          "unsupportedProperties": [],
           "diff": {
-            "status": "prefix",
+            "status": "ok",
             "safe": true,
-            "projection": "prefix",
-            "cppMethodCount": 9,
+            "projection": "full",
+            "cppMethodCount": 12,
             "pascalMethodCount": 12,
             "acceptedAliases": [],
             "methodDiffs": []
@@ -16133,7 +16081,7 @@
         {
           "name": "ISolutionCut",
           "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
-          "methodCount": 9,
+          "methodCount": 12,
           "propertyCount": 0,
           "methods": [
             "GetKind",
@@ -16144,7 +16092,10 @@
             "GetPosXp",
             "GetPosYp",
             "GetTarXp",
-            "GetTarYp"
+            "GetTarYp",
+            "GetNeedShift",
+            "CalcLength",
+            "GetShiftDistance"
           ],
           "properties": [],
           "supportedPropertyAccessors": [
@@ -16156,46 +16107,17 @@
             "PosXp",
             "PosYp",
             "TarXp",
-            "TarYp"
+            "TarYp",
+            "NeedShift",
+            "ShiftDistance"
           ],
-          "unsupportedMethods": [
-            {
-              "slot": 9,
-              "name": "GetNeedShift",
-              "signature": "function GetNeedShift(): Boolean"
-            },
-            {
-              "slot": 10,
-              "name": "CalcLength",
-              "signature": "function CalcLength(): Double"
-            },
-            {
-              "slot": 11,
-              "name": "GetShiftDistance",
-              "signature": "function GetShiftDistance(): Integer"
-            }
-          ],
-          "unsupportedProperties": [
-            {
-              "name": "NeedShift",
-              "type": "Boolean",
-              "missingAccessors": [
-                "GetNeedShift"
-              ]
-            },
-            {
-              "name": "ShiftDistance",
-              "type": "Integer",
-              "missingAccessors": [
-                "GetShiftDistance"
-              ]
-            }
-          ],
+          "unsupportedMethods": [],
+          "unsupportedProperties": [],
           "diff": {
-            "status": "prefix",
+            "status": "ok",
             "safe": true,
-            "projection": "prefix",
-            "cppMethodCount": 9,
+            "projection": "full",
+            "cppMethodCount": 12,
             "pascalMethodCount": 12,
             "acceptedAliases": [],
             "methodDiffs": []
@@ -19089,5 +19011,5 @@
       ]
     }
   },
-  "generationFingerprint": "37bf6ec2db783b367d2608d24ffc9b82b7b89f6f990bda68e4e3c0f9155613dc"
+  "generationFingerprint": "0aed21e69a9f4ba925735e2f788b358c2f4668fe2328c7529971e4cce6f5dfed"
 }

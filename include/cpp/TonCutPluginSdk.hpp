@@ -443,6 +443,9 @@ struct ISolutionCut : IUnknown {
   virtual HRESULT STDMETHODCALLTYPE GetPosYp(int* result) = 0;
   virtual HRESULT STDMETHODCALLTYPE GetTarXp(int* result) = 0;
   virtual HRESULT STDMETHODCALLTYPE GetTarYp(int* result) = 0;
+  virtual HRESULT STDMETHODCALLTYPE GetNeedShift(DelphiBool* result) = 0;
+  virtual HRESULT STDMETHODCALLTYPE CalcLength(double* result) = 0;
+  virtual HRESULT STDMETHODCALLTYPE GetShiftDistance(int* result) = 0;
 };
 
 struct ISolutionCuts : IUnknown {

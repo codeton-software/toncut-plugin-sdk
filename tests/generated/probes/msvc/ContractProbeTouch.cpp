@@ -179,6 +179,9 @@ void TouchISolutionCut(toncut::ISolutionCut* aValue) {
   aValue->GetPosYp(nullptr);
   aValue->GetTarXp(nullptr);
   aValue->GetTarYp(nullptr);
+  aValue->GetNeedShift(nullptr);
+  aValue->CalcLength(nullptr);
+  aValue->GetShiftDistance(nullptr);
 }
 
 void TouchISolutionCuts(toncut::ISolutionCuts* aValue) {

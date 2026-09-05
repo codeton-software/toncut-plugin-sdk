@@ -14,6 +14,8 @@
   through `CalcEffectiveLayout`, which contains the methods needed by the PLT
   starter. The wider Desktop API still needs careful ABI translation work
   before you expand the prefix.
+- The native C++ view exposes the complete `ISolutionCut` contract, including
+  `NeedShift`, `CalcLength`, and `ShiftDistance`, in the Pascal vtable order.
 - Interface parameters and results use their exact Pascal interface pointer
   types even when that interface remains otherwise opaque in C++. A documented
   opaque interface exposes only its `IUnknown` prefix, so callers can retain

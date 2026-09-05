@@ -24,4 +24,5 @@ JSON for devices, materials, formats, and sheets. The current contracts also
 keep `IDevice.MinCutSize` and `IDevice.MinCutDistance` as independent values,
 publish solution-sheet waste-field metrics, and append solution-cut shift
 distance and solution-waste holes without disturbing their established vtable
-prefixes.
+prefixes. The C++ solution-cut view exposes `NeedShift`, then `CalcLength`, then
+the appended `ShiftDistance` slot in the same order as the Pascal interface.

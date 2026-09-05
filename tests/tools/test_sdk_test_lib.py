@@ -841,6 +841,68 @@ class CppProjectionValidationTests(unittest.TestCase):
         self.assertTrue(diff["safe"])
         self.assertEqual(diff["projection"], "prefix")
 
+    def test_solution_cut_is_a_complete_pascal_projection_with_shift_metadata(self) -> None:
+        manifest = build_manifest(parse_pascal_units(), parse_cpp_header())
+        config = load_config()
+
+        validate_cpp_projections(manifest, config)
+
+        pascal = next(
+            item for item in manifest["interfaces"] if item["name"] == "ISolutionCut"
+        )
+        cpp = next(
+            item
+            for item in manifest["cppInterfaces"]
+            if item["name"] == "ISolutionCut"
+        )
+        expected_method_names = [
+            "GetKind",
+            "GetPosX",
+            "GetPosY",
+            "GetTarX",
+            "GetTarY",
+            "GetPosXp",
+            "GetPosYp",
+            "GetTarXp",
+            "GetTarYp",
+            "GetNeedShift",
+            "CalcLength",
+            "GetShiftDistance",
+        ]
+        self.assertEqual(
+            [method["name"] for method in pascal["methods"]],
+            expected_method_names,
+        )
+        self.assertEqual(
+            [method["name"] for method in cpp["methods"]],
+            expected_method_names,
+        )
+        self.assertEqual(
+            [
+                [parameter["type"] for parameter in method["parameters"]]
+                for method in cpp["methods"]
+            ],
+            [
+                ["TCutKind*"],
+                ["int*"],
+                ["int*"],
+                ["int*"],
+                ["int*"],
+                ["int*"],
+                ["int*"],
+                ["int*"],
+                ["int*"],
+                ["DelphiBool*"],
+                ["double*"],
+                ["int*"],
+            ],
+        )
+        diff = diff_cpp_interface_against_pascal(
+            cpp, pascal, config["cppProjection"]
+        )
+        self.assertTrue(diff["safe"])
+        self.assertEqual(diff["projection"], "full")
+
     def test_solution_sheet_prefix_has_the_required_abi_types(self) -> None:
         cpp = next(
             item for item in parse_cpp_header() if item["name"] == "ISolutionSheet"
