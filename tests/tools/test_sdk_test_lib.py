@@ -1,6 +1,7 @@
 import sys
 import unittest
 import importlib.util
+import re
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -53,6 +54,43 @@ def make_interface(name: str, method_names: list[str]) -> dict:
 
 
 class CppProjectionValidationTests(unittest.TestCase):
+    def test_public_narrative_keeps_algorithm_payloads_and_internals_opaque(
+        self,
+    ) -> None:
+        sdk_root = Path(__file__).resolve().parents[2]
+        public_narrative_files = [
+            sdk_root / "README.md",
+            *sorted((sdk_root / "manuals").rglob("*.md")),
+            *sorted((sdk_root / "examples").rglob("*.md")),
+            *sorted((sdk_root / "examples").rglob("*.pas")),
+            *sorted((sdk_root / "examples").rglob("*.cpp")),
+            *sorted((sdk_root / "examples").rglob("*.hpp")),
+            *sorted((sdk_root / "examples").rglob("*.cs")),
+            *sorted((sdk_root / "tests" / "generated" / "reports").rglob("*.md")),
+        ]
+        algorithm_data_mentions: list[str] = []
+        internals_mentions: list[str] = []
+        for path in public_narrative_files:
+            text = path.read_text(encoding="utf-8")
+            relative_path = path.relative_to(sdk_root).as_posix()
+            if re.search(r"(?i)ITcAlgorithmData|algorithm[- ]data", text):
+                algorithm_data_mentions.append(relative_path)
+            if re.search(r"(?i)\binternals\b", text):
+                internals_mentions.append(relative_path)
+
+        policy_path = "manuals/public-contract-units.md"
+        self.assertEqual(algorithm_data_mentions, [policy_path])
+        self.assertEqual(internals_mentions, [policy_path])
+
+        policy_text = (sdk_root / policy_path).read_text(encoding="utf-8")
+        self.assertIn(
+            "This SDK documents only its public interface signatures: it does not\n"
+            "publish or prescribe any algorithm-specific payload, schema, member paths,\n"
+            "keys, values, defaults, or examples, and it does not publish an internals\n"
+            "configuration tree.",
+            policy_text,
+        )
+
     def test_contract_generation_is_byte_idempotent(self) -> None:
         generate_artifacts()
         first = {
