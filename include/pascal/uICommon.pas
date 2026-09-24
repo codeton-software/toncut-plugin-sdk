@@ -55,7 +55,11 @@ type
   TOrnaments = set of TOrnament;
 
   TOldPiecePriority = (ppNormal, ppHigh, ppCritical, ppDefault);
-  TStockPriority = (spNormal, spLow);
+  // Legacy stock priority labels. ISheet.Priority is an Integer now (see the
+  // cStockPriority* constants); this enum survives only to parse the named
+  // labels 'normal' / 'low' in JSON, SSI and SQLite data, exactly as
+  // TOldPiecePriority does for pieces.
+  TOldStockPriority = (spNormal, spLow);
   TProjectPriority = (prpDefault, prpNormal, prpHigh, prpCritical);
 
   TProjectState = (prsNew, prsReady, prsPending, prsDone, prsCanceled, prsDeleted);
@@ -108,6 +112,16 @@ const
   cPiecePriorityNormal = 1;
   cPiecePriorityHigh = 10;
   cPiecePriorityCritical = 100;
+
+  // Stock priorities: HIGHER = consume EARLIER. Soft: the score decides;
+  // ordering uses it only as the last tie-break. The labels 'low' and
+  // 'normal' map to these values, and a value above normal (up to
+  // cStockPriorityMax) means "use this first", for example remnants or old
+  // stock.
+  cStockPriorityMin = 0;
+  cStockPriorityLow = 0;
+  cStockPriorityNormal = 10;
+  cStockPriorityMax = 100;
 
   cDefaultUnits: TDefaultUnits = (
     Time: tuDefault;

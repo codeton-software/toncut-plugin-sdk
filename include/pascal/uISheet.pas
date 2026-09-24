@@ -46,8 +46,21 @@ type
     function GetEdging(): IRectangle; safecall;
     function GetMinEdgeDistance(): IRectangle; safecall;
 
-    function GetPriority(): TStockPriority; safecall;
-    procedure SetPriority(aPriority: TStockPriority); safecall;
+    // Stock priority as a NUMBER, cStockPriorityMin..cStockPriorityMax
+    // (0..100), higher = consume earlier; 'low' = cStockPriorityLow (0),
+    // 'normal' = cStockPriorityNormal (10, the default). Soft: it enters the
+    // sheet score and only breaks ordering ties. Values outside the range are
+    // rejected. ABI NOTE: these are the same vtable slots (same GUID) that
+    // used to carry the 1-byte TOldStockPriority enum; the signature changed
+    // in place, as IFormat.Priority did for pieces. This is NOT merely "must
+    // be recompiled": a safecall function returns through a hidden result
+    // pointer, so a stale plugin calling GetPriority passes a pointer to a
+    // 1-byte local and the engine writes 4 bytes into it (memory
+    // corruption), and a stale SetPriority(spNormal) arrives here as
+    // priority 0 = LOW. Loading a plugin built against the enum is undefined
+    // behaviour; plugins MUST be rebuilt against the new SDK.
+    function GetPriority(): Integer; safecall;
+    procedure SetPriority(aPriority: Integer); safecall;
 
     function GetCutShiftHorzLimit(): Integer; safecall;
     procedure SetCutShiftHorzLimit(aLimit: Integer); safecall;
@@ -96,7 +109,7 @@ type
     property Material: IMaterial read GetMaterial write SetMaterial;
     property Edging: IRectangle read GetEdging;
     property MinEdgeDistance: IRectangle read GetMinEdgeDistance;
-    property Priority: TStockPriority read GetPriority write SetPriority;
+    property Priority: Integer read GetPriority write SetPriority;
 
     property CutShiftHorzLimit: Integer read GetCutShiftHorzLimit write SetCutShiftHorzLimit;
     property CutShiftVertLimit: Integer read GetCutShiftVertLimit write SetCutShiftVertLimit;
