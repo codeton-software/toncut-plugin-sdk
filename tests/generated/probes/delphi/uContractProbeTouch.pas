@@ -892,7 +892,7 @@ begin
   var __Material8Value := aValue.Material;
   var __Edging9Value := aValue.Edging;
   var __MinEdgeDistance10Value := aValue.MinEdgeDistance;
-  aValue.Priority := Default(TStockPriority);
+  aValue.Priority := 1;
   var __Priority11Value := aValue.Priority;
   aValue.CutShiftHorzLimit := 1;
   var __CutShiftHorzLimit12Value := aValue.CutShiftHorzLimit;

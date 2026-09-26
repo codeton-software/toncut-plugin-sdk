@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-05T03:33:59.606Z",
+  "generatedAt": "2026-09-25T16:53:37.541Z",
   "sourceRoot": "SDK/include",
   "totals": {
     "interfaceCount": 65,
@@ -12032,17 +12032,17 @@
         },
         {
           "kind": "method",
-          "signature": "function GetPriority(): TStockPriority",
+          "signature": "function GetPriority(): Integer",
           "name": "GetPriority",
           "procedureKind": "function",
-          "returnType": "TStockPriority",
+          "returnType": "Integer",
           "parameters": [],
           "order": 20,
           "accessor": true
         },
         {
           "kind": "method",
-          "signature": "procedure SetPriority(aPriority: TStockPriority)",
+          "signature": "procedure SetPriority(aPriority: Integer)",
           "name": "SetPriority",
           "procedureKind": "procedure",
           "returnType": null,
@@ -12050,7 +12050,7 @@
             {
               "name": "aPriority",
               "modifier": null,
-              "type": "TStockPriority"
+              "type": "Integer"
             }
           ],
           "order": 21,
@@ -12472,9 +12472,9 @@
         },
         {
           "kind": "property",
-          "signature": "property Priority: TStockPriority read GetPriority write SetPriority",
+          "signature": "property Priority: Integer read GetPriority write SetPriority",
           "name": "Priority",
-          "type": "TStockPriority",
+          "type": "Integer",
           "parameters": [],
           "readAccessor": "GetPriority",
           "writeAccessor": "SetPriority",
@@ -22820,5 +22820,5 @@
       ]
     }
   ],
-  "generationFingerprint": "0aed21e69a9f4ba925735e2f788b358c2f4668fe2328c7529971e4cce6f5dfed"
+  "generationFingerprint": "28b71ca28c22eb6ce7699eee626e99a2ccc8de2f5f0a8ccaef0e2ddf10b375bd"
 }

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-05T03:33:59.606Z",
+  "generatedAt": "2026-09-25T16:53:37.541Z",
   "totals": {
     "interfaceCount": 65,
     "methodCount": 965,
@@ -4275,12 +4275,12 @@
             {
               "slot": 20,
               "name": "GetPriority",
-              "signature": "function GetPriority(): TStockPriority"
+              "signature": "function GetPriority(): Integer"
             },
             {
               "slot": 21,
               "name": "SetPriority",
-              "signature": "procedure SetPriority(aPriority: TStockPriority)"
+              "signature": "procedure SetPriority(aPriority: Integer)"
             },
             {
               "slot": 22,
@@ -4425,7 +4425,7 @@
             },
             {
               "name": "Priority",
-              "type": "TStockPriority",
+              "type": "Integer",
               "missingAccessors": [
                 "GetPriority",
                 "SetPriority"
@@ -9883,12 +9883,12 @@
             {
               "slot": 20,
               "name": "GetPriority",
-              "signature": "function GetPriority(): TStockPriority"
+              "signature": "function GetPriority(): Integer"
             },
             {
               "slot": 21,
               "name": "SetPriority",
-              "signature": "procedure SetPriority(aPriority: TStockPriority)"
+              "signature": "procedure SetPriority(aPriority: Integer)"
             },
             {
               "slot": 22,
@@ -10033,7 +10033,7 @@
             },
             {
               "name": "Priority",
-              "type": "TStockPriority",
+              "type": "Integer",
               "missingAccessors": [
                 "GetPriority",
                 "SetPriority"
@@ -15576,12 +15576,12 @@
             {
               "slot": 20,
               "name": "GetPriority",
-              "signature": "function GetPriority(): TStockPriority"
+              "signature": "function GetPriority(): Integer"
             },
             {
               "slot": 21,
               "name": "SetPriority",
-              "signature": "procedure SetPriority(aPriority: TStockPriority)"
+              "signature": "procedure SetPriority(aPriority: Integer)"
             },
             {
               "slot": 22,
@@ -15726,7 +15726,7 @@
             },
             {
               "name": "Priority",
-              "type": "TStockPriority",
+              "type": "Integer",
               "missingAccessors": [
                 "GetPriority",
                 "SetPriority"
@@ -19011,5 +19011,5 @@
       ]
     }
   },
-  "generationFingerprint": "0aed21e69a9f4ba925735e2f788b358c2f4668fe2328c7529971e4cce6f5dfed"
+  "generationFingerprint": "28b71ca28c22eb6ce7699eee626e99a2ccc8de2f5f0a8ccaef0e2ddf10b375bd"
 }
