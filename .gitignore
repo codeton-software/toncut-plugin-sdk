@@ -31,3 +31,4 @@ tests/**/*.exe
 *.pyc
 .DS_Store
 Thumbs.db
+include/pascal/__history/
