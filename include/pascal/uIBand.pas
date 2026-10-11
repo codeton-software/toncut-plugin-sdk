@@ -3,6 +3,7 @@ unit uIBand;
 interface
 
 uses
+  uICommon,
   uINotifyEvent,
   uIIdChangeEvent;
 
@@ -37,12 +38,23 @@ type
     procedure BeginUpdate(); safecall;
     procedure EndUpdate(); safecall;
 
+    // Preview color used when the item is drawn, as a TTcColor: $RRGGBB,
+    // clTcNone (no preview color, the default) or clTcRandom (the host
+    // derives a stable color from Id).
+    // ABI NOTE: appended after EndUpdate (same GUID, engine v24) so every
+    // earlier slot keeps the published plugin-API order; every implementer
+    // must provide both methods.
+    function GetPreviewColor(): TTcColor; safecall;
+    procedure SetPreviewColor(aColor: TTcColor); safecall;
+
     property Id: Int64 read GetId write SetId;
     property Title: WideString read GetTitle write SetTitle;
     property Width: Cardinal read GetWidth write SetWidth;
     property MaxMaterialThickness: Cardinal read GetMaxMaterialThickness write SetMaxMaterialThickness;
     property Thickness: Cardinal read GetThickness write SetThickness;
     property Surplus: Cardinal read GetSurplus write SetSurplus;
+
+    property PreviewColor: TTcColor read GetPreviewColor write SetPreviewColor;
 
     property OnChange: INotifyEvent read GetOnChange;
     property OnIdChange: IIdChangeEvent read GetOnIdChange;

@@ -12,6 +12,12 @@ uses
   uISheetDefectChangeEvent,
   uITcAlgorithmData;
 
+const
+  // ISheet.PricePerSqM when the stock item has no price of its own; a
+  // supplied price is finite and >= 0, so this value cannot collide with
+  // one, and an explicit 0 stays a real 0.
+  cStockPriceAbsent = -1;
+
 type
   ISheet = interface
     ['{3D92A70F-6B18-45C4-A8E1-7C204F6B9D35}']
@@ -98,6 +104,17 @@ type
     procedure BeginUpdate(); safecall;
     procedure EndUpdate(); safecall;
 
+    // The stock item's own price per square metre, or cStockPriceAbsent when
+    // it has none (the material's PricePerSqM then applies). Setting
+    // cStockPriceAbsent clears it; any other value must be finite and >= 0.
+    // ABI NOTE: appended after every earlier method (same GUID), so every
+    // existing vtable slot keeps its position. Engine version 24
+    // (cEngineVersion) carries these slots; the host plugin gate refuses a
+    // plugin built for a different engine version, and every ISheet
+    // implementer must provide both methods.
+    function GetPricePerSqM(): TTcPrice; safecall;
+    procedure SetPricePerSqM(aPrice: TTcPrice); safecall;
+
     property Id: Int64 read GetId write SetId;
     property Width: Cardinal read GetWidth write SetWidth;
     property Length: Cardinal read GetLength write SetLength;
@@ -117,6 +134,7 @@ type
     property EffectiveCutShiftVertLimit: Integer read GetEffectiveCutShiftVertLimit;
 
     property ExtractionCost: TTcPrice read GetExtractionCost write SetExtractionCost;
+    property PricePerSqM: TTcPrice read GetPricePerSqM write SetPricePerSqM;
 
     property CustomData: WideString read GetCustomData write SetCustomData;
     // Mutable, typed access to the unit-aware algorithm data owned by this sheet.

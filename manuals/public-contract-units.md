@@ -5,8 +5,11 @@ The SDK ships the public Pascal interface units unchanged under:
 - `../include/pascal/`
 
 The current mirror contains 55 units and is byte-for-byte synchronized with
-the canonical TonCut Desktop interface sources. `uITcPluginCommon.pas` keeps
-`cEngineVersion = 23`, the already reserved unpublished engine value.
+the canonical TonCut Desktop interface sources. `uITcPluginCommon.pas` sets
+`cEngineVersion = 24`, which carries the `ISheet.Priority` break, the
+appended `ISheet.PricePerSqM` slots, the appended `IBand.PreviewColor` and
+`IFormat.PreviewColor` slots, and the `soAllPermutations` stock order described
+below.
 
 ## TonCut Contract Units
 
@@ -50,3 +53,55 @@ rebuilt against this SDK before it is loaded again.** The C++ view of
 that stops before `GetEdging`, so `Priority` was never projected there and
 needs no C++ change; see "ABI Mapping Rules" in `plugin-contract-and-abi.md`
 for why a prefix may not skip slots.
+
+`ISheet` also gained two methods, `GetPricePerSqM`/`SetPricePerSqM`, appended
+at the end of the interface directly after `EndUpdate`, and the
+`PricePerSqM: TTcPrice` property built on them; the interface GUID is
+unchanged. The property is declared next to `ExtractionCost`, but interface
+properties occupy no vtable slots, so only the method order matters. A stock
+item's `PricePerSqM` is either its own per-square-metre price or
+`cStockPriceAbsent` (`-1`) when it has none, in which case the owning
+material's `PricePerSqM` applies instead — any plugin that reads `ISheet`
+pricing must apply that fallback itself, the engine does not resolve it for
+the caller. Setting `cStockPriceAbsent` clears a stock item's own price; any
+other value supplied to `SetPricePerSqM` must be finite and `>= 0`. Because
+the two methods are appended after every earlier method, no existing vtable
+slot moved, but every class implementing `ISheet` must add both methods to
+remain a valid implementation. The C++ `ISheet` prefix view is unaffected.
+
+`IBand` and `IFormat` each gained `GetPreviewColor`/`SetPreviewColor`, appended
+at the end of the interface directly after `EndUpdate`, and a
+`PreviewColor: TTcColor` property built on them; both interface GUIDs are
+unchanged. The properties are declared next to `Surplus` (`IBand`) and
+`StorageCost` (`IFormat`), but properties occupy no vtable slots. `uICommon.pas`
+adds the `TTcColor = Integer` type and two special values:
+
+- an ordinary `TTcColor` is a 24-bit RGB value packed as `$RRGGBB` (red in
+  bits 16..23, blue in bits 0..7) - not the VCL `TColor` byte order;
+- `clTcNone` (`-1`) means no preview color is assigned, which is the default;
+- `clTcRandom` (`-2`) asks the host to derive a stable color from the item's
+  `Id`;
+- every other negative value is invalid.
+
+No existing slot of either interface moved, but every class implementing
+`IBand` or `IFormat` must add both methods to remain a valid implementation.
+The C++ header does not reach these slots: `IBand` is projected only as its
+`IUnknown` prefix, and the `IFormat` view is a prefix that ends at
+`SetMaterial`, so neither needs a C++ change.
+
+`TSheetOrder` in `uICommon.pas` gains `soAllPermutations`, appended after
+`soCustom` as ordinal `4`; the ordinals of `soFromLarge`, `soFromSmall`,
+`soRandom` and `soCustom` are unchanged. It selects a search over alternative
+stock-item orders that keeps the best result (the engine's `allPermutations`
+stock-order direction).
+No interface method takes or returns `TSheetOrder`, so no vtable slot changes,
+but code that switches over `TSheetOrder` must handle the new value. The C++
+header does not declare `TSheetOrder`.
+
+**Engine version 24.** `cEngineVersion` advances to `24` for this SDK: version
+24 carries the `ISheet.Priority` break, the appended `ISheet.PricePerSqM`
+slots, the appended `IBand`/`IFormat` `PreviewColor` slots, and the
+`soAllPermutations` stock order. The host's plugin gate refuses a plugin whose reported engine version
+does not match, so a plugin built against an earlier SDK is not loaded, and a
+plugin built against this SDK is not loaded by an older host that lacks the
+new slots. Rebuild every plugin against this SDK.

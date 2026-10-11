@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-25T16:53:37.541Z",
+  "generatedAt": "2026-10-10T19:36:14.136Z",
   "totals": {
     "interfaceCount": 65,
-    "methodCount": 965,
-    "propertyCount": 426,
+    "methodCount": 971,
+    "propertyCount": 429,
     "cppInterfaceCount": 30,
     "cppMethodCount": 227
   },
@@ -30,8 +30,8 @@
         {
           "name": "IBand",
           "file": "SDK/include/pascal/uIBand.pas",
-          "methodCount": 18,
-          "propertyCount": 8,
+          "methodCount": 20,
+          "propertyCount": 9,
           "methods": [
             "GetId",
             "SetId",
@@ -50,7 +50,9 @@
             "Clone",
             "Assign",
             "BeginUpdate",
-            "EndUpdate"
+            "EndUpdate",
+            "GetPreviewColor",
+            "SetPreviewColor"
           ],
           "properties": [
             "Id",
@@ -59,6 +61,7 @@
             "MaxMaterialThickness",
             "Thickness",
             "Surplus",
+            "PreviewColor",
             "OnChange",
             "OnIdChange"
           ]
@@ -341,8 +344,8 @@
         {
           "name": "IFormat",
           "file": "SDK/include/pascal/uIFormat.pas",
-          "methodCount": 70,
-          "propertyCount": 39,
+          "methodCount": 72,
+          "propertyCount": 40,
           "methods": [
             "GetId",
             "SetId",
@@ -413,7 +416,9 @@
             "GetOnIdChange",
             "UpdateEffectivePriority",
             "BeginUpdate",
-            "EndUpdate"
+            "EndUpdate",
+            "GetPreviewColor",
+            "SetPreviewColor"
           ],
           "properties": [
             "Id",
@@ -442,6 +447,7 @@
             "Order",
             "SellingPrice",
             "StorageCost",
+            "PreviewColor",
             "CustomData",
             "AlgorithmData",
             "EffectivePriority",
@@ -1205,8 +1211,8 @@
         {
           "name": "ISheet",
           "file": "SDK/include/pascal/uISheet.pas",
-          "methodCount": 47,
-          "propertyCount": 29,
+          "methodCount": 49,
+          "propertyCount": 30,
           "methods": [
             "GetId",
             "SetId",
@@ -1254,7 +1260,9 @@
             "GetOnDefectRemove",
             "GetOnDefectChange",
             "BeginUpdate",
-            "EndUpdate"
+            "EndUpdate",
+            "GetPricePerSqM",
+            "SetPricePerSqM"
           ],
           "properties": [
             "Id",
@@ -1274,6 +1282,7 @@
             "EffectiveCutShiftHorzLimit",
             "EffectiveCutShiftVertLimit",
             "ExtractionCost",
+            "PricePerSqM",
             "CustomData",
             "AlgorithmData",
             "Defects",
@@ -2301,6 +2310,16 @@
               "slot": 69,
               "name": "EndUpdate",
               "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 70,
+              "name": "GetPreviewColor",
+              "signature": "function GetPreviewColor(): TTcColor"
+            },
+            {
+              "slot": 71,
+              "name": "SetPreviewColor",
+              "signature": "procedure SetPreviewColor(aColor: TTcColor)"
             }
           ],
           "unsupportedProperties": [
@@ -2396,6 +2415,14 @@
               "missingAccessors": [
                 "GetStorageCost",
                 "SetStorageCost"
+              ]
+            },
+            {
+              "name": "PreviewColor",
+              "type": "TTcColor",
+              "missingAccessors": [
+                "GetPreviewColor",
+                "SetPreviewColor"
               ]
             },
             {
@@ -2496,7 +2523,7 @@
             "safe": true,
             "projection": "prefix",
             "cppMethodCount": 28,
-            "pascalMethodCount": 70,
+            "pascalMethodCount": 72,
             "acceptedAliases": [],
             "methodDiffs": []
           }
@@ -4406,6 +4433,16 @@
               "slot": 46,
               "name": "EndUpdate",
               "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 47,
+              "name": "GetPricePerSqM",
+              "signature": "function GetPricePerSqM(): TTcPrice"
+            },
+            {
+              "slot": 48,
+              "name": "SetPricePerSqM",
+              "signature": "procedure SetPricePerSqM(aPrice: TTcPrice)"
             }
           ],
           "unsupportedProperties": [
@@ -4467,6 +4504,14 @@
               "missingAccessors": [
                 "GetExtractionCost",
                 "SetExtractionCost"
+              ]
+            },
+            {
+              "name": "PricePerSqM",
+              "type": "TTcPrice",
+              "missingAccessors": [
+                "GetPricePerSqM",
+                "SetPricePerSqM"
               ]
             },
             {
@@ -4560,7 +4605,7 @@
             "safe": true,
             "projection": "prefix",
             "cppMethodCount": 18,
-            "pascalMethodCount": 47,
+            "pascalMethodCount": 49,
             "acceptedAliases": [],
             "methodDiffs": []
           }
@@ -5188,6 +5233,16 @@
               "slot": 17,
               "name": "EndUpdate",
               "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 18,
+              "name": "GetPreviewColor",
+              "signature": "function GetPreviewColor(): TTcColor"
+            },
+            {
+              "slot": 19,
+              "name": "SetPreviewColor",
+              "signature": "procedure SetPreviewColor(aColor: TTcColor)"
             }
           ],
           "unsupportedProperties": [
@@ -5240,6 +5295,14 @@
               ]
             },
             {
+              "name": "PreviewColor",
+              "type": "TTcColor",
+              "missingAccessors": [
+                "GetPreviewColor",
+                "SetPreviewColor"
+              ]
+            },
+            {
               "name": "OnChange",
               "type": "INotifyEvent",
               "missingAccessors": [
@@ -5259,7 +5322,7 @@
             "safe": true,
             "projection": "documented-opaque",
             "cppMethodCount": 0,
-            "pascalMethodCount": 18,
+            "pascalMethodCount": 20,
             "methodDiffs": []
           }
         },
@@ -7909,6 +7972,16 @@
               "slot": 69,
               "name": "EndUpdate",
               "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 70,
+              "name": "GetPreviewColor",
+              "signature": "function GetPreviewColor(): TTcColor"
+            },
+            {
+              "slot": 71,
+              "name": "SetPreviewColor",
+              "signature": "procedure SetPreviewColor(aColor: TTcColor)"
             }
           ],
           "unsupportedProperties": [
@@ -8004,6 +8077,14 @@
               "missingAccessors": [
                 "GetStorageCost",
                 "SetStorageCost"
+              ]
+            },
+            {
+              "name": "PreviewColor",
+              "type": "TTcColor",
+              "missingAccessors": [
+                "GetPreviewColor",
+                "SetPreviewColor"
               ]
             },
             {
@@ -8104,7 +8185,7 @@
             "safe": true,
             "projection": "prefix",
             "cppMethodCount": 28,
-            "pascalMethodCount": 70,
+            "pascalMethodCount": 72,
             "acceptedAliases": [],
             "methodDiffs": []
           }
@@ -10014,6 +10095,16 @@
               "slot": 46,
               "name": "EndUpdate",
               "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 47,
+              "name": "GetPricePerSqM",
+              "signature": "function GetPricePerSqM(): TTcPrice"
+            },
+            {
+              "slot": 48,
+              "name": "SetPricePerSqM",
+              "signature": "procedure SetPricePerSqM(aPrice: TTcPrice)"
             }
           ],
           "unsupportedProperties": [
@@ -10075,6 +10166,14 @@
               "missingAccessors": [
                 "GetExtractionCost",
                 "SetExtractionCost"
+              ]
+            },
+            {
+              "name": "PricePerSqM",
+              "type": "TTcPrice",
+              "missingAccessors": [
+                "GetPricePerSqM",
+                "SetPricePerSqM"
               ]
             },
             {
@@ -10168,7 +10267,7 @@
             "safe": true,
             "projection": "prefix",
             "cppMethodCount": 18,
-            "pascalMethodCount": 47,
+            "pascalMethodCount": 49,
             "acceptedAliases": [],
             "methodDiffs": []
           }
@@ -10796,6 +10895,16 @@
               "slot": 17,
               "name": "EndUpdate",
               "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 18,
+              "name": "GetPreviewColor",
+              "signature": "function GetPreviewColor(): TTcColor"
+            },
+            {
+              "slot": 19,
+              "name": "SetPreviewColor",
+              "signature": "procedure SetPreviewColor(aColor: TTcColor)"
             }
           ],
           "unsupportedProperties": [
@@ -10848,6 +10957,14 @@
               ]
             },
             {
+              "name": "PreviewColor",
+              "type": "TTcColor",
+              "missingAccessors": [
+                "GetPreviewColor",
+                "SetPreviewColor"
+              ]
+            },
+            {
               "name": "OnChange",
               "type": "INotifyEvent",
               "missingAccessors": [
@@ -10867,7 +10984,7 @@
             "safe": true,
             "projection": "documented-opaque",
             "cppMethodCount": 0,
-            "pascalMethodCount": 18,
+            "pascalMethodCount": 20,
             "methodDiffs": []
           }
         },
@@ -13602,6 +13719,16 @@
               "slot": 69,
               "name": "EndUpdate",
               "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 70,
+              "name": "GetPreviewColor",
+              "signature": "function GetPreviewColor(): TTcColor"
+            },
+            {
+              "slot": 71,
+              "name": "SetPreviewColor",
+              "signature": "procedure SetPreviewColor(aColor: TTcColor)"
             }
           ],
           "unsupportedProperties": [
@@ -13697,6 +13824,14 @@
               "missingAccessors": [
                 "GetStorageCost",
                 "SetStorageCost"
+              ]
+            },
+            {
+              "name": "PreviewColor",
+              "type": "TTcColor",
+              "missingAccessors": [
+                "GetPreviewColor",
+                "SetPreviewColor"
               ]
             },
             {
@@ -13797,7 +13932,7 @@
             "safe": true,
             "projection": "prefix",
             "cppMethodCount": 28,
-            "pascalMethodCount": 70,
+            "pascalMethodCount": 72,
             "acceptedAliases": [],
             "methodDiffs": []
           }
@@ -15707,6 +15842,16 @@
               "slot": 46,
               "name": "EndUpdate",
               "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 47,
+              "name": "GetPricePerSqM",
+              "signature": "function GetPricePerSqM(): TTcPrice"
+            },
+            {
+              "slot": 48,
+              "name": "SetPricePerSqM",
+              "signature": "procedure SetPricePerSqM(aPrice: TTcPrice)"
             }
           ],
           "unsupportedProperties": [
@@ -15768,6 +15913,14 @@
               "missingAccessors": [
                 "GetExtractionCost",
                 "SetExtractionCost"
+              ]
+            },
+            {
+              "name": "PricePerSqM",
+              "type": "TTcPrice",
+              "missingAccessors": [
+                "GetPricePerSqM",
+                "SetPricePerSqM"
               ]
             },
             {
@@ -15861,7 +16014,7 @@
             "safe": true,
             "projection": "prefix",
             "cppMethodCount": 18,
-            "pascalMethodCount": 47,
+            "pascalMethodCount": 49,
             "acceptedAliases": [],
             "methodDiffs": []
           }
@@ -16489,6 +16642,16 @@
               "slot": 17,
               "name": "EndUpdate",
               "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 18,
+              "name": "GetPreviewColor",
+              "signature": "function GetPreviewColor(): TTcColor"
+            },
+            {
+              "slot": 19,
+              "name": "SetPreviewColor",
+              "signature": "procedure SetPreviewColor(aColor: TTcColor)"
             }
           ],
           "unsupportedProperties": [
@@ -16541,6 +16704,14 @@
               ]
             },
             {
+              "name": "PreviewColor",
+              "type": "TTcColor",
+              "missingAccessors": [
+                "GetPreviewColor",
+                "SetPreviewColor"
+              ]
+            },
+            {
               "name": "OnChange",
               "type": "INotifyEvent",
               "missingAccessors": [
@@ -16560,7 +16731,7 @@
             "safe": true,
             "projection": "documented-opaque",
             "cppMethodCount": 0,
-            "pascalMethodCount": 18,
+            "pascalMethodCount": 20,
             "methodDiffs": []
           }
         },
@@ -19011,5 +19182,5 @@
       ]
     }
   },
-  "generationFingerprint": "28b71ca28c22eb6ce7699eee626e99a2ccc8de2f5f0a8ccaef0e2ddf10b375bd"
+  "generationFingerprint": "92d44aea36a1c9885b9c213e3e9d45e904ca3a39f8da50428f22044093849ea2"
 }

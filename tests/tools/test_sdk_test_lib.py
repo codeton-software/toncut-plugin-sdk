@@ -13,6 +13,8 @@ from sdk_test_lib import (  # noqa: E402
     GENERATED_ROOT,
     build_manifest,
     build_support,
+    contract_generation_fingerprint,
+    fingerprint_input_bytes,
     diff_cpp_interface_against_pascal,
     generate_artifacts,
     load_config,
@@ -90,6 +92,24 @@ class CppProjectionValidationTests(unittest.TestCase):
             "configuration tree.",
             policy_text,
         )
+
+    def test_contract_fingerprint_ignores_crlf_checkout_line_endings(self) -> None:
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as directory:
+            lf_path = Path(directory) / "lf.pas"
+            crlf_path = Path(directory) / "crlf.pas"
+            lf_path.write_bytes(b"unit uX;\ninterface\nend.\n")
+            crlf_path.write_bytes(b"unit uX;\r\ninterface\r\nend.\r\n")
+            self.assertEqual(
+                fingerprint_input_bytes(lf_path), fingerprint_input_bytes(crlf_path)
+            )
+            # Any other byte difference still changes the hashed input.
+            crlf_path.write_bytes(b"unit uY;\r\ninterface\r\nend.\r\n")
+            self.assertNotEqual(
+                fingerprint_input_bytes(lf_path), fingerprint_input_bytes(crlf_path)
+            )
+        self.assertRegex(contract_generation_fingerprint(), r"^[0-9a-f]{64}$")
 
     def test_contract_generation_is_byte_idempotent(self) -> None:
         generate_artifacts()

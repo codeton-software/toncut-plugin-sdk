@@ -56,6 +56,13 @@ def iso_timestamp() -> str:
     )
 
 
+def fingerprint_input_bytes(input_path: Path) -> bytes:
+    # The checked-out line-ending convention (for example CRLF from a
+    # `text eol=crlf` attribute) must not change the contract fingerprint, so
+    # CRLF is hashed as LF, which is also how Git stores these files.
+    return input_path.read_bytes().replace(b"\r\n", b"\n")
+
+
 def contract_generation_fingerprint() -> str:
     input_paths = [
         Path(__file__).resolve(),
@@ -72,7 +79,7 @@ def contract_generation_fingerprint() -> str:
         relative_path = input_path.relative_to(SDK_ROOT).as_posix()
         digest.update(relative_path.encode("utf-8"))
         digest.update(b"\0")
-        digest.update(input_path.read_bytes())
+        digest.update(fingerprint_input_bytes(input_path))
         digest.update(b"\0")
     return digest.hexdigest()
 

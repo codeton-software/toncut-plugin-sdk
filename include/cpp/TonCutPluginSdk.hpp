@@ -39,7 +39,7 @@ static_assert(sizeof(TTcWeight) == 8, "Delphi TTcWeight ABI must remain eight by
 static_assert(sizeof(TOrnaments) == 1, "Delphi TOrnaments set ABI must remain one byte");
 static_assert(sizeof(TMirrors) == 1, "Delphi TMirrors set ABI must remain one byte");
 
-constexpr int cEngineVersion = 23;
+constexpr int cEngineVersion = 24;
 constexpr unsigned cLengthMultiplier = 100;
 
 enum TTcpResult : std::uint8_t {

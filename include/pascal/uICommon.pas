@@ -44,7 +44,7 @@ type
   TMirrors = set of TMirror;
 
   TTryDirection = (tdByLength, tdByWidth, tdAuto);
-  TSheetOrder = (soFromLarge, soFromSmall, soRandom, soCustom);
+  TSheetOrder = (soFromLarge, soFromSmall, soRandom, soCustom, soAllPermutations);
   TEdgingCuts = (ecOptimal, ecHorizontalFirst, ecVerticalFirst);
   TCutDirections = (cdHorizontal, cdVertical, cdAny);
   TOriginEdgingCuts = (oecDefault, oecTwoFullCuts);
@@ -96,18 +96,26 @@ type
   TTcAxisDirection = (adWest, adNorth, adEast, adSouth);
   TTcMoveDirection = (mdAlongX, mdAlongY, mdAny);
 
+  // Color: a 24-bit RGB value packed as $RRGGBB (red in bits 16..23, green
+  // in bits 8..15, blue in bits 0..7), or one of the negative clTc* special
+  // values below. Note that this is not the VCL TColor byte order.
+  TTcColor = Integer;
+
 const
+  // Multipliers, dividers and factors.
   cLengthMultiplier = 100;
   cRotationUnit = 0.1;
   cFieldMultiplier = cLengthMultiplier * cLengthMultiplier;
 
   cShapeScaleFactor = 10000 / cLengthMultiplier;
 
+  // Rotations.
   cRotation90 = Round(90 / cRotationUnit);
   cRotation180 = Round(180 / cRotationUnit);
   cRotation270 = Round(270 / cRotationUnit);
   cRotation360 = Round(360 / cRotationUnit);
 
+  // Priorities.
   cPiecePriorityDefault = 0;
   cPiecePriorityNormal = 1;
   cPiecePriorityHigh = 10;
@@ -123,6 +131,7 @@ const
   cStockPriorityNormal = 10;
   cStockPriorityMax = 100;
 
+  // Units.
   cDefaultUnits: TDefaultUnits = (
     Time: tuDefault;
     Percent: puDefault;
@@ -131,10 +140,17 @@ const
     Angle: auDefault;
   );
 
+  // Algorithms.
   cAlgorithmLinear = 'linear';
   cAlgorithmAnyShapes = 'any-shapes';
   cAlgorithmRectangles = 'rectangles';
   cAlgorithmStripes = 'stripes';
+
+  // Colors: special TTcColor values. clTcNone means no color is assigned;
+  // clTcRandom asks the host to derive a stable color from the item's Id.
+  // Every other negative value is invalid.
+  clTcNone = -1;
+  clTcRandom = -2;
 
 implementation
 

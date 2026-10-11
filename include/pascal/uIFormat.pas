@@ -122,6 +122,15 @@ type
     procedure BeginUpdate(); safecall;
     procedure EndUpdate(); safecall;
 
+    // Preview color used when the item is drawn, as a TTcColor: $RRGGBB,
+    // clTcNone (no preview color, the default) or clTcRandom (the host
+    // derives a stable color from Id).
+    // ABI NOTE: appended after EndUpdate (same GUID, engine v24) so every
+    // earlier slot keeps the published plugin-API order; every implementer
+    // must provide both methods.
+    function GetPreviewColor(): TTcColor; safecall;
+    procedure SetPreviewColor(aColor: TTcColor); safecall;
+
     property Id: Int64 read GetId write SetId;
     property Project: IProject read GetProject write SetProject;
     property Length: Cardinal read GetLength write SetLength;
@@ -153,6 +162,8 @@ type
 
     property SellingPrice: TTcPrice read GetSellingPrice write SetSellingPrice;
     property StorageCost: TTcPrice read GetStorageCost write SetStorageCost;
+
+    property PreviewColor: TTcColor read GetPreviewColor write SetPreviewColor;
 
     property CustomData: WideString read GetCustomData write SetCustomData;
     // Mutable, typed access to the unit-aware algorithm data owned by this format.

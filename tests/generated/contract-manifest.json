@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-09-25T16:53:37.541Z",
+  "generatedAt": "2026-10-10T19:36:14.136Z",
   "sourceRoot": "SDK/include",
   "totals": {
     "interfaceCount": 65,
-    "methodCount": 965,
-    "propertyCount": 426,
+    "methodCount": 971,
+    "propertyCount": 429,
     "cppInterfaceCount": 30,
     "cppMethodCount": 227
   },
@@ -286,6 +286,32 @@
           "parameters": [],
           "order": 17,
           "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "function GetPreviewColor(): TTcColor",
+          "name": "GetPreviewColor",
+          "procedureKind": "function",
+          "returnType": "TTcColor",
+          "parameters": [],
+          "order": 18,
+          "accessor": true
+        },
+        {
+          "kind": "method",
+          "signature": "procedure SetPreviewColor(aColor: TTcColor)",
+          "name": "SetPreviewColor",
+          "procedureKind": "procedure",
+          "returnType": null,
+          "parameters": [
+            {
+              "name": "aColor",
+              "modifier": null,
+              "type": "TTcColor"
+            }
+          ],
+          "order": 19,
+          "accessor": true
         }
       ],
       "properties": [
@@ -363,6 +389,18 @@
         },
         {
           "kind": "property",
+          "signature": "property PreviewColor: TTcColor read GetPreviewColor write SetPreviewColor",
+          "name": "PreviewColor",
+          "type": "TTcColor",
+          "parameters": [],
+          "readAccessor": "GetPreviewColor",
+          "writeAccessor": "SetPreviewColor",
+          "writable": true,
+          "defaultProperty": false,
+          "order": 6
+        },
+        {
+          "kind": "property",
           "signature": "property OnChange: INotifyEvent read GetOnChange",
           "name": "OnChange",
           "type": "INotifyEvent",
@@ -371,7 +409,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 6
+          "order": 7
         },
         {
           "kind": "property",
@@ -383,7 +421,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 7
+          "order": 8
         }
       ]
     },
@@ -3989,6 +4027,32 @@
           "parameters": [],
           "order": 69,
           "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "function GetPreviewColor(): TTcColor",
+          "name": "GetPreviewColor",
+          "procedureKind": "function",
+          "returnType": "TTcColor",
+          "parameters": [],
+          "order": 70,
+          "accessor": true
+        },
+        {
+          "kind": "method",
+          "signature": "procedure SetPreviewColor(aColor: TTcColor)",
+          "name": "SetPreviewColor",
+          "procedureKind": "procedure",
+          "returnType": null,
+          "parameters": [
+            {
+              "name": "aColor",
+              "modifier": null,
+              "type": "TTcColor"
+            }
+          ],
+          "order": 71,
+          "accessor": true
         }
       ],
       "properties": [
@@ -4306,6 +4370,18 @@
         },
         {
           "kind": "property",
+          "signature": "property PreviewColor: TTcColor read GetPreviewColor write SetPreviewColor",
+          "name": "PreviewColor",
+          "type": "TTcColor",
+          "parameters": [],
+          "readAccessor": "GetPreviewColor",
+          "writeAccessor": "SetPreviewColor",
+          "writable": true,
+          "defaultProperty": false,
+          "order": 26
+        },
+        {
+          "kind": "property",
           "signature": "property CustomData: WideString read GetCustomData write SetCustomData",
           "name": "CustomData",
           "type": "WideString",
@@ -4314,7 +4390,7 @@
           "writeAccessor": "SetCustomData",
           "writable": true,
           "defaultProperty": false,
-          "order": 26
+          "order": 27
         },
         {
           "kind": "property",
@@ -4326,7 +4402,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 27
+          "order": 28
         },
         {
           "kind": "property",
@@ -4338,7 +4414,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 28
+          "order": 29
         },
         {
           "kind": "property",
@@ -4350,7 +4426,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 29
+          "order": 30
         },
         {
           "kind": "property",
@@ -4362,7 +4438,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 30
+          "order": 31
         },
         {
           "kind": "property",
@@ -4374,7 +4450,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 31
+          "order": 32
         },
         {
           "kind": "property",
@@ -4386,7 +4462,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 32
+          "order": 33
         },
         {
           "kind": "property",
@@ -4398,7 +4474,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 33
+          "order": 34
         },
         {
           "kind": "property",
@@ -4410,7 +4486,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 34
+          "order": 35
         },
         {
           "kind": "property",
@@ -4422,7 +4498,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 35
+          "order": 36
         },
         {
           "kind": "property",
@@ -4434,7 +4510,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 36
+          "order": 37
         },
         {
           "kind": "property",
@@ -4446,7 +4522,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 37
+          "order": 38
         },
         {
           "kind": "property",
@@ -4458,7 +4534,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 38
+          "order": 39
         }
       ]
     },
@@ -12335,6 +12411,32 @@
           "parameters": [],
           "order": 46,
           "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "function GetPricePerSqM(): TTcPrice",
+          "name": "GetPricePerSqM",
+          "procedureKind": "function",
+          "returnType": "TTcPrice",
+          "parameters": [],
+          "order": 47,
+          "accessor": true
+        },
+        {
+          "kind": "method",
+          "signature": "procedure SetPricePerSqM(aPrice: TTcPrice)",
+          "name": "SetPricePerSqM",
+          "procedureKind": "procedure",
+          "returnType": null,
+          "parameters": [
+            {
+              "name": "aPrice",
+              "modifier": null,
+              "type": "TTcPrice"
+            }
+          ],
+          "order": 48,
+          "accessor": true
         }
       ],
       "properties": [
@@ -12544,6 +12646,18 @@
         },
         {
           "kind": "property",
+          "signature": "property PricePerSqM: TTcPrice read GetPricePerSqM write SetPricePerSqM",
+          "name": "PricePerSqM",
+          "type": "TTcPrice",
+          "parameters": [],
+          "readAccessor": "GetPricePerSqM",
+          "writeAccessor": "SetPricePerSqM",
+          "writable": true,
+          "defaultProperty": false,
+          "order": 17
+        },
+        {
+          "kind": "property",
           "signature": "property CustomData: WideString read GetCustomData write SetCustomData",
           "name": "CustomData",
           "type": "WideString",
@@ -12552,7 +12666,7 @@
           "writeAccessor": "SetCustomData",
           "writable": true,
           "defaultProperty": false,
-          "order": 17
+          "order": 18
         },
         {
           "kind": "property",
@@ -12564,7 +12678,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 18
+          "order": 19
         },
         {
           "kind": "property",
@@ -12576,7 +12690,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 19
+          "order": 20
         },
         {
           "kind": "property",
@@ -12588,7 +12702,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 20
+          "order": 21
         },
         {
           "kind": "property",
@@ -12600,7 +12714,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 21
+          "order": 22
         },
         {
           "kind": "property",
@@ -12612,7 +12726,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 22
+          "order": 23
         },
         {
           "kind": "property",
@@ -12624,7 +12738,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 23
+          "order": 24
         },
         {
           "kind": "property",
@@ -12636,7 +12750,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 24
+          "order": 25
         },
         {
           "kind": "property",
@@ -12648,7 +12762,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 25
+          "order": 26
         },
         {
           "kind": "property",
@@ -12660,7 +12774,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 26
+          "order": 27
         },
         {
           "kind": "property",
@@ -12672,7 +12786,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 27
+          "order": 28
         },
         {
           "kind": "property",
@@ -12684,7 +12798,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 28
+          "order": 29
         }
       ]
     },
@@ -22820,5 +22934,5 @@
       ]
     }
   ],
-  "generationFingerprint": "28b71ca28c22eb6ce7699eee626e99a2ccc8de2f5f0a8ccaef0e2ddf10b375bd"
+  "generationFingerprint": "92d44aea36a1c9885b9c213e3e9d45e904ca3a39f8da50428f22044093849ea2"
 }
