@@ -4,10 +4,16 @@ This folder is the external-facing SDK package for TonCut Desktop plugins. It co
 
 ## Start Here
 
-1. Read `manuals/getting-started.md`.
+1. Read `manuals/getting-started.md` and browse the Plugin API reference at https://docs.toncut.com/tc-plugin-sdk/.
 2. Review `manuals/plugin-contract-and-abi.md`.
 3. Open one of the example projects under `examples/`.
 4. Build the native plugin output as `.plg`.
+
+## Compatibility
+
+- Supported host: TonCut Desktop 8.5.
+- Plugin engine interface version: 24 (`cEngineVersion` in `include/pascal/uITcPluginCommon.pas`, mirrored in `include/cpp/TonCutPluginSdk.hpp`). The host refuses a plugin that reports a different value, so rebuild every plugin against this SDK.
+- Documentation: the Plugin API reference is published at https://docs.toncut.com/tc-plugin-sdk/.
 
 The shipped SDK assumes the TonCut Win32 ABI used by the Delphi plugins, including quad-word record alignment.
 

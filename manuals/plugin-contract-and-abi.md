@@ -19,7 +19,7 @@ For non-Delphi examples, the translated C++ view lives in:
 - plugin binaries must export `TcpInitializeV2`
 - the export uses `stdcall`
 - the returned object must implement `ITcPlugin`
-- the current engine compatibility value is the one shown in the header badge of the web docs
+- the engine compatibility value is `cEngineVersion = 24` for TonCut Desktop 8.5 (`GetEngineVersion` must return it; the host refuses a plugin that reports a different value); the Plugin API site at https://docs.toncut.com/tc-plugin-sdk/ shows the same value in its header badge
 - TonCut Desktop discovers plugins recursively under `Plugins\`
 - TonCut Desktop uses `ITcPlugin.Features` to decide which optional entry points are available; set `feConfigure` if `Configure` is supported and `feAbout` if `About` is supported
 

@@ -4,6 +4,8 @@ TonCut Desktop loads `.plg` files from the `Plugins\` tree, resolves the exporte
 
 In Delphi, that is written as a normal function result. In native C++ exports, Delphi passes the interface result as a hidden first `ITcPlugin**` parameter.
 
+This SDK targets TonCut Desktop 8.5 (plugin engine interface version 24). The full Plugin API reference is at https://docs.toncut.com/tc-plugin-sdk/.
+
 ## Minimal Path
 
 1. Read `plugin-contract-and-abi.md` to understand the host contract.
