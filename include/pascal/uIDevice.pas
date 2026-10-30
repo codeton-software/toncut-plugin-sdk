@@ -110,6 +110,15 @@ type
     procedure BeginUpdate(); safecall;
     procedure EndUpdate(); safecall;
 
+    // Append interface methods to preserve existing vtable slots.
+    function GetDefaultRotation(): Integer; safecall;
+    procedure SetDefaultRotation(aRotation: Integer); safecall;
+    function GetDefaultMirror(): TMirrors; safecall;
+    procedure SetDefaultMirror(aMirror: TMirrors); safecall;
+
+    property DefaultRotation: Integer read GetDefaultRotation write SetDefaultRotation;
+    property DefaultMirror: TMirrors read GetDefaultMirror write SetDefaultMirror;
+
     property Id: Int64 read GetId write SetId;
     property Title: WideString read GetTitle write SetTitle;
     property Driver: WideString read GetDriver write SetDriver;

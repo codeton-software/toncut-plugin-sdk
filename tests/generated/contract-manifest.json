@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-10-10T19:36:14.136Z",
+  "generatedAt": "2026-10-30T08:10:17.626Z",
   "sourceRoot": "SDK/include",
   "totals": {
     "interfaceCount": 65,
-    "methodCount": 971,
-    "propertyCount": 429,
+    "methodCount": 975,
+    "propertyCount": 431,
     "cppInterfaceCount": 30,
     "cppMethodCount": 227
   },
@@ -2205,9 +2205,85 @@
           "parameters": [],
           "order": 67,
           "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "function GetDefaultRotation(): Integer",
+          "name": "GetDefaultRotation",
+          "procedureKind": "function",
+          "returnType": "Integer",
+          "parameters": [],
+          "order": 68,
+          "accessor": true
+        },
+        {
+          "kind": "method",
+          "signature": "procedure SetDefaultRotation(aRotation: Integer)",
+          "name": "SetDefaultRotation",
+          "procedureKind": "procedure",
+          "returnType": null,
+          "parameters": [
+            {
+              "name": "aRotation",
+              "modifier": null,
+              "type": "Integer"
+            }
+          ],
+          "order": 69,
+          "accessor": true
+        },
+        {
+          "kind": "method",
+          "signature": "function GetDefaultMirror(): TMirrors",
+          "name": "GetDefaultMirror",
+          "procedureKind": "function",
+          "returnType": "TMirrors",
+          "parameters": [],
+          "order": 70,
+          "accessor": true
+        },
+        {
+          "kind": "method",
+          "signature": "procedure SetDefaultMirror(aMirror: TMirrors)",
+          "name": "SetDefaultMirror",
+          "procedureKind": "procedure",
+          "returnType": null,
+          "parameters": [
+            {
+              "name": "aMirror",
+              "modifier": null,
+              "type": "TMirrors"
+            }
+          ],
+          "order": 71,
+          "accessor": true
         }
       ],
       "properties": [
+        {
+          "kind": "property",
+          "signature": "property DefaultRotation: Integer read GetDefaultRotation write SetDefaultRotation",
+          "name": "DefaultRotation",
+          "type": "Integer",
+          "parameters": [],
+          "readAccessor": "GetDefaultRotation",
+          "writeAccessor": "SetDefaultRotation",
+          "writable": true,
+          "defaultProperty": false,
+          "order": 0
+        },
+        {
+          "kind": "property",
+          "signature": "property DefaultMirror: TMirrors read GetDefaultMirror write SetDefaultMirror",
+          "name": "DefaultMirror",
+          "type": "TMirrors",
+          "parameters": [],
+          "readAccessor": "GetDefaultMirror",
+          "writeAccessor": "SetDefaultMirror",
+          "writable": true,
+          "defaultProperty": false,
+          "order": 1
+        },
         {
           "kind": "property",
           "signature": "property Id: Int64 read GetId write SetId",
@@ -2218,7 +2294,7 @@
           "writeAccessor": "SetId",
           "writable": true,
           "defaultProperty": false,
-          "order": 0
+          "order": 2
         },
         {
           "kind": "property",
@@ -2230,7 +2306,7 @@
           "writeAccessor": "SetTitle",
           "writable": true,
           "defaultProperty": false,
-          "order": 1
+          "order": 3
         },
         {
           "kind": "property",
@@ -2242,7 +2318,7 @@
           "writeAccessor": "SetDriver",
           "writable": true,
           "defaultProperty": false,
-          "order": 2
+          "order": 4
         },
         {
           "kind": "property",
@@ -2254,7 +2330,7 @@
           "writeAccessor": "SetCanCutAnyShapes",
           "writable": true,
           "defaultProperty": false,
-          "order": 3
+          "order": 5
         },
         {
           "kind": "property",
@@ -2266,7 +2342,7 @@
           "writeAccessor": "SetCanCrossCuts",
           "writable": true,
           "defaultProperty": false,
-          "order": 4
+          "order": 6
         },
         {
           "kind": "property",
@@ -2278,7 +2354,7 @@
           "writeAccessor": "SetFullCutsOnly",
           "writable": true,
           "defaultProperty": false,
-          "order": 5
+          "order": 7
         },
         {
           "kind": "property",
@@ -2290,7 +2366,7 @@
           "writeAccessor": "SetStripCuts",
           "writable": true,
           "defaultProperty": false,
-          "order": 6
+          "order": 8
         },
         {
           "kind": "property",
@@ -2302,7 +2378,7 @@
           "writeAccessor": "SetMaxStripeWidth",
           "writable": true,
           "defaultProperty": false,
-          "order": 7
+          "order": 9
         },
         {
           "kind": "property",
@@ -2314,7 +2390,7 @@
           "writeAccessor": "SetMinCutSize",
           "writable": true,
           "defaultProperty": false,
-          "order": 8
+          "order": 10
         },
         {
           "kind": "property",
@@ -2326,7 +2402,7 @@
           "writeAccessor": "SetMinCutDistance",
           "writable": true,
           "defaultProperty": false,
-          "order": 9
+          "order": 11
         },
         {
           "kind": "property",
@@ -2338,7 +2414,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 10
+          "order": 12
         },
         {
           "kind": "property",
@@ -2350,7 +2426,7 @@
           "writeAccessor": "SetEdgingCuts",
           "writable": true,
           "defaultProperty": false,
-          "order": 11
+          "order": 13
         },
         {
           "kind": "property",
@@ -2362,7 +2438,7 @@
           "writeAccessor": "SetOriginEdgingCuts",
           "writable": true,
           "defaultProperty": false,
-          "order": 12
+          "order": 14
         },
         {
           "kind": "property",
@@ -2374,7 +2450,7 @@
           "writeAccessor": "SetMaxCutDepthOn",
           "writable": true,
           "defaultProperty": false,
-          "order": 13
+          "order": 15
         },
         {
           "kind": "property",
@@ -2386,7 +2462,7 @@
           "writeAccessor": "SetMaxCutDepth",
           "writable": true,
           "defaultProperty": false,
-          "order": 14
+          "order": 16
         },
         {
           "kind": "property",
@@ -2398,7 +2474,7 @@
           "writeAccessor": "SetFirstCutDirection",
           "writable": true,
           "defaultProperty": false,
-          "order": 15
+          "order": 17
         },
         {
           "kind": "property",
@@ -2410,7 +2486,7 @@
           "writeAccessor": "SetMaxCutDepthIncludeSheetEdging",
           "writable": true,
           "defaultProperty": false,
-          "order": 16
+          "order": 18
         },
         {
           "kind": "property",
@@ -2422,7 +2498,7 @@
           "writeAccessor": "SetMaxCutLengthByLengthOn",
           "writable": true,
           "defaultProperty": false,
-          "order": 17
+          "order": 19
         },
         {
           "kind": "property",
@@ -2434,7 +2510,7 @@
           "writeAccessor": "SetMaxCutLengthByLength",
           "writable": true,
           "defaultProperty": false,
-          "order": 18
+          "order": 20
         },
         {
           "kind": "property",
@@ -2446,7 +2522,7 @@
           "writeAccessor": "SetMaxCutLengthByWidthOn",
           "writable": true,
           "defaultProperty": false,
-          "order": 19
+          "order": 21
         },
         {
           "kind": "property",
@@ -2458,7 +2534,7 @@
           "writeAccessor": "SetMaxCutLengthByWidth",
           "writable": true,
           "defaultProperty": false,
-          "order": 20
+          "order": 22
         },
         {
           "kind": "property",
@@ -2470,7 +2546,7 @@
           "writeAccessor": "SetMaterialKind",
           "writable": true,
           "defaultProperty": false,
-          "order": 21
+          "order": 23
         },
         {
           "kind": "property",
@@ -2482,7 +2558,7 @@
           "writeAccessor": "SetCanCutSlants",
           "writable": true,
           "defaultProperty": false,
-          "order": 22
+          "order": 24
         },
         {
           "kind": "property",
@@ -2494,7 +2570,7 @@
           "writeAccessor": "SetLeftSlantMeasurement",
           "writable": true,
           "defaultProperty": false,
-          "order": 23
+          "order": 25
         },
         {
           "kind": "property",
@@ -2506,7 +2582,7 @@
           "writeAccessor": "SetRightSlantMeasurement",
           "writable": true,
           "defaultProperty": false,
-          "order": 24
+          "order": 26
         },
         {
           "kind": "property",
@@ -2518,7 +2594,7 @@
           "writeAccessor": "SetCutCostPerMeter",
           "writable": true,
           "defaultProperty": false,
-          "order": 25
+          "order": 27
         },
         {
           "kind": "property",
@@ -2530,7 +2606,7 @@
           "writeAccessor": "SetReuseCost",
           "writable": true,
           "defaultProperty": false,
-          "order": 26
+          "order": 28
         },
         {
           "kind": "property",
@@ -2542,7 +2618,7 @@
           "writeAccessor": "SetUtilizationCost",
           "writable": true,
           "defaultProperty": false,
-          "order": 27
+          "order": 29
         },
         {
           "kind": "property",
@@ -2554,7 +2630,7 @@
           "writeAccessor": "SetSegmentShiftCost",
           "writable": true,
           "defaultProperty": false,
-          "order": 28
+          "order": 30
         },
         {
           "kind": "property",
@@ -2566,7 +2642,7 @@
           "writeAccessor": "SetSegmentRotationCost",
           "writable": true,
           "defaultProperty": false,
-          "order": 29
+          "order": 31
         },
         {
           "kind": "property",
@@ -2578,7 +2654,7 @@
           "writeAccessor": "SetCustomData",
           "writable": true,
           "defaultProperty": false,
-          "order": 30
+          "order": 32
         },
         {
           "kind": "property",
@@ -2590,7 +2666,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 31
+          "order": 33
         },
         {
           "kind": "property",
@@ -2602,7 +2678,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 32
+          "order": 34
         },
         {
           "kind": "property",
@@ -2614,7 +2690,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 33
+          "order": 35
         }
       ]
     },
@@ -22934,5 +23010,5 @@
       ]
     }
   ],
-  "generationFingerprint": "92d44aea36a1c9885b9c213e3e9d45e904ca3a39f8da50428f22044093849ea2"
+  "generationFingerprint": "34711ee7fa632b4c2fa21dccaf85cf64f51d40909a259d81cffe6e24b4bb3636"
 }

@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-10-10T19:36:14.136Z",
+  "generatedAt": "2026-10-30T08:10:17.626Z",
   "totals": {
     "interfaceCount": 65,
-    "methodCount": 971,
-    "propertyCount": 429,
+    "methodCount": 975,
+    "propertyCount": 431,
     "cppInterfaceCount": 30,
     "cppMethodCount": 227
   },
@@ -173,8 +173,8 @@
         {
           "name": "IDevice",
           "file": "SDK/include/pascal/uIDevice.pas",
-          "methodCount": 68,
-          "propertyCount": 34,
+          "methodCount": 72,
+          "propertyCount": 36,
           "methods": [
             "Clone",
             "Assign",
@@ -243,9 +243,15 @@
             "GetOnChange",
             "GetOnIdChange",
             "BeginUpdate",
-            "EndUpdate"
+            "EndUpdate",
+            "GetDefaultRotation",
+            "SetDefaultRotation",
+            "GetDefaultMirror",
+            "SetDefaultMirror"
           ],
           "properties": [
+            "DefaultRotation",
+            "DefaultMirror",
             "Id",
             "Title",
             "Driver",
@@ -5828,9 +5834,45 @@
               "slot": 67,
               "name": "EndUpdate",
               "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 68,
+              "name": "GetDefaultRotation",
+              "signature": "function GetDefaultRotation(): Integer"
+            },
+            {
+              "slot": 69,
+              "name": "SetDefaultRotation",
+              "signature": "procedure SetDefaultRotation(aRotation: Integer)"
+            },
+            {
+              "slot": 70,
+              "name": "GetDefaultMirror",
+              "signature": "function GetDefaultMirror(): TMirrors"
+            },
+            {
+              "slot": 71,
+              "name": "SetDefaultMirror",
+              "signature": "procedure SetDefaultMirror(aMirror: TMirrors)"
             }
           ],
           "unsupportedProperties": [
+            {
+              "name": "DefaultRotation",
+              "type": "Integer",
+              "missingAccessors": [
+                "GetDefaultRotation",
+                "SetDefaultRotation"
+              ]
+            },
+            {
+              "name": "DefaultMirror",
+              "type": "TMirrors",
+              "missingAccessors": [
+                "GetDefaultMirror",
+                "SetDefaultMirror"
+              ]
+            },
             {
               "name": "Id",
               "type": "Int64",
@@ -6105,7 +6147,7 @@
             "safe": true,
             "projection": "documented-opaque",
             "cppMethodCount": 0,
-            "pascalMethodCount": 68,
+            "pascalMethodCount": 72,
             "methodDiffs": []
           }
         },
@@ -11490,9 +11532,45 @@
               "slot": 67,
               "name": "EndUpdate",
               "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 68,
+              "name": "GetDefaultRotation",
+              "signature": "function GetDefaultRotation(): Integer"
+            },
+            {
+              "slot": 69,
+              "name": "SetDefaultRotation",
+              "signature": "procedure SetDefaultRotation(aRotation: Integer)"
+            },
+            {
+              "slot": 70,
+              "name": "GetDefaultMirror",
+              "signature": "function GetDefaultMirror(): TMirrors"
+            },
+            {
+              "slot": 71,
+              "name": "SetDefaultMirror",
+              "signature": "procedure SetDefaultMirror(aMirror: TMirrors)"
             }
           ],
           "unsupportedProperties": [
+            {
+              "name": "DefaultRotation",
+              "type": "Integer",
+              "missingAccessors": [
+                "GetDefaultRotation",
+                "SetDefaultRotation"
+              ]
+            },
+            {
+              "name": "DefaultMirror",
+              "type": "TMirrors",
+              "missingAccessors": [
+                "GetDefaultMirror",
+                "SetDefaultMirror"
+              ]
+            },
             {
               "name": "Id",
               "type": "Int64",
@@ -11767,7 +11845,7 @@
             "safe": true,
             "projection": "documented-opaque",
             "cppMethodCount": 0,
-            "pascalMethodCount": 68,
+            "pascalMethodCount": 72,
             "methodDiffs": []
           }
         },
@@ -17237,9 +17315,45 @@
               "slot": 67,
               "name": "EndUpdate",
               "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 68,
+              "name": "GetDefaultRotation",
+              "signature": "function GetDefaultRotation(): Integer"
+            },
+            {
+              "slot": 69,
+              "name": "SetDefaultRotation",
+              "signature": "procedure SetDefaultRotation(aRotation: Integer)"
+            },
+            {
+              "slot": 70,
+              "name": "GetDefaultMirror",
+              "signature": "function GetDefaultMirror(): TMirrors"
+            },
+            {
+              "slot": 71,
+              "name": "SetDefaultMirror",
+              "signature": "procedure SetDefaultMirror(aMirror: TMirrors)"
             }
           ],
           "unsupportedProperties": [
+            {
+              "name": "DefaultRotation",
+              "type": "Integer",
+              "missingAccessors": [
+                "GetDefaultRotation",
+                "SetDefaultRotation"
+              ]
+            },
+            {
+              "name": "DefaultMirror",
+              "type": "TMirrors",
+              "missingAccessors": [
+                "GetDefaultMirror",
+                "SetDefaultMirror"
+              ]
+            },
             {
               "name": "Id",
               "type": "Int64",
@@ -17514,7 +17628,7 @@
             "safe": true,
             "projection": "documented-opaque",
             "cppMethodCount": 0,
-            "pascalMethodCount": 68,
+            "pascalMethodCount": 72,
             "methodDiffs": []
           }
         },
@@ -19182,5 +19296,5 @@
       ]
     }
   },
-  "generationFingerprint": "92d44aea36a1c9885b9c213e3e9d45e904ca3a39f8da50428f22044093849ea2"
+  "generationFingerprint": "34711ee7fa632b4c2fa21dccaf85cf64f51d40909a259d81cffe6e24b4bb3636"
 }

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-10T19:36:14.136Z",
+  "generatedAt": "2026-10-30T08:10:17.626Z",
   "fixtures": {
     "sampleCsv": "../examples/shared/csv/example.csv",
     "manualOutputDir": "generated/runtime/manual-output",
@@ -141,5 +141,5 @@
     "manualRuntimeReport": "generated/runtime/manual-runtime-report.json",
     "manualLogsDir": "generated/runtime/logs"
   },
-  "generationFingerprint": "92d44aea36a1c9885b9c213e3e9d45e904ca3a39f8da50428f22044093849ea2"
+  "generationFingerprint": "34711ee7fa632b4c2fa21dccaf85cf64f51d40909a259d81cffe6e24b4bb3636"
 }

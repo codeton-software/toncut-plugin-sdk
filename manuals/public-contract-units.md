@@ -33,6 +33,12 @@ holes without disturbing their established vtable prefixes. The C++
 solution-cut view exposes `NeedShift`, then `CalcLength`, then the appended
 `ShiftDistance` slot in the same order as the Pascal interface.
 
+`IDevice` gained `DefaultRotation` (`0`, `90`, `180` or `270`, default `0`) and
+`DefaultMirror` (a `TMirrors` set, default empty) in TonCut 8.5. They are the
+device's persisted default orientation, appended after the existing members so
+every established vtable slot keeps its position. The plugin interface version
+stays `cEngineVersion = 24`. The C++ header keeps `IDevice` opaque, as before.
+
 **BREAKING CHANGE:** `ISheet.Priority` (`GetPriority`/`SetPriority`) changed
 from the 1-byte `TStockPriority` enum to a numeric `Integer`,
 `cStockPriorityMin`..`cStockPriorityMax` (`0`..`100`, higher means consume
