@@ -14,6 +14,8 @@ The script auto-discovers Visual Studio `MSBuild.exe` with `vswhere.exe` and aut
 It accepts only the production `Win32` platform; the TonCut plugin ABI is not
 compatible with a Win64 build.
 
+Note: the C++Builder example has not been compiled or tested by the maintainers and is provided as-is; see `SDK/README.md` for how to report problems.
+
 ## Example Ids
 
 - `delphi`

@@ -3,7 +3,7 @@
 | Environment | Status | Notes |
 | --- | --- | --- |
 | Delphi | Full native starter | Uses the shipped Pascal interfaces directly. |
-| C++Builder | Native starter on the SDK C++ subset | Covers CSV import/export plus single-sheet PLT result export. |
+| C++Builder | Native starter on the SDK C++ subset (not compiled or tested by the maintainers) | Covers CSV import/export plus single-sheet PLT result export. Provided as-is; see the notice in `../README.md`. |
 | VS C++ | Native starter on the SDK C++ subset | Covers CSV import/export plus single-sheet PLT result export. |
 | C# | Split starter scaffold | Ships the native `TcpInitializeV2` boundary, native PLT result export, and the managed CSV core. |
 

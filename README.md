@@ -17,6 +17,8 @@ This folder is the external-facing SDK package for TonCut Desktop plugins. It co
 
 The shipped SDK assumes the TonCut Win32 ABI used by the Delphi plugins, including quad-word record alignment.
 
+> **C++Builder is untested.** The Delphi, VS C++, and C# examples are built by the maintainers. The C++Builder example (`examples/cppbuilder/`) and the C++Builder build path in the example and test drivers have never been compiled or tested by the maintainers, so they are provided as-is and may need adjustments. If you find a problem, please [open an issue](https://github.com/codeton-software/toncut-plugin-sdk/issues) or send a [pull request](https://github.com/codeton-software/toncut-plugin-sdk/pulls).
+
 ## Layout
 
 - `include/cpp/TonCutPluginSdk.hpp` is the shared C++ contract header.
@@ -28,7 +30,7 @@ The shipped SDK assumes the TonCut Win32 ABI used by the Delphi plugins, includi
 ## Example Entry Points
 
 - Delphi: `examples/delphi/CsvImportExport/CsvImportExport.dproj`
-- C++Builder: `examples/cppbuilder/CsvImportExport/CsvImportExport.cbproj`
+- C++Builder (not tested by the maintainers, see Compatibility): `examples/cppbuilder/CsvImportExport/CsvImportExport.cbproj`
 - VS C++: `examples/msvc/CsvImportExport/CsvImportExport.sln`
 - C#: `examples/csharp/CsvImportExport/CsvImportExport.sln`
 - Example build driver: `examples/build_examples.py`

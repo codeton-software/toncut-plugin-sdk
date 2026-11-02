@@ -15,7 +15,7 @@ Run these commands from the `SDK/tests` directory. If you start in `SDK`, use `p
   Runs focused contract-generator regressions, including the prior unsafe
   `ISolutionSheet` non-prefix projection.
 - `python tools/run_sdk_tests.py build`
-  Prints fresh-rebuild commands for probes, harness, and starter examples. Add `--skip-cppbuilder` if C++Builder is not installed. Add `--dry-run` to force print-only output even if `TONCUT_SDK_TESTS_DRY_RUN=0` is set. Use `--execute` or set `TONCUT_SDK_TESTS_DRY_RUN=0` to run the commands. The runner auto-discovers Visual Studio `MSBuild.exe` with `vswhere.exe` when it is installed but not already on `PATH`, and it auto-loads RAD Studio `rsvars.bat` for Delphi/C++Builder projects.
+  (The C++Builder lane has never been run by the maintainers; see `SDK/README.md`.) Prints fresh-rebuild commands for probes, harness, and starter examples. Add `--skip-cppbuilder` if C++Builder is not installed. Add `--dry-run` to force print-only output even if `TONCUT_SDK_TESTS_DRY_RUN=0` is set. Use `--execute` or set `TONCUT_SDK_TESTS_DRY_RUN=0` to run the commands. The runner auto-discovers Visual Studio `MSBuild.exe` with `vswhere.exe` when it is installed but not already on `PATH`, and it auto-loads RAD Studio `rsvars.bat` for Delphi/C++Builder projects.
 - `python tools/run_sdk_tests.py runtime`
   Discovers built artifacts, writes `generated/runtime/artifact-status.json`, and prints the next manual runtime commands. Add `--skip-cppbuilder` to stop treating C++Builder outputs as required.
 - `python tools/run_sdk_tests.py report`

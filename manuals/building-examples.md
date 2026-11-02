@@ -21,6 +21,8 @@ The driver accepts only `--platform Win32`, matching the production plugin ABI.
 
 ## C++Builder
 
+Not compiled or tested by the maintainers; provided as-is. If you hit a problem, please open an issue or pull request (see the notice in `../README.md`).
+
 - Open `../examples/cppbuilder/CsvImportExport/CsvImportExport.cbproj`
 - Build the `Win32` target
 - Output: `../examples/cppbuilder/CsvImportExport/bin/Win32/<Config>/CsvImportExportCppBuilder.plg`
