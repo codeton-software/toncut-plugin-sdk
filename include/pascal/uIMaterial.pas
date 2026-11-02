@@ -71,8 +71,8 @@ type
     function GetDevice(): IDevice; safecall;
     procedure SetDevice(const aDevice: IDevice); safecall;
 
-    function GetAlgorithm(): String; safecall;
-    procedure SetAlgorithm(const aAlgorithm: String); safecall;
+    function GetAlgorithm(): WideString; safecall;
+    procedure SetAlgorithm(const aAlgorithm: WideString); safecall;
 
     function GetQualityLevel(): TQualityLevel; safecall;
     procedure SetQualityLevel(aQualityLevel: TQualityLevel); safecall;
@@ -201,7 +201,7 @@ type
     property Colorable: Boolean read GetColorable write SetColorable;
 
     property Device: IDevice read GetDevice write SetDevice;
-    property Algorithm: String read GetAlgorithm write SetAlgorithm;
+    property Algorithm: WideString read GetAlgorithm write SetAlgorithm;
     property QualityLevel: TQualityLevel read GetQualityLevel write SetQualityLevel;
 
     property ReuseWaste: Boolean read GetReuseWaste write SetReuseWaste;

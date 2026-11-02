@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-02T13:20:03.257Z",
+  "generatedAt": "2026-11-02T15:19:45.923Z",
   "totals": {
     "interfaceCount": 65,
     "methodCount": 975,
@@ -2526,7 +2526,7 @@
         {
           "name": "IMaterial",
           "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
-          "methodCount": 116,
+          "methodCount": 118,
           "propertyCount": 0,
           "methods": [
             "GetId",
@@ -2565,6 +2565,8 @@
             "SetColorable",
             "GetDevice",
             "SetDevice",
+            "GetAlgorithm",
+            "SetAlgorithm",
             "GetQualityLevel",
             "SetQualityLevel",
             "GetReuseWaste",
@@ -2648,16 +2650,6 @@
           ],
           "reservedMethods": [
             {
-              "slot": 36,
-              "name": "ReservedGetAlgorithm",
-              "pascalName": "GetAlgorithm"
-            },
-            {
-              "slot": 37,
-              "name": "ReservedSetAlgorithm",
-              "pascalName": "SetAlgorithm"
-            },
-            {
               "slot": 109,
               "name": "ReservedGetAlgorithmData",
               "pascalName": "GetAlgorithmData"
@@ -2683,6 +2675,7 @@
             "Grindable",
             "Colorable",
             "Device",
+            "Algorithm",
             "QualityLevel",
             "ReuseWaste",
             "MinShorterRecycleSize",
@@ -2731,30 +2724,12 @@
           ],
           "unsupportedMethods": [
             {
-              "slot": 36,
-              "name": "GetAlgorithm",
-              "signature": "function GetAlgorithm(): String"
-            },
-            {
-              "slot": 37,
-              "name": "SetAlgorithm",
-              "signature": "procedure SetAlgorithm(const aAlgorithm: String)"
-            },
-            {
               "slot": 109,
               "name": "GetAlgorithmData",
               "signature": "function GetAlgorithmData(): ITcAlgorithmData"
             }
           ],
           "unsupportedProperties": [
-            {
-              "name": "Algorithm",
-              "type": "String",
-              "missingAccessors": [
-                "GetAlgorithm",
-                "SetAlgorithm"
-              ]
-            },
             {
               "name": "AlgorithmData",
               "type": "ITcAlgorithmData",
@@ -2770,16 +2745,6 @@
             "cppMethodCount": 119,
             "pascalMethodCount": 119,
             "acceptedAliases": [
-              {
-                "index": 36,
-                "pascalMethod": "GetAlgorithm",
-                "cppMethod": "ReservedGetAlgorithm"
-              },
-              {
-                "index": 37,
-                "pascalMethod": "SetAlgorithm",
-                "cppMethod": "ReservedSetAlgorithm"
-              },
               {
                 "index": 109,
                 "pascalMethod": "GetAlgorithmData",
@@ -6506,7 +6471,7 @@
         {
           "name": "IMaterial",
           "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
-          "methodCount": 116,
+          "methodCount": 118,
           "propertyCount": 0,
           "methods": [
             "GetId",
@@ -6545,6 +6510,8 @@
             "SetColorable",
             "GetDevice",
             "SetDevice",
+            "GetAlgorithm",
+            "SetAlgorithm",
             "GetQualityLevel",
             "SetQualityLevel",
             "GetReuseWaste",
@@ -6628,16 +6595,6 @@
           ],
           "reservedMethods": [
             {
-              "slot": 36,
-              "name": "ReservedGetAlgorithm",
-              "pascalName": "GetAlgorithm"
-            },
-            {
-              "slot": 37,
-              "name": "ReservedSetAlgorithm",
-              "pascalName": "SetAlgorithm"
-            },
-            {
               "slot": 109,
               "name": "ReservedGetAlgorithmData",
               "pascalName": "GetAlgorithmData"
@@ -6663,6 +6620,7 @@
             "Grindable",
             "Colorable",
             "Device",
+            "Algorithm",
             "QualityLevel",
             "ReuseWaste",
             "MinShorterRecycleSize",
@@ -6711,30 +6669,12 @@
           ],
           "unsupportedMethods": [
             {
-              "slot": 36,
-              "name": "GetAlgorithm",
-              "signature": "function GetAlgorithm(): String"
-            },
-            {
-              "slot": 37,
-              "name": "SetAlgorithm",
-              "signature": "procedure SetAlgorithm(const aAlgorithm: String)"
-            },
-            {
               "slot": 109,
               "name": "GetAlgorithmData",
               "signature": "function GetAlgorithmData(): ITcAlgorithmData"
             }
           ],
           "unsupportedProperties": [
-            {
-              "name": "Algorithm",
-              "type": "String",
-              "missingAccessors": [
-                "GetAlgorithm",
-                "SetAlgorithm"
-              ]
-            },
             {
               "name": "AlgorithmData",
               "type": "ITcAlgorithmData",
@@ -6750,16 +6690,6 @@
             "cppMethodCount": 119,
             "pascalMethodCount": 119,
             "acceptedAliases": [
-              {
-                "index": 36,
-                "pascalMethod": "GetAlgorithm",
-                "cppMethod": "ReservedGetAlgorithm"
-              },
-              {
-                "index": 37,
-                "pascalMethod": "SetAlgorithm",
-                "cppMethod": "ReservedSetAlgorithm"
-              },
               {
                 "index": 109,
                 "pascalMethod": "GetAlgorithmData",
@@ -10571,7 +10501,7 @@
         {
           "name": "IMaterial",
           "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
-          "methodCount": 116,
+          "methodCount": 118,
           "propertyCount": 0,
           "methods": [
             "GetId",
@@ -10610,6 +10540,8 @@
             "SetColorable",
             "GetDevice",
             "SetDevice",
+            "GetAlgorithm",
+            "SetAlgorithm",
             "GetQualityLevel",
             "SetQualityLevel",
             "GetReuseWaste",
@@ -10693,16 +10625,6 @@
           ],
           "reservedMethods": [
             {
-              "slot": 36,
-              "name": "ReservedGetAlgorithm",
-              "pascalName": "GetAlgorithm"
-            },
-            {
-              "slot": 37,
-              "name": "ReservedSetAlgorithm",
-              "pascalName": "SetAlgorithm"
-            },
-            {
               "slot": 109,
               "name": "ReservedGetAlgorithmData",
               "pascalName": "GetAlgorithmData"
@@ -10728,6 +10650,7 @@
             "Grindable",
             "Colorable",
             "Device",
+            "Algorithm",
             "QualityLevel",
             "ReuseWaste",
             "MinShorterRecycleSize",
@@ -10776,30 +10699,12 @@
           ],
           "unsupportedMethods": [
             {
-              "slot": 36,
-              "name": "GetAlgorithm",
-              "signature": "function GetAlgorithm(): String"
-            },
-            {
-              "slot": 37,
-              "name": "SetAlgorithm",
-              "signature": "procedure SetAlgorithm(const aAlgorithm: String)"
-            },
-            {
               "slot": 109,
               "name": "GetAlgorithmData",
               "signature": "function GetAlgorithmData(): ITcAlgorithmData"
             }
           ],
           "unsupportedProperties": [
-            {
-              "name": "Algorithm",
-              "type": "String",
-              "missingAccessors": [
-                "GetAlgorithm",
-                "SetAlgorithm"
-              ]
-            },
             {
               "name": "AlgorithmData",
               "type": "ITcAlgorithmData",
@@ -10815,16 +10720,6 @@
             "cppMethodCount": 119,
             "pascalMethodCount": 119,
             "acceptedAliases": [
-              {
-                "index": 36,
-                "pascalMethod": "GetAlgorithm",
-                "cppMethod": "ReservedGetAlgorithm"
-              },
-              {
-                "index": 37,
-                "pascalMethod": "SetAlgorithm",
-                "cppMethod": "ReservedSetAlgorithm"
-              },
               {
                 "index": 109,
                 "pascalMethod": "GetAlgorithmData",
@@ -14142,5 +14037,5 @@
       ]
     }
   },
-  "generationFingerprint": "d370eb2ec927c530fd8fff5aae9ef07c675b817647e40574ca60bd0f97a2c83b"
+  "generationFingerprint": "3200c63f7b72f04258405aabd9436fee64969c5d86a7104291275d9dc03c9466"
 }

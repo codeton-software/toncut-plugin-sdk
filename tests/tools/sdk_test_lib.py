@@ -782,9 +782,11 @@ PASCAL_CPP_ABI_TYPES = {
     "integer": {"int", "std::int32_t"},
     "int64": {"std::int64_t"},
     "single": {"float"},
-    # A Delphi String (UnicodeString) is not a COM type. The C++ header keeps
-    # such a slot only for vtable alignment, under a configured reserved name.
-    "string": {"DelphiUnicodeStringSlot"},
+    # Delphi String types are not COM types and have no C++ ABI mapping: any
+    # C++ projection of such a slot is an ABI mismatch. Use WideString (BSTR).
+    "string": set(),
+    "unicodestring": set(),
+    "ansistring": set(),
     "tfield": {"std::int64_t", "TField"},
     "thandle": {"HWND"},
     "trotation": {"unsigned short", "std::uint16_t"},

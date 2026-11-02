@@ -1,6 +1,6 @@
 # Contract Summary
 
-Generated: 2026-11-02T13:20:03.257Z
+Generated: 2026-11-02T15:19:45.923Z
 
 - Pascal interfaces: 65
 - Pascal methods: 975

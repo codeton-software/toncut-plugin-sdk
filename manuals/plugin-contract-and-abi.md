@@ -311,7 +311,7 @@ The non-Delphi examples follow these mapping rules:
   prefix only; this makes ownership operations (`QueryInterface`, `AddRef`, and
   `Release`) source-usable without claiming support for later Pascal slots
 - a `Reserved...` method keeps the vtable aligned past a slot C++ must not
-  call; see the `IMaterial.Algorithm` warning below
+  call (`ReservedGetAlgorithmData`)
 - `IUnknown` reference counting is preserved exactly
 - Delphi Win32 record alignment is quad word (`{$A8}` / pack 8)
 - `TcpInitializeV2` uses Delphi's hidden interface-result parameter on native C++ exports
@@ -333,15 +333,13 @@ The non-Delphi examples follow these mapping rules:
 | `WideString` | `BSTR` | pointer |
 | `THandle` (window) | `HWND` | pointer |
 
-### `IMaterial.Algorithm` Warning
+### `IMaterial.Algorithm`
 
-`IMaterial.GetAlgorithm`/`SetAlgorithm` use a Delphi `String`
-(UnicodeString), not a `WideString`, in a `safecall` interface. Such a string
-belongs to the memory manager of the module that created it, so it cannot
-safely cross from TonCut into a plugin. **Do not use `IMaterial.Algorithm`
-from plugins**, in any language. The C++ header keeps those two slots only as
-`ReservedGetAlgorithm`/`ReservedSetAlgorithm` so that every later `IMaterial`
-method stays in the right slot.
+`IMaterial.Algorithm` is a `WideString` (`BSTR` in C++) since the 2026-11
+contract correction at engine version 24; its two slots, `GetAlgorithm` and
+`SetAlgorithm`, did not move. Earlier SDKs declared a Delphi `String` there,
+which cannot cross a module boundary: plugins built against an older SDK must
+not use `IMaterial.Algorithm`.
 
 ## Portability Boundary
 

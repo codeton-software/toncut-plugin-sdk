@@ -254,8 +254,8 @@ void TouchIMaterial(toncut::IMaterial* aValue) {
   aValue->SetColorable(1);
   aValue->GetDevice(nullptr);
   aValue->SetDevice(nullptr);
-  aValue->ReservedGetAlgorithm(nullptr);
-  aValue->ReservedSetAlgorithm({});
+  aValue->GetAlgorithm(nullptr);
+  aValue->SetAlgorithm({});
   aValue->GetQualityLevel(nullptr);
   aValue->SetQualityLevel({});
   aValue->GetReuseWaste(nullptr);

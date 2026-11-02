@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-02T13:20:03.257Z",
+  "generatedAt": "2026-11-02T15:19:45.923Z",
   "sourceRoot": "SDK/include",
   "totals": {
     "interfaceCount": 65,
@@ -6319,17 +6319,17 @@
         },
         {
           "kind": "method",
-          "signature": "function GetAlgorithm(): String",
+          "signature": "function GetAlgorithm(): WideString",
           "name": "GetAlgorithm",
           "procedureKind": "function",
-          "returnType": "String",
+          "returnType": "WideString",
           "parameters": [],
           "order": 36,
           "accessor": true
         },
         {
           "kind": "method",
-          "signature": "procedure SetAlgorithm(const aAlgorithm: String)",
+          "signature": "procedure SetAlgorithm(const aAlgorithm: WideString)",
           "name": "SetAlgorithm",
           "procedureKind": "procedure",
           "returnType": null,
@@ -6337,7 +6337,7 @@
             {
               "name": "aAlgorithm",
               "modifier": "const",
-              "type": "String"
+              "type": "WideString"
             }
           ],
           "order": 37,
@@ -7571,9 +7571,9 @@
         },
         {
           "kind": "property",
-          "signature": "property Algorithm: String read GetAlgorithm write SetAlgorithm",
+          "signature": "property Algorithm: WideString read GetAlgorithm write SetAlgorithm",
           "name": "Algorithm",
-          "type": "String",
+          "type": "WideString",
           "parameters": [],
           "readAccessor": "GetAlgorithm",
           "writeAccessor": "SetAlgorithm",
@@ -22550,24 +22550,24 @@
           ]
         },
         {
-          "name": "ReservedGetAlgorithm",
-          "signature": "HRESULT ReservedGetAlgorithm(DelphiUnicodeStringSlot* result)",
+          "name": "GetAlgorithm",
+          "signature": "HRESULT GetAlgorithm(BSTR* result)",
           "returnType": "HRESULT",
           "parameters": [
             {
               "name": "result",
-              "type": "DelphiUnicodeStringSlot*"
+              "type": "BSTR*"
             }
           ]
         },
         {
-          "name": "ReservedSetAlgorithm",
-          "signature": "HRESULT ReservedSetAlgorithm(DelphiUnicodeStringSlot aAlgorithm)",
+          "name": "SetAlgorithm",
+          "signature": "HRESULT SetAlgorithm(BSTR aAlgorithm)",
           "returnType": "HRESULT",
           "parameters": [
             {
               "name": "aAlgorithm",
-              "type": "DelphiUnicodeStringSlot"
+              "type": "BSTR"
             }
           ]
         },
@@ -27790,5 +27790,5 @@
       ]
     }
   ],
-  "generationFingerprint": "d370eb2ec927c530fd8fff5aae9ef07c675b817647e40574ca60bd0f97a2c83b"
+  "generationFingerprint": "3200c63f7b72f04258405aabd9436fee64969c5d86a7104291275d9dc03c9466"
 }

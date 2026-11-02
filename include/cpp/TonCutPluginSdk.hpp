@@ -43,11 +43,6 @@ using TMirrors = std::uint8_t;
 using TMaterialKinds = std::uint8_t;
 using TField = std::int64_t;
 using TTcColor = int;
-// Placeholder for a Delphi `String` (UnicodeString) slot. A UnicodeString is
-// a pointer into the host's Delphi memory manager and is not a COM type, so
-// C++ cannot own, free, or create one. Slots using it are named Reserved...
-// and must not be called.
-using DelphiUnicodeStringSlot = void*;
 
 static_assert(sizeof(void*) == 4, "TonCut plugin ABI requires a Win32 target");
 static_assert(sizeof(int) == 4, "Delphi Integer ABI must remain four bytes");
@@ -67,7 +62,6 @@ static_assert(sizeof(TMirrors) == 1, "Delphi TMirrors set ABI must remain one by
 static_assert(sizeof(TMaterialKinds) == 1, "Delphi TMaterialKinds set ABI must remain one byte");
 static_assert(sizeof(TField) == 8, "Delphi TField (Int64) ABI must remain eight bytes");
 static_assert(sizeof(TTcColor) == 4, "Delphi TTcColor (Integer) ABI must remain four bytes");
-static_assert(sizeof(DelphiUnicodeStringSlot) == 4, "Delphi String slots are one Win32 pointer");
 
 // Plugin engine interface version. The host activates a plugin only when
 // GetEngineVersion returns exactly this value (24 = TonCut Desktop 8.5).
@@ -525,10 +519,10 @@ struct IMaterial : IUnknown {
   virtual HRESULT STDMETHODCALLTYPE SetColorable(DelphiBool aColorable) = 0;
   virtual HRESULT STDMETHODCALLTYPE GetDevice(IDevice** result) = 0;
   virtual HRESULT STDMETHODCALLTYPE SetDevice(IDevice* aDevice) = 0;
-  // Reserved slot 39: Pascal `String` (Delphi UnicodeString) slot: not callable from C++.
-  virtual HRESULT STDMETHODCALLTYPE ReservedGetAlgorithm(DelphiUnicodeStringSlot* result) = 0;
-  // Reserved slot 40: Pascal `String` (Delphi UnicodeString) slot: not callable from C++.
-  virtual HRESULT STDMETHODCALLTYPE ReservedSetAlgorithm(DelphiUnicodeStringSlot aAlgorithm) = 0;
+  // Slots 39/40: WideString (BSTR) since the 2026-11 contract correction at
+  // engine version 24; earlier SDKs declared a Delphi String here.
+  virtual HRESULT STDMETHODCALLTYPE GetAlgorithm(BSTR* result) = 0;
+  virtual HRESULT STDMETHODCALLTYPE SetAlgorithm(BSTR aAlgorithm) = 0;
   virtual HRESULT STDMETHODCALLTYPE GetQualityLevel(TQualityLevel* result) = 0;
   virtual HRESULT STDMETHODCALLTYPE SetQualityLevel(TQualityLevel aQualityLevel) = 0;
   virtual HRESULT STDMETHODCALLTYPE GetReuseWaste(DelphiBool* result) = 0;

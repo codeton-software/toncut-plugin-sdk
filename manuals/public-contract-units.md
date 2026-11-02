@@ -40,6 +40,12 @@ every established vtable slot keeps its position. The plugin interface version
 stays `cEngineVersion = 24`. The C++ header projects the complete `IDevice`
 interface, including `DefaultRotation` and `DefaultMirror`.
 
+`IMaterial.Algorithm` (`GetAlgorithm`/`SetAlgorithm`) is a `WideString` (`BSTR`
+in C++) since the 2026-11 contract correction at engine version 24. Earlier
+SDKs declared a Delphi `String` there, which cannot cross a module boundary;
+the two slots did not move and `cEngineVersion` stays `24`. Plugins built
+against an older SDK must not use `IMaterial.Algorithm`.
+
 **BREAKING CHANGE:** `ISheet.Priority` (`GetPriority`/`SetPriority`) changed
 from the 1-byte `TStockPriority` enum to a numeric `Integer`,
 `cStockPriorityMin`..`cStockPriorityMax` (`0`..`100`, higher means consume

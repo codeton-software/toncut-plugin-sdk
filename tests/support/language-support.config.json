@@ -68,8 +68,6 @@
         "16": { "pascal": "LoadByProject", "cpp": "LoadByProjectInto" }
       },
       "IMaterial": {
-        "36": { "pascal": "GetAlgorithm", "cpp": "ReservedGetAlgorithm" },
-        "37": { "pascal": "SetAlgorithm", "cpp": "ReservedSetAlgorithm" },
         "109": { "pascal": "GetAlgorithmData", "cpp": "ReservedGetAlgorithmData" }
       },
       "IMaterials": {
@@ -105,8 +103,6 @@
         "52": "Not part of the published C++ surface; kept for slot alignment."
       },
       "IMaterial": {
-        "36": "Pascal String (Delphi UnicodeString) is not a COM type and cannot cross the C++ boundary.",
-        "37": "Pascal String (Delphi UnicodeString) is not a COM type and cannot cross the C++ boundary.",
         "109": "Not part of the published C++ surface; kept for slot alignment."
       },
       "ISheet": {

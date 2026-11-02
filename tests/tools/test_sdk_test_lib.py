@@ -373,13 +373,18 @@ class CppProjectionValidationTests(unittest.TestCase):
             )
 
         material = projected["IMaterial"]
-        algorithm = next(
-            item
-            for item in material["unsupportedProperties"]
-            if item["name"] == "Algorithm"
+        # IMaterial.Algorithm is a WideString since the 2026-11 contract
+        # correction, so C++ can call both accessors.
+        self.assertIn("Algorithm", material["supportedPropertyAccessors"])
+        self.assertNotIn(
+            "Algorithm",
+            [item["name"] for item in material["unsupportedProperties"]],
         )
+        self.assertIn("GetAlgorithm", material["methods"])
+        self.assertIn("SetAlgorithm", material["methods"])
         self.assertEqual(
-            algorithm["missingAccessors"], ["GetAlgorithm", "SetAlgorithm"]
+            [item["name"] for item in material["reservedMethods"]],
+            ["ReservedGetAlgorithmData"],
         )
         self.assertIn("Device", material["supportedPropertyAccessors"])
         self.assertIn("Kerf", material["supportedPropertyAccessors"])
@@ -1452,20 +1457,91 @@ class CppProjectionValidationTests(unittest.TestCase):
                 ],
             )
 
-    def test_material_device_slots_and_reserved_string_slots(self) -> None:
+    def test_material_device_and_widestring_algorithm_slots(self) -> None:
         cpp = {item["name"]: item for item in parse_cpp_header()}["IMaterial"]
         names = [method["name"] for method in cpp["methods"]]
         self.assertEqual(names[34:38], [
             "GetDevice",
             "SetDevice",
-            "ReservedGetAlgorithm",
-            "ReservedSetAlgorithm",
+            "GetAlgorithm",
+            "SetAlgorithm",
         ])
         self.assertEqual(
             [p["type"] for p in cpp["methods"][36]["parameters"]],
-            ["DelphiUnicodeStringSlot*"],
+            ["BSTR*"],
+        )
+        self.assertEqual(
+            [p["type"] for p in cpp["methods"][37]["parameters"]],
+            ["BSTR"],
+        )
+        pascal = {item["name"]: item for item in parse_pascal_units()}["IMaterial"]
+        self.assertEqual(pascal["methods"][36]["returnType"], "WideString")
+        self.assertEqual(
+            [p["type"] for p in pascal["methods"][37]["parameters"]], ["WideString"]
         )
         self.assertEqual(names[-2:], ["BeginUpdate", "EndUpdate"])
+
+    def test_published_safecall_contract_has_no_delphi_string_members(self) -> None:
+        # Delphi String/UnicodeString/AnsiString cannot cross a module boundary;
+        # the plugin contract uses WideString (BSTR) only.
+        string_types = {"string", "unicodestring", "ansistring"}
+        offenders = []
+        for interface in parse_pascal_units():
+            for method in interface["methods"]:
+                types = [
+                    method.get("returnType") or "",
+                    *(parameter["type"] for parameter in method["parameters"]),
+                ]
+                if any(type_name.strip().lower() in string_types for type_name in types):
+                    offenders.append(f"{interface['name']}.{method['name']}")
+        self.assertEqual(offenders, [])
+
+    def test_delphi_string_member_has_no_cpp_abi_mapping(self) -> None:
+        pascal = {
+            "name": "ITest",
+            "methods": [
+                {
+                    "name": "GetText",
+                    "parameters": [],
+                    "returnType": "String",
+                },
+                {
+                    "name": "SetText",
+                    "parameters": [
+                        {"name": "aText", "modifier": "const", "type": "UnicodeString"}
+                    ],
+                    "returnType": None,
+                },
+            ],
+            "properties": [],
+        }
+        for cpp_type in ("BSTR*", "void**", "String*", "wchar_t**"):
+            cpp = {
+                "name": "ITest",
+                "methods": [
+                    {
+                        "name": "GetText",
+                        "parameters": [{"name": "result", "type": cpp_type}],
+                        "returnType": "HRESULT",
+                    }
+                ],
+            }
+            diff = diff_cpp_interface_against_pascal(cpp, pascal)
+            self.assertFalse(diff["safe"], cpp_type)
+            self.assertEqual(diff["methodDiffs"][0]["status"], "abi-type-mismatch")
+        cpp = {
+            "name": "ITest",
+            "methods": [
+                {"name": "GetText", "parameters": [{"name": "r", "type": "BSTR*"}], "returnType": "HRESULT"},
+                {"name": "SetText", "parameters": [{"name": "v", "type": "BSTR"}], "returnType": "HRESULT"},
+            ],
+        }
+        diff = diff_cpp_interface_against_pascal(cpp, pascal)
+        self.assertFalse(diff["safe"])
+        self.assertEqual(
+            [item["status"] for item in diff["methodDiffs"]],
+            ["abi-type-mismatch", "abi-type-mismatch"],
+        )
 
     def test_reserved_slot_must_use_reserved_alias(self) -> None:
         pascal = make_interface("ITest", ["GetValue", "GetName", "Last"])

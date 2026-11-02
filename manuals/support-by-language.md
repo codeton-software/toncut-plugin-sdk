@@ -21,9 +21,9 @@ plugin.
   `ISheet`, `ISheets`, `ISolution`, `ISolutionSheet`, `ISolutionFormat`,
   `ISolutionFormats`, `ISolutionWaste`, `ISolutionWastes`, `ISolutionCut` and
   `ISolutionCuts`.
-- `IMaterial.Algorithm` is unusable from every language (see
-  `plugin-contract-and-abi.md`); its two slots appear in C++ only as
-  `ReservedGetAlgorithm`/`ReservedSetAlgorithm`.
+- `IMaterial.Algorithm` is a `WideString` (`BSTR` in C++) since the 2026-11
+  contract correction at engine version 24; plugins built against an older
+  SDK must not use it (see `plugin-contract-and-abi.md`).
 - Pascal overloads have distinct C++ names, for example
   `ITonCut::FormatLengthFromInt`/`FormatLengthFromExtended`,
   `ITonCut::HumanReadableFieldFromInt64`/`HumanReadableFieldFromExtended`,
