@@ -36,6 +36,7 @@
   <ItemGroup>
     <None Include="..\..\shared\cpp\CsvCodec.hpp" />
     <None Include="..\..\shared\cpp\CsvImportExportPluginBase.hpp" />
+    <None Include="..\..\shared\cpp\StarterPlotterInfo.hpp" />
     <None Include="..\..\..\include\cpp\TonCutPluginSdk.hpp" />
   </ItemGroup>
   <Import Project="$(BDS)\Bin\CodeGear.Cpp.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Cpp.Targets')" />

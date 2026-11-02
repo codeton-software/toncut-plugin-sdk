@@ -58,6 +58,10 @@ For every non-Delphi lane, whole interfaces absent from the C++ header appear
 in `unsupportedInterfaces`. Projected-interface entries include
 `unsupportedMethods` (Pascal slot, name, and signature),
 `supportedPropertyAccessors`, and accessor-aware `unsupportedProperties`.
+Slots that the C++ header keeps only for vtable alignment (named `Reserved...`,
+listed under `cppProjection.reservedSlots` in
+`support/language-support.config.json`) appear in `reservedMethods` and in
+`unsupportedMethods`, never in `methods`.
 Ownership-only `IUnknown` pointer types are kept out of callable support counts
 and recorded separately in `ownershipOnlyInterfaces`/`opaquePointerTypes` while
 also remaining in `unsupportedInterfaces`.

@@ -11,15 +11,21 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from sdk_test_lib import (  # noqa: E402
     GENERATED_ROOT,
+    build_cpp_interface_support,
     build_manifest,
     build_support,
     contract_generation_fingerprint,
     fingerprint_input_bytes,
     diff_cpp_interface_against_pascal,
+    evaluate_pascal_integer_constants,
     generate_artifacts,
     load_config,
+    parse_cpp_aliases,
     parse_cpp_header,
     parse_cpp_enums,
+    parse_cpp_iids,
+    parse_cpp_integer_constants,
+    parse_pascal_interface_guids,
     parse_pascal_enum_ordinals,
     parse_pascal_units,
     validate_cpp_data_types,
@@ -208,6 +214,110 @@ class CppProjectionValidationTests(unittest.TestCase):
             parse_pascal_enum_ordinals()["TTcpResult"],
         )
 
+    def test_cpp_constants_aliases_and_iids_match_pascal(self) -> None:
+        validate_cpp_data_types()
+        constants = parse_cpp_integer_constants()
+        evaluated = evaluate_pascal_integer_constants()
+        for name in (
+            "cEngineVersion",
+            "cLengthMultiplier",
+            "cFieldMultiplier",
+            "cRotation90",
+            "cRotation180",
+            "cRotation270",
+            "cRotation360",
+            "cPiecePriorityDefault",
+            "cPiecePriorityNormal",
+            "cPiecePriorityHigh",
+            "cPiecePriorityCritical",
+            "cStockPriorityMin",
+            "cStockPriorityLow",
+            "cStockPriorityNormal",
+            "cStockPriorityMax",
+            "cStockPriceAbsent",
+            "clTcNone",
+            "clTcRandom",
+        ):
+            self.assertIn(name, constants)
+            self.assertEqual(constants[name], evaluated[name], name)
+        self.assertEqual(evaluated["cFieldMultiplier"], 10000)
+        self.assertEqual(evaluated["cRotation90"], 900)
+        self.assertEqual(evaluated["cStockPriceAbsent"], -1)
+        self.assertEqual(evaluated["clTcNone"], -1)
+        self.assertEqual(evaluated["clTcRandom"], -2)
+
+        aliases = parse_cpp_aliases()
+        self.assertEqual(aliases["TMaterialKinds"], "std::uint8_t")
+        self.assertEqual(aliases["TField"], "std::int64_t")
+        self.assertEqual(aliases["TTcColor"], "int")
+
+        iids = parse_cpp_iids()
+        guids = parse_pascal_interface_guids()
+        self.assertEqual(iids["ITcPlotterInfo"], "6706EAE7-3E78-4841-AAD0-7B2D3F85551E")
+        self.assertEqual(iids["IMaterial"], "5C81D3A6-7E42-4B19-8F63-2D9B5A14C708")
+        for name, iid in iids.items():
+            self.assertEqual(iid, guids[name], name)
+        self.assertNotIn("ITcPlugin", iids)
+        projected = {
+            item["name"] for item in parse_cpp_header() if item["methods"]
+        }
+        self.assertEqual(set(iids), projected - {"ITcPlugin"})
+
+    def test_constant_alias_and_iid_drift_is_rejected(self) -> None:
+        constants = dict(parse_cpp_integer_constants())
+        constants["cStockPriceAbsent"] = 0
+        with patch("sdk_test_lib.parse_cpp_integer_constants", return_value=constants):
+            with self.assertRaisesRegex(ValueError, "cStockPriceAbsent"):
+                validate_cpp_data_types()
+
+        constants = dict(parse_cpp_integer_constants())
+        constants["cUnknownConstant"] = 1
+        with patch("sdk_test_lib.parse_cpp_integer_constants", return_value=constants):
+            with self.assertRaisesRegex(ValueError, "no evaluable Pascal source"):
+                validate_cpp_data_types()
+
+        iids = dict(parse_cpp_iids())
+        iids["IMaterial"] = "00000000-0000-0000-0000-000000000000"
+        with patch("sdk_test_lib.parse_cpp_iids", return_value=iids):
+            with self.assertRaisesRegex(ValueError, "IID_IMaterial"):
+                validate_cpp_data_types()
+
+        iids = dict(parse_cpp_iids())
+        del iids["ISolutionWaste"]
+        with patch("sdk_test_lib.parse_cpp_iids", return_value=iids):
+            with self.assertRaisesRegex(ValueError, "has no IID_ISolutionWaste"):
+                validate_cpp_data_types()
+
+        for alias_name, wrong_type in (
+            ("TMaterialKinds", "std::uint16_t"),
+            ("TField", "int"),
+            ("TTcColor", "unsigned"),
+        ):
+            aliases = dict(parse_cpp_aliases())
+            aliases[alias_name] = wrong_type
+            with patch("sdk_test_lib.parse_cpp_aliases", return_value=aliases):
+                with self.assertRaisesRegex(ValueError, alias_name):
+                    validate_cpp_data_types()
+
+    def test_unlisted_reserved_method_is_rejected(self) -> None:
+        pascal = make_interface("ITest", ["GetName", "Last"])
+        cpp = make_interface("ITest", ["ReservedGetName", "Last"])
+        config = {
+            "cppProjection": {
+                "methodAliases": {
+                    "ITest": {"0": {"pascal": "GetName", "cpp": "ReservedGetName"}}
+                }
+            }
+        }
+        with self.assertRaisesRegex(ValueError, "not listed in reservedSlots"):
+            validate_cpp_projections(
+                {"interfaces": [pascal], "cppInterfaces": [cpp]}, config
+            )
+        config["cppProjection"]["reservedSlots"] = {"ITest": {"0": "not callable"}}
+        validate_cpp_projections(
+            {"interfaces": [pascal], "cppInterfaces": [cpp]}, config
+        )
+
     def test_generated_support_reports_unsupported_interfaces_and_members(self) -> None:
         manifest = build_manifest(parse_pascal_units(), parse_cpp_header())
         support = build_support(manifest, load_config())
@@ -254,23 +364,55 @@ class CppProjectionValidationTests(unittest.TestCase):
                 [item["name"] for item in projected[owner_name]["unsupportedMethods"]],
             )
 
-        self.assertNotIn("ITcPlotterInfo", projected)
-        self.assertEqual(len(msvc["supportedInterfaces"]), 15)
-        self.assertEqual(len(msvc["ownershipOnlyInterfaces"]), 15)
-        self.assertEqual(len(msvc["unsupportedInterfaces"]), 50)
+            reserved = projected[owner_name]["reservedMethods"]
+            self.assertIn(
+                "ReservedGetAlgorithmData", [item["name"] for item in reserved]
+            )
+            self.assertNotIn(
+                "ReservedGetAlgorithmData", projected[owner_name]["methods"]
+            )
+
+        material = projected["IMaterial"]
+        algorithm = next(
+            item
+            for item in material["unsupportedProperties"]
+            if item["name"] == "Algorithm"
+        )
+        self.assertEqual(
+            algorithm["missingAccessors"], ["GetAlgorithm", "SetAlgorithm"]
+        )
+        self.assertIn("Device", material["supportedPropertyAccessors"])
+        self.assertIn("Kerf", material["supportedPropertyAccessors"])
+        self.assertEqual(material["diff"]["projection"], "full")
+
+        for full_name in (
+            "ISolutionFormat",
+            "ISolutionFormats",
+            "ISolutionWaste",
+            "ISolutionWastes",
+            "ISolutionSheet",
+            "IDevices",
+            "ITcPlotterInfo",
+        ):
+            self.assertIn(full_name, projected)
+            self.assertEqual(projected[full_name]["unsupportedMethods"], [])
+            self.assertEqual(projected[full_name]["diff"]["projection"], "full")
+
+        self.assertEqual(len(msvc["supportedInterfaces"]), 22)
+        self.assertEqual(len(msvc["ownershipOnlyInterfaces"]), 22)
+        self.assertEqual(len(msvc["unsupportedInterfaces"]), 43)
         ownership_only = {
             item["name"] for item in msvc["ownershipOnlyInterfaces"]
         }
-        self.assertIn("IDevices", ownership_only)
-        self.assertIn("IDevices", msvc["unsupportedInterfaces"])
-        plotter_info = next(
+        self.assertIn("IBands", ownership_only)
+        self.assertIn("IBands", msvc["unsupportedInterfaces"])
+        self.assertNotIn("IDevices", msvc["unsupportedInterfaces"])
+        algorithm_data = next(
             item
             for item in msvc["ownershipOnlyInterfaces"]
-            if item["name"] == "ITcPlotterInfo"
+            if item["name"] == "ITcAlgorithmData"
         )
-        self.assertEqual(plotter_info["diff"]["projection"], "documented-opaque")
-        self.assertEqual(len(plotter_info["unsupportedMethods"]), 53)
-        self.assertIn("ITcPlotterInfo", msvc["unsupportedInterfaces"])
+        self.assertEqual(algorithm_data["diff"]["projection"], "documented-opaque")
         self.assertEqual(set(msvc["opaquePointerTypes"]), ownership_only)
 
         csharp = support["lanes"]["csharp"]
@@ -279,10 +421,10 @@ class CppProjectionValidationTests(unittest.TestCase):
         self.assertEqual(csharp["directManagedSupportedInterfaces"], [])
         self.assertEqual(
             len(csharp["nativeShimSupportedInterfaces"]),
-            15,
+            22,
         )
-        self.assertEqual(len(csharp["nativeShimOwnershipOnlyInterfaces"]), 15)
-        self.assertEqual(len(csharp["nativeShimUnsupportedInterfaces"]), 50)
+        self.assertEqual(len(csharp["nativeShimOwnershipOnlyInterfaces"]), 22)
+        self.assertEqual(len(csharp["nativeShimUnsupportedInterfaces"]), 43)
         self.assertEqual(csharp["ownershipOnlyInterfaces"], [])
         self.assertTrue(
             all(
@@ -310,7 +452,13 @@ class CppProjectionValidationTests(unittest.TestCase):
             for method in interface["methods"]:
                 for parameter in method["parameters"]:
                     base_type = parameter["type"].removeprefix("const ").rstrip("*")
-                    if base_type.startswith("I") and len(base_type) > 1:
+                    # IUnknown comes from <Unknwn.h>; every other interface
+                    # pointer type must be declared by the SDK header.
+                    if (
+                        base_type.startswith("I")
+                        and len(base_type) > 1
+                        and base_type != "IUnknown"
+                    ):
                         self.assertIn(base_type, defined_names)
 
     def test_pascal_overload_directives_do_not_leak_into_return_types(self) -> None:
@@ -498,7 +646,7 @@ class CppProjectionValidationTests(unittest.TestCase):
         self.assertIn("Backup := 'caller-owned-preexisting-backup';", harness)
         self.assertEqual(harness.count("aPlugin.BackupConfig(Backup)"), 2)
 
-    def test_native_save_result_propagates_set_is_saved_failure(self) -> None:
+    def test_native_save_result_reports_set_is_saved_failure(self) -> None:
         source_path = (
             Path(__file__).resolve().parents[2]
             / "examples"
@@ -508,16 +656,90 @@ class CppProjectionValidationTests(unittest.TestCase):
         )
         source = source_path.read_text(encoding="utf-8")
         save_result_start = source.index("::SaveResult(")
-        save_result = source[save_result_start : save_result_start + 1800]
+        save_result_end = source.index("::BatchSaveResult(", save_result_start)
+        save_result = source[save_result_start:save_result_end]
         call = save_result.index("const HRESULT hr = aSolutionSheet->SetIsSaved(1)")
         check = save_result.index("if (FAILED(hr))", call)
-        failure_result = save_result.index("*result = cprException", check)
-        failure_return = save_result.index("return hr", failure_result)
-        success_result = save_result.index("*result = cprOK", failure_return)
+        failure_result = save_result.index("return Report(result, cprFailed);", check)
+        success_result = save_result.index("return Report(result, cprOK);", failure_result)
         self.assertLess(call, check)
         self.assertLess(check, failure_result)
-        self.assertLess(failure_result, failure_return)
-        self.assertLess(failure_return, success_result)
+        self.assertLess(failure_result, success_result)
+        # A failed HRESULT from a TTcpResult method disables the plugin.
+        self.assertNotIn("return hr", save_result)
+        self.assertNotIn("E_UNEXPECTED", source)
+
+    def test_native_starter_follows_verified_host_contract(self) -> None:
+        sdk_root = Path(__file__).resolve().parents[2]
+        source = (
+            sdk_root / "examples" / "shared" / "cpp" / "CsvImportExportPluginBase.cpp"
+        ).read_text(encoding="utf-8")
+        plotter_start = source.index("::GetPlotterInfo(")
+        plotter_end = source.index("::Initialize(", plotter_start)
+        self.assertIn(
+            "return StarterPlotterInfo::Create(result);",
+            source[plotter_start:plotter_end],
+        )
+        features_start = source.index("::GetFeatures(")
+        features = source[features_start:plotter_start]
+        self.assertIn("FeatureMask(feSaveResultToFile)", features)
+        self.assertNotIn("feConfigure", features)
+        # Non-interactive import: staged factories only, never ITonCut.Create*.
+        self.assertNotIn("tonCut_->CreateMaterial", source)
+        self.assertNotIn("tonCut_->CreateProject", source)
+        self.assertIn("materials->CreateMaterial(material.put())", source)
+        self.assertIn("projects->CreateProject(project.put())", source)
+        self.assertIn("material->SetDevice(device.get())", source)
+        self.assertIn("tonCut_->GetUsingProjects(&usingProjects)", source)
+        save_file_start = source.index("::SaveFile(")
+        save_file = source[save_file_start : source.index("::ExportSolutionSheetAsPlt(", save_file_start)]
+        self.assertIn("std::to_wstring(quantity),", save_file)
+        self.assertNotIn("quantity > 0 ? quantity : 1", save_file)
+        self.assertIn("riid != IID_ITcPlotterInfo", (
+            sdk_root / "examples" / "shared" / "cpp" / "StarterPlotterInfo.hpp"
+        ).read_text(encoding="utf-8"))
+        # PLT: SolutionCuts are already in the output frame; HPGL 40 units/mm.
+        plt_start = source.index("::ExportSolutionSheetAsPlt(")
+        plt_end = source.index("::ExportSolutionSheetLayout(", plt_start)
+        self.assertNotIn("->CalcPoint", source[plt_start:plt_end])
+        self.assertNotIn("25.4", source)
+        self.assertIn("constexpr double kHpglUnitsPerMillimeter = 40.0;", source)
+        layout_start = plt_end
+        layout = source[layout_start : source.index("::SaveResult(", layout_start)]
+        self.assertIn("solutionSheet->GetQuantity(&sheetQuantity)", layout)
+        self.assertIn("part->GetX(&x)", layout)
+        self.assertIn("waste->GetX(&x)", layout)
+
+        plotter_info = (
+            sdk_root / "examples" / "shared" / "cpp" / "StarterPlotterInfo.hpp"
+        ).read_text(encoding="utf-8")
+        self.assertIn("MaterialKindMask(mk1D) | MaterialKindMask(mk2D)", plotter_info)
+
+        delphi = (
+            sdk_root / "examples" / "delphi" / "CsvImportExport" / "uCsvImportExportPlugin.pas"
+        ).read_text(encoding="utf-8")
+        self.assertIn("Result := TStarterPlotterInfo.Create();", delphi)
+        self.assertIn("Result := [feImport, feExport, feSaveResultToFile, feAbout];", delphi)
+        self.assertNotIn("FTonCut.CreateMaterial", delphi)
+        self.assertNotIn("FTonCut.CreateProject", delphi)
+        self.assertNotIn("25.4", delphi)
+        self.assertNotIn("CalcPointF(", delphi)
+        self.assertIn("Result.Device := device;", delphi)
+
+        dpr = (
+            sdk_root / "examples" / "delphi" / "CsvImportExport" / "CsvImportExportDelphi.dpr"
+        ).read_text(encoding="utf-8")
+        for directive in ("{$IFNDEF WIN32}", "{$E plg}", "{$A8}"):
+            self.assertIn(directive, dpr)
+        self.assertIn("if Plugin.Initialize(", dpr)
+
+        for module_definition in (
+            sdk_root / "examples" / "msvc" / "CsvImportExport" / "CsvImportExport.def",
+            sdk_root / "examples" / "csharp" / "native-shim" / "CsvImportExport.Native.def",
+        ):
+            self.assertIn(
+                "TcpInitializeV2", module_definition.read_text(encoding="utf-8")
+            )
 
     def test_native_unsigned_csv_parser_matches_delphi_cardinal_range(self) -> None:
         sdk_root = Path(__file__).resolve().parents[2]
@@ -569,7 +791,7 @@ class CppProjectionValidationTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         delphi_start = delphi_source.index("function ToCsvMillimeters(")
         delphi_end = delphi_source.index(
-            "function TCsvImportExportPlugin.FindMaterialByTitle(", delphi_start
+            "function MillimetersText(", delphi_start
         )
         self.assertIn(
             "UInt64(AValue) + UInt64(cLengthMultiplier div 2)",
@@ -656,17 +878,22 @@ class CppProjectionValidationTests(unittest.TestCase):
         cpp_source = (
             sdk_root / "examples" / "shared" / "cpp" / "CsvImportExportPluginBase.cpp"
         ).read_text(encoding="utf-8")
-        ensure_start = cpp_source.index("CsvImportExportPluginBase::EnsureMaterial(")
+        ensure_start = cpp_source.index("CsvImportExportPluginBase::FindOrCreateMaterial(")
         ensure_end = cpp_source.index("CsvImportExportPluginBase::LoadFile(", ensure_start)
-        self.assertIn(
-            "return HRESULT_FROM_WIN32(ERROR_ALREADY_EXISTS);",
-            cpp_source[ensure_start:ensure_end],
-        )
+        ensure = cpp_source[ensure_start:ensure_end]
+        find = ensure.index("materials->FindByTitle(")
+        create = ensure.index("materials->CreateMaterial(", find)
+        device = ensure.index("material->SetDevice(", create)
+        add = ensure.index("materials->Add(", device)
+        self.assertLess(find, create)
+        self.assertLess(create, device)
+        self.assertLess(device, add)
+        self.assertIn("EffectiveMaterialWidth(kind, width)", ensure)
         load_start = ensure_end
         load_end = cpp_source.index("CsvImportExportPluginBase::SaveFile(", load_start)
         self.assertEqual(
             cpp_source[load_start:load_end].count("if (FAILED(hr) || !material)"),
-            2,
+            1,
         )
 
         csharp_source = (
@@ -803,8 +1030,8 @@ class CppProjectionValidationTests(unittest.TestCase):
             / "uCsvImportExportPlugin.pas"
         ).read_text(encoding="utf-8")
         self.assertIn(
-            "aProjects.BeginUpdate();\n        try\n          aFormats.BeginUpdate();"
-            "\n          try\n            aSheets.BeginUpdate();\n            try",
+            "aProjects.BeginUpdate();\n    try\n      aFormats.BeginUpdate();"
+            "\n      try\n        aSheets.BeginUpdate();\n        try",
             source,
         )
         sheets_end = source.index("aSheets.EndUpdate();")
@@ -826,22 +1053,23 @@ class CppProjectionValidationTests(unittest.TestCase):
         load_end = plugin_source.index("function TCsvImportExportPlugin.SaveFile(", load_start)
         load = plugin_source[load_start:load_end]
         validate = load.index("headerResult := ValidateHeader(aFileName);")
-        preserve = load.index("Exit(headerResult);", validate)
-        parse = load.index("table := ParseCsvText(text);", preserve)
+        reject = load.index("Exit(cprFailed);", validate)
+        parse = load.index("table := ParseCsvText(text);", reject)
         revalidate = load.index("not HasRequiredHeader(table[0])", parse)
-        project_create = load.index("projectCache := TDictionary<string, IProject>.Create;", revalidate)
-        project_try = load.index("\n    try\n", project_create)
-        material_create = load.index("materialCache := TDictionary<string, IMaterial>.Create;", project_try)
-        material_try = load.index("\n      try\n", material_create)
-        material_free = load.index("materialCache.Free;", material_try)
-        project_free = load.index("projectCache.Free;", material_free)
-        self.assertLess(validate, preserve)
+        projects_mode = load.index("usingProjects := FTonCut.UsingProjects;", revalidate)
+        update_scope = load.index("aProjects.BeginUpdate();", projects_mode)
+        material = load.index("material := FindOrCreateMaterial(", update_scope)
+        project = load.index(
+            "if usingProjects and (projectTitle <> '') then", material
+        )
+        self.assertLess(validate, reject)
         self.assertLess(parse, revalidate)
-        self.assertLess(project_create, project_try)
-        self.assertLess(project_try, material_create)
-        self.assertLess(material_create, material_try)
-        self.assertLess(material_try, material_free)
-        self.assertLess(material_free, project_free)
+        self.assertLess(revalidate, projects_mode)
+        self.assertLess(projects_mode, update_scope)
+        self.assertLess(update_scope, material)
+        self.assertLess(material, project)
+        self.assertTrue(load.rstrip().endswith("end;"))
+        self.assertIn("except\n    Result := cprException;", load)
 
         save_result_start = plugin_source.index(
             "function TCsvImportExportPlugin.SaveResult("
@@ -851,7 +1079,16 @@ class CppProjectionValidationTests(unittest.TestCase):
         )
         save_result = plugin_source[save_result_start:save_result_end]
         self.assertNotIn("Exit(", save_result)
-        self.assertIn("finally\n    commands.Free;", save_result)
+        guarded = save_result.index("  try\n    commands := TStringList.Create;")
+        release = save_result.index("finally\n      commands.Free;", guarded)
+        handler = save_result.index("except\n    Result := cprException;", release)
+        self.assertLess(guarded, release)
+        self.assertLess(release, handler)
+        plotter_start = plugin_source.index("function TCsvImportExportPlugin.GetPlotterInfo")
+        plotter = plugin_source[
+            plotter_start : plugin_source.index("function TCsvImportExportPlugin.Initialize(", plotter_start)
+        ]
+        self.assertIn("try\n    Result := TStarterPlotterInfo.Create();\n  except", plotter)
 
         common_source = (
             sdk_root
@@ -875,7 +1112,7 @@ class CppProjectionValidationTests(unittest.TestCase):
         self.assertLess(row_try, row_free)
         self.assertLess(row_free, rows_free)
 
-    def test_current_solution_sheet_is_an_exact_pascal_prefix(self) -> None:
+    def test_current_solution_sheet_is_a_complete_pascal_projection(self) -> None:
         manifest = build_manifest(parse_pascal_units(), parse_cpp_header())
         config = load_config()
 
@@ -891,13 +1128,14 @@ class CppProjectionValidationTests(unittest.TestCase):
         )
         self.assertEqual(
             [method["name"] for method in cpp["methods"]],
-            [method["name"] for method in pascal["methods"][:23]],
+            [method["name"] for method in pascal["methods"]],
         )
+        self.assertEqual(len(cpp["methods"]), 25)
         diff = diff_cpp_interface_against_pascal(
             cpp, pascal, config["cppProjection"]
         )
         self.assertTrue(diff["safe"])
-        self.assertEqual(diff["projection"], "prefix")
+        self.assertEqual(diff["projection"], "full")
 
     def test_solution_cut_is_a_complete_pascal_projection_with_shift_metadata(self) -> None:
         manifest = build_manifest(parse_pascal_units(), parse_cpp_header())
@@ -961,7 +1199,7 @@ class CppProjectionValidationTests(unittest.TestCase):
         self.assertTrue(diff["safe"])
         self.assertEqual(diff["projection"], "full")
 
-    def test_solution_sheet_prefix_has_the_required_abi_types(self) -> None:
+    def test_solution_sheet_projection_has_the_required_abi_types(self) -> None:
         cpp = next(
             item for item in parse_cpp_header() if item["name"] == "ISolutionSheet"
         )
@@ -989,6 +1227,8 @@ class CppProjectionValidationTests(unittest.TestCase):
             ["double*", "double*"],
             ["int*", "int*"],
             ["unsigned*", "unsigned*", "unsigned*", "unsigned*", "unsigned*", "unsigned*"],
+            ["int", "int", "TField*"],
+            ["int*", "double*"],
         ]
 
         self.assertEqual(
@@ -1167,6 +1407,98 @@ class CppProjectionValidationTests(unittest.TestCase):
         self.assertTrue(diff["safe"])
         self.assertEqual(diff["projection"], "full")
         self.assertEqual(len(diff["acceptedAliases"]), 2)
+
+    def test_solution_formats_and_wastes_are_complete_projections(self) -> None:
+        interfaces = {item["name"]: item for item in parse_cpp_header()}
+        self.assertEqual(
+            [
+                [method["name"], [p["type"] for p in method["parameters"]]]
+                for method in interfaces["ISolutionFormat"]["methods"]
+            ],
+            [
+                ["GetFormat", ["IFormat**"]],
+                ["GetX", ["unsigned*"]],
+                ["GetY", ["unsigned*"]],
+                ["GetRotation", ["unsigned short*"]],
+                ["GetMirrored", ["DelphiBool*"]],
+            ],
+        )
+        self.assertEqual(
+            [method["name"] for method in interfaces["ISolutionWaste"]["methods"]],
+            [
+                "GetX",
+                "GetY",
+                "GetLength",
+                "GetWidth",
+                "GetShape",
+                "GetField",
+                "GetIdentifier",
+                "GetShapePathAsString",
+                "GetHoles",
+            ],
+        )
+        for collection, element in (
+            ("ISolutionFormats", "ISolutionFormat"),
+            ("ISolutionWastes", "ISolutionWaste"),
+        ):
+            self.assertEqual(
+                [
+                    [method["name"], [p["type"] for p in method["parameters"]]]
+                    for method in interfaces[collection]["methods"]
+                ],
+                [
+                    ["GetCount", ["int*"]],
+                    ["GetByIndex", ["unsigned", f"{element}**"]],
+                ],
+            )
+
+    def test_material_device_slots_and_reserved_string_slots(self) -> None:
+        cpp = {item["name"]: item for item in parse_cpp_header()}["IMaterial"]
+        names = [method["name"] for method in cpp["methods"]]
+        self.assertEqual(names[34:38], [
+            "GetDevice",
+            "SetDevice",
+            "ReservedGetAlgorithm",
+            "ReservedSetAlgorithm",
+        ])
+        self.assertEqual(
+            [p["type"] for p in cpp["methods"][36]["parameters"]],
+            ["DelphiUnicodeStringSlot*"],
+        )
+        self.assertEqual(names[-2:], ["BeginUpdate", "EndUpdate"])
+
+    def test_reserved_slot_must_use_reserved_alias(self) -> None:
+        pascal = make_interface("ITest", ["GetValue", "GetName", "Last"])
+        for method in pascal["methods"]:
+            method["signature"] = f"procedure {method['name']}(); safecall;"
+        cpp = make_interface("ITest", ["GetValue", "GetNameAlias", "Last"])
+        config = {
+            "cppProjection": {
+                "methodAliases": {
+                    "ITest": {"1": {"pascal": "GetName", "cpp": "GetNameAlias"}}
+                },
+                "reservedSlots": {"ITest": {"1": "not callable"}},
+            }
+        }
+        with self.assertRaisesRegex(ValueError, "ReservedGetName"):
+            validate_cpp_projections(
+                {"interfaces": [pascal], "cppInterfaces": [cpp]}, config
+            )
+
+        reserved = make_interface("ITest", ["GetValue", "ReservedGetName", "Last"])
+        config["cppProjection"]["methodAliases"]["ITest"]["1"]["cpp"] = (
+            "ReservedGetName"
+        )
+        manifest = {"interfaces": [pascal], "cppInterfaces": [reserved]}
+        validate_cpp_projections(manifest, config)
+        support = build_cpp_interface_support(
+            reserved, pascal, config["cppProjection"]
+        )
+        self.assertEqual(support["methods"], ["GetValue", "Last"])
+        self.assertEqual(support["methodCount"], 2)
+        self.assertEqual(
+            [item["name"] for item in support["unsupportedMethods"]], ["GetName"]
+        )
 
     def test_zero_method_cpp_interfaces_require_documented_ownership_only_status(self) -> None:
         pascal = make_interface("ITest", ["First"])

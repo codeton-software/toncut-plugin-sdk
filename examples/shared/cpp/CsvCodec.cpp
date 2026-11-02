@@ -457,6 +457,10 @@ std::wstring EncodeCsvRows(const std::vector<CsvRowRecord>& records) {
   return output;
 }
 
+std::wstring EncodeCsvLine(const std::vector<std::wstring>& fields) {
+  return BuildLine(fields);
+}
+
 bool WriteUtf8CsvFile(const std::wstring& path, const std::wstring& content, std::wstring& error) {
   std::string utf8;
   if (!ToUtf8(content, utf8)) {

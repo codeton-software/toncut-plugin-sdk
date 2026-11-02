@@ -3,43 +3,74 @@
     "opaqueInterfaces": [
       "IBand",
       "IBands",
-      "IDevice",
-      "IDevices",
-      "IMaterialChangeEvent",
-      "INotifyEvent",
-      "IProjectChangeEvent",
+      "IBanding",
+      "IGrinds",
+      "IRectangle",
       "IResults",
       "IShape",
       "ISheetDefect",
-      "ISolutionFormats",
-      "ISolutionWastes",
+      "ISheetDefects",
       "IStandardSheet",
+      "IStandardSheets",
       "ITemplates",
-      "ITcPlotterInfo"
+      "ITcAlgorithmData",
+      "INotifyEvent",
+      "IIdChangeEvent",
+      "IDeviceChangeEvent",
+      "IFormatChangeEvent",
+      "IMaterialChangeEvent",
+      "IProjectChangeEvent",
+      "ISheetChangeEvent",
+      "ISheetDefectChangeEvent",
+      "IStandardSheetChangeEvent"
     ],
     "ownershipOnlyInterfaces": [
       "IBand",
       "IBands",
-      "IDevice",
-      "IDevices",
-      "IMaterialChangeEvent",
-      "INotifyEvent",
-      "IProjectChangeEvent",
+      "IBanding",
+      "IGrinds",
+      "IRectangle",
       "IResults",
       "IShape",
       "ISheetDefect",
-      "ISolutionFormats",
-      "ISolutionWastes",
+      "ISheetDefects",
       "IStandardSheet",
+      "IStandardSheets",
       "ITemplates",
-      "ITcPlotterInfo"
+      "ITcAlgorithmData",
+      "INotifyEvent",
+      "IIdChangeEvent",
+      "IDeviceChangeEvent",
+      "IFormatChangeEvent",
+      "IMaterialChangeEvent",
+      "IProjectChangeEvent",
+      "ISheetChangeEvent",
+      "ISheetDefectChangeEvent",
+      "IStandardSheetChangeEvent"
     ],
     "methodAliases": {
+      "IDevice": {
+        "63": { "pascal": "GetAlgorithmData", "cpp": "ReservedGetAlgorithmData" }
+      },
+      "IDevices": {
+        "5": { "pascal": "IndexOf", "cpp": "IndexOfByObject" },
+        "6": { "pascal": "IndexOf", "cpp": "IndexOfById" },
+        "11": { "pascal": "CheckUniqueName", "cpp": "CheckUniqueNameByDevice" }
+      },
+      "IFormat": {
+        "52": { "pascal": "GetAlgorithmData", "cpp": "ReservedGetAlgorithmData" }
+      },
       "IFormats": {
         "8": { "pascal": "IndexOf", "cpp": "IndexOfByObject" },
         "9": { "pascal": "IndexOf", "cpp": "IndexOfById" },
         "10": { "pascal": "IndexOf", "cpp": "IndexOfByList" },
-        "11": { "pascal": "IndexOf", "cpp": "IndexOfByOther" }
+        "11": { "pascal": "IndexOf", "cpp": "IndexOfByOther" },
+        "16": { "pascal": "LoadByProject", "cpp": "LoadByProjectInto" }
+      },
+      "IMaterial": {
+        "36": { "pascal": "GetAlgorithm", "cpp": "ReservedGetAlgorithm" },
+        "37": { "pascal": "SetAlgorithm", "cpp": "ReservedSetAlgorithm" },
+        "109": { "pascal": "GetAlgorithmData", "cpp": "ReservedGetAlgorithmData" }
       },
       "IMaterials": {
         "6": { "pascal": "IndexOf", "cpp": "IndexOfByObject" },
@@ -51,6 +82,9 @@
         "6": { "pascal": "IndexOf", "cpp": "IndexOfById" },
         "11": { "pascal": "CheckUniqueName", "cpp": "CheckUniqueNameByProject" }
       },
+      "ISheet": {
+        "32": { "pascal": "GetAlgorithmData", "cpp": "ReservedGetAlgorithmData" }
+      },
       "ISheets": {
         "5": { "pascal": "IndexOf", "cpp": "IndexOfByObject" },
         "6": { "pascal": "IndexOf", "cpp": "IndexOfById" },
@@ -61,6 +95,22 @@
         "21": { "pascal": "FormatLength", "cpp": "FormatLengthFromExtended" },
         "24": { "pascal": "HumanReadableField", "cpp": "HumanReadableFieldFromInt64" },
         "25": { "pascal": "HumanReadableField", "cpp": "HumanReadableFieldFromExtended" }
+      }
+    },
+    "reservedSlots": {
+      "IDevice": {
+        "63": "Not part of the published C++ surface; kept for slot alignment."
+      },
+      "IFormat": {
+        "52": "Not part of the published C++ surface; kept for slot alignment."
+      },
+      "IMaterial": {
+        "36": "Pascal String (Delphi UnicodeString) is not a COM type and cannot cross the C++ boundary.",
+        "37": "Pascal String (Delphi UnicodeString) is not a COM type and cannot cross the C++ boundary.",
+        "109": "Not part of the published C++ surface; kept for slot alignment."
+      },
+      "ISheet": {
+        "32": "Not part of the published C++ surface; kept for slot alignment."
       }
     }
   },

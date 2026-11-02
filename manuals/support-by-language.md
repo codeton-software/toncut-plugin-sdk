@@ -1,38 +1,60 @@
 # Support By Language
 
+Every plugin, in every language, must be a 32-bit (Win32, x86) DLL with the
+`.plg` extension. TonCut Desktop is a 32-bit process and cannot load a 64-bit
+plugin.
+
 | Environment | Status | Notes |
 | --- | --- | --- |
 | Delphi | Full native starter | Uses the shipped Pascal interfaces directly. |
-| C++Builder | Native starter on the SDK C++ subset (not compiled or tested by the maintainers) | Covers CSV import/export plus single-sheet PLT result export. Provided as-is; see the notice in `../README.md`. |
-| VS C++ | Native starter on the SDK C++ subset | Covers CSV import/export plus single-sheet PLT result export. |
-| C# | Split starter scaffold | Ships the native `TcpInitializeV2` boundary, native PLT result export, and the managed CSV core. |
+| C++Builder | Native starter on the SDK C++ header (not compiled or tested by the maintainers) | Same starter as VS C++. Provided as-is; see the notice in `../README.md`. |
+| VS C++ | Native starter on the SDK C++ header | CSV import/export plus single-sheet result export (HPGL cutting paths or CSV sheet layout). |
+| C# | Native shim only | The plugin itself is the C++ native shim, which uses the native C++ CSV code. The C# CSV library is not called until you add your own bridge. |
 
 ## Practical Boundary
 
 - Delphi and C++Builder can treat the Pascal units as native source contracts.
-- VS C++ and C++Builder expose the contiguous `ISolutionSheet` vtable prefix
-  through `CalcEffectiveLayout`, which contains the methods needed by the PLT
-  starter. The wider Desktop API still needs careful ABI translation work
-  before you expand the prefix.
-- The native C++ view exposes the complete `ISolutionCut` contract, including
-  `NeedShift`, `CalcLength`, and `ShiftDistance`, in the Pascal vtable order.
+- The C++ header projects the complete vtable of the interfaces a typical
+  import, export or result-export plugin needs: `ITcPlugin`, `ITonCut`,
+  `ITcEnumExtensionsCallback`, `ITcPlotterInfo`, `IDevice`, `IDevices`,
+  `IMaterial`, `IMaterials`, `IProject`, `IProjects`, `IFormat`, `IFormats`,
+  `ISheet`, `ISheets`, `ISolution`, `ISolutionSheet`, `ISolutionFormat`,
+  `ISolutionFormats`, `ISolutionWaste`, `ISolutionWastes`, `ISolutionCut` and
+  `ISolutionCuts`.
+- `IMaterial.Algorithm` is unusable from every language (see
+  `plugin-contract-and-abi.md`); its two slots appear in C++ only as
+  `ReservedGetAlgorithm`/`ReservedSetAlgorithm`.
+- Pascal overloads have distinct C++ names, for example
+  `ITonCut::FormatLengthFromInt`/`FormatLengthFromExtended`,
+  `ITonCut::HumanReadableFieldFromInt64`/`HumanReadableFieldFromExtended`,
+  `IFormats::IndexOfByObject`/`IndexOfById`/`IndexOfByList`/`IndexOfByOther`
+  and `IFormats::LoadByProjectInto`/`LoadByProject`. Each keeps its Pascal
+  vtable slot.
 - Interface parameters and results use their exact Pascal interface pointer
   types even when that interface remains otherwise opaque in C++. A documented
   opaque interface exposes only its `IUnknown` prefix, so callers can retain
   and release the returned pointer but cannot call its Pascal members. The
   omission is a source-language support boundary, not permission to erase ABI
   types.
-- C# has no direct managed projection of the public Pascal interfaces. Its
-  supported interface surface belongs to `examples/csharp/native-shim`; a
-  project-specific bridge is still required to connect that native shim to
-  `examples/csharp/managed-core` for CSV logic.
+- C# has no managed projection of the Pascal interfaces, and TonCut does not
+  load .NET assemblies. A C# plugin is a native C++ DLL (the
+  `examples/csharp/native-shim` project) that exports `TcpInitializeV2` and
+  implements the TonCut interfaces in C++. As shipped, the shim uses the
+  native C++ CSV code and never loads managed code. The managed project
+  (`examples/csharp/managed-core`) is a C# implementation of the same CSV
+  schema for you to call once you add a bridge from the shim (C++/CLI, COM,
+  or a hosted runtime); that bridge is project-specific and not part of the
+  SDK. Managed code runs inside the 32-bit
+  TonCut process, so build it for x86 (the managed project sets
+  `PlatformTarget` to `x86`).
 
 ## Machine-Readable Boundary
 
 `tests/generated/language-support.json` derives each non-Delphi lane's support
 boundary from the Pascal contract and C++ header. Every projected native
 interface records omitted Pascal slots in `unsupportedMethods` and properties
-with unavailable accessors in `unsupportedProperties`. The C# lane separates
+with unavailable accessors in `unsupportedProperties`; `reservedMethods` lists
+the slots that exist only for vtable alignment. The C# lane separates
 `nativeShimSupportedInterfaces` from its empty
 `directManagedSupportedInterfaces`. Pointer types that expose only ownership
 operations are listed separately in `ownershipOnlyInterfaces` and

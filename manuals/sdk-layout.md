@@ -15,6 +15,7 @@ SDK/
         CsvCodec.hpp
         CsvImportExportPluginBase.cpp
         CsvImportExportPluginBase.hpp
+        StarterPlotterInfo.hpp
       csv/
         example.csv
     delphi/

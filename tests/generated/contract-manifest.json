@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-10-30T08:10:17.626Z",
+  "generatedAt": "2026-11-02T13:20:03.257Z",
   "sourceRoot": "SDK/include",
   "totals": {
     "interfaceCount": 65,
     "methodCount": 975,
     "propertyCount": 431,
-    "cppInterfaceCount": 30,
-    "cppMethodCount": 227
+    "cppInterfaceCount": 44,
+    "cppMethodCount": 650
   },
   "interfaces": [
     {
@@ -19813,6 +19813,11 @@
       "methods": []
     },
     {
+      "name": "IBanding",
+      "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
+      "methods": []
+    },
+    {
       "name": "IBands",
       "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
       "methods": []
@@ -19820,12 +19825,1076 @@
     {
       "name": "IDevice",
       "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
+      "methods": [
+        {
+          "name": "Clone",
+          "signature": "HRESULT Clone(IDevice** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IDevice**"
+            }
+          ]
+        },
+        {
+          "name": "Assign",
+          "signature": "HRESULT Assign(IDevice* aOther)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aOther",
+              "type": "IDevice*"
+            }
+          ]
+        },
+        {
+          "name": "GetId",
+          "signature": "HRESULT GetId(std::int64_t* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "std::int64_t*"
+            }
+          ]
+        },
+        {
+          "name": "SetId",
+          "signature": "HRESULT SetId(std::int64_t aId)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aId",
+              "type": "std::int64_t"
+            }
+          ]
+        },
+        {
+          "name": "GetTitle",
+          "signature": "HRESULT GetTitle(BSTR* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "BSTR*"
+            }
+          ]
+        },
+        {
+          "name": "SetTitle",
+          "signature": "HRESULT SetTitle(BSTR aTitle)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aTitle",
+              "type": "BSTR"
+            }
+          ]
+        },
+        {
+          "name": "GetDriver",
+          "signature": "HRESULT GetDriver(BSTR* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "BSTR*"
+            }
+          ]
+        },
+        {
+          "name": "SetDriver",
+          "signature": "HRESULT SetDriver(BSTR aDriver)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aDriver",
+              "type": "BSTR"
+            }
+          ]
+        },
+        {
+          "name": "GetCanCutAnyShapes",
+          "signature": "HRESULT GetCanCutAnyShapes(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetCanCutAnyShapes",
+          "signature": "HRESULT SetCanCutAnyShapes(DelphiBool aCanCutAnyShapes)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCanCutAnyShapes",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetCanCrossCuts",
+          "signature": "HRESULT GetCanCrossCuts(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetCanCrossCuts",
+          "signature": "HRESULT SetCanCrossCuts(DelphiBool aCanCrossCuts)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCanCrossCuts",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetFullCutsOnly",
+          "signature": "HRESULT GetFullCutsOnly(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetFullCutsOnly",
+          "signature": "HRESULT SetFullCutsOnly(DelphiBool aFullCutsOnly)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aFullCutsOnly",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetStripCuts",
+          "signature": "HRESULT GetStripCuts(TStripCutting* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TStripCutting*"
+            }
+          ]
+        },
+        {
+          "name": "SetStripCuts",
+          "signature": "HRESULT SetStripCuts(TStripCutting aStripCuts)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aStripCuts",
+              "type": "TStripCutting"
+            }
+          ]
+        },
+        {
+          "name": "GetMaxStripeWidth",
+          "signature": "HRESULT GetMaxStripeWidth(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "SetMaxStripeWidth",
+          "signature": "HRESULT SetMaxStripeWidth(int aMaxWidth)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aMaxWidth",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "name": "GetMinCutSize",
+          "signature": "HRESULT GetMinCutSize(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetMinCutSize",
+          "signature": "HRESULT SetMinCutSize(unsigned aSize)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aSize",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetMinCutDistance",
+          "signature": "HRESULT GetMinCutDistance(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetMinCutDistance",
+          "signature": "HRESULT SetMinCutDistance(unsigned aDistance)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aDistance",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetMinEdgeDistance",
+          "signature": "HRESULT GetMinEdgeDistance(IRectangle** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IRectangle**"
+            }
+          ]
+        },
+        {
+          "name": "GetEdgingCuts",
+          "signature": "HRESULT GetEdgingCuts(TEdgingCuts* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TEdgingCuts*"
+            }
+          ]
+        },
+        {
+          "name": "SetEdgingCuts",
+          "signature": "HRESULT SetEdgingCuts(TEdgingCuts aEdgingCuts)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aEdgingCuts",
+              "type": "TEdgingCuts"
+            }
+          ]
+        },
+        {
+          "name": "GetOriginEdgingCuts",
+          "signature": "HRESULT GetOriginEdgingCuts(TOriginEdgingCuts* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TOriginEdgingCuts*"
+            }
+          ]
+        },
+        {
+          "name": "SetOriginEdgingCuts",
+          "signature": "HRESULT SetOriginEdgingCuts(TOriginEdgingCuts aOriginEdgingCuts)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aOriginEdgingCuts",
+              "type": "TOriginEdgingCuts"
+            }
+          ]
+        },
+        {
+          "name": "GetMaxCutDepthOn",
+          "signature": "HRESULT GetMaxCutDepthOn(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetMaxCutDepthOn",
+          "signature": "HRESULT SetMaxCutDepthOn(DelphiBool aOn)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aOn",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetMaxCutDepth",
+          "signature": "HRESULT GetMaxCutDepth(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetMaxCutDepth",
+          "signature": "HRESULT SetMaxCutDepth(unsigned aDepth)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aDepth",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetFirstCutDirection",
+          "signature": "HRESULT GetFirstCutDirection(TCutDirections* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TCutDirections*"
+            }
+          ]
+        },
+        {
+          "name": "SetFirstCutDirection",
+          "signature": "HRESULT SetFirstCutDirection(TCutDirections aDirection)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aDirection",
+              "type": "TCutDirections"
+            }
+          ]
+        },
+        {
+          "name": "GetMaxCutDepthIncludeSheetEdging",
+          "signature": "HRESULT GetMaxCutDepthIncludeSheetEdging(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetMaxCutDepthIncludeSheetEdging",
+          "signature": "HRESULT SetMaxCutDepthIncludeSheetEdging(DelphiBool aInclude)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aInclude",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetMaxCutLengthByLengthOn",
+          "signature": "HRESULT GetMaxCutLengthByLengthOn(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetMaxCutLengthByLengthOn",
+          "signature": "HRESULT SetMaxCutLengthByLengthOn(DelphiBool aOn)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aOn",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetMaxCutLengthByLength",
+          "signature": "HRESULT GetMaxCutLengthByLength(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetMaxCutLengthByLength",
+          "signature": "HRESULT SetMaxCutLengthByLength(unsigned aLength)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aLength",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetMaxCutLengthByWidthOn",
+          "signature": "HRESULT GetMaxCutLengthByWidthOn(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetMaxCutLengthByWidthOn",
+          "signature": "HRESULT SetMaxCutLengthByWidthOn(DelphiBool aOn)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aOn",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetMaxCutLengthByWidth",
+          "signature": "HRESULT GetMaxCutLengthByWidth(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetMaxCutLengthByWidth",
+          "signature": "HRESULT SetMaxCutLengthByWidth(unsigned aLength)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aLength",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetMaterialKind",
+          "signature": "HRESULT GetMaterialKind(TMaterialKind* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TMaterialKind*"
+            }
+          ]
+        },
+        {
+          "name": "SetMaterialKind",
+          "signature": "HRESULT SetMaterialKind(TMaterialKind aKind)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aKind",
+              "type": "TMaterialKind"
+            }
+          ]
+        },
+        {
+          "name": "GetCanCutSlants",
+          "signature": "HRESULT GetCanCutSlants(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetCanCutSlants",
+          "signature": "HRESULT SetCanCutSlants(DelphiBool aCan)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCan",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetLeftSlantMeasurement",
+          "signature": "HRESULT GetLeftSlantMeasurement(TSlantMeasurement* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TSlantMeasurement*"
+            }
+          ]
+        },
+        {
+          "name": "SetLeftSlantMeasurement",
+          "signature": "HRESULT SetLeftSlantMeasurement(TSlantMeasurement aSlantMeasurement)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aSlantMeasurement",
+              "type": "TSlantMeasurement"
+            }
+          ]
+        },
+        {
+          "name": "GetRightSlantMeasurement",
+          "signature": "HRESULT GetRightSlantMeasurement(TSlantMeasurement* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TSlantMeasurement*"
+            }
+          ]
+        },
+        {
+          "name": "SetRightSlantMeasurement",
+          "signature": "HRESULT SetRightSlantMeasurement(TSlantMeasurement aSlantMeasurement)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aSlantMeasurement",
+              "type": "TSlantMeasurement"
+            }
+          ]
+        },
+        {
+          "name": "GetCutCostPerMeter",
+          "signature": "HRESULT GetCutCostPerMeter(TTcPrice* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcPrice*"
+            }
+          ]
+        },
+        {
+          "name": "SetCutCostPerMeter",
+          "signature": "HRESULT SetCutCostPerMeter(TTcPrice aCost)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCost",
+              "type": "TTcPrice"
+            }
+          ]
+        },
+        {
+          "name": "GetReuseCost",
+          "signature": "HRESULT GetReuseCost(TTcPrice* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcPrice*"
+            }
+          ]
+        },
+        {
+          "name": "SetReuseCost",
+          "signature": "HRESULT SetReuseCost(TTcPrice aCost)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCost",
+              "type": "TTcPrice"
+            }
+          ]
+        },
+        {
+          "name": "GetUtilizationCost",
+          "signature": "HRESULT GetUtilizationCost(TTcPrice* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcPrice*"
+            }
+          ]
+        },
+        {
+          "name": "SetUtilizationCost",
+          "signature": "HRESULT SetUtilizationCost(TTcPrice aCost)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCost",
+              "type": "TTcPrice"
+            }
+          ]
+        },
+        {
+          "name": "GetSegmentShiftCost",
+          "signature": "HRESULT GetSegmentShiftCost(TTcPrice* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcPrice*"
+            }
+          ]
+        },
+        {
+          "name": "SetSegmentShiftCost",
+          "signature": "HRESULT SetSegmentShiftCost(TTcPrice aCost)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCost",
+              "type": "TTcPrice"
+            }
+          ]
+        },
+        {
+          "name": "GetSegmentRotationCost",
+          "signature": "HRESULT GetSegmentRotationCost(TTcPrice* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcPrice*"
+            }
+          ]
+        },
+        {
+          "name": "SetSegmentRotationCost",
+          "signature": "HRESULT SetSegmentRotationCost(TTcPrice aCost)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCost",
+              "type": "TTcPrice"
+            }
+          ]
+        },
+        {
+          "name": "GetCustomData",
+          "signature": "HRESULT GetCustomData(BSTR* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "BSTR*"
+            }
+          ]
+        },
+        {
+          "name": "SetCustomData",
+          "signature": "HRESULT SetCustomData(BSTR aData)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aData",
+              "type": "BSTR"
+            }
+          ]
+        },
+        {
+          "name": "ReservedGetAlgorithmData",
+          "signature": "HRESULT ReservedGetAlgorithmData(ITcAlgorithmData** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "ITcAlgorithmData**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnChange",
+          "signature": "HRESULT GetOnChange(INotifyEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "INotifyEvent**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnIdChange",
+          "signature": "HRESULT GetOnIdChange(IIdChangeEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IIdChangeEvent**"
+            }
+          ]
+        },
+        {
+          "name": "BeginUpdate",
+          "signature": "HRESULT BeginUpdate()",
+          "returnType": "HRESULT",
+          "parameters": []
+        },
+        {
+          "name": "EndUpdate",
+          "signature": "HRESULT EndUpdate()",
+          "returnType": "HRESULT",
+          "parameters": []
+        },
+        {
+          "name": "GetDefaultRotation",
+          "signature": "HRESULT GetDefaultRotation(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "SetDefaultRotation",
+          "signature": "HRESULT SetDefaultRotation(int aRotation)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aRotation",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "name": "GetDefaultMirror",
+          "signature": "HRESULT GetDefaultMirror(TMirrors* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TMirrors*"
+            }
+          ]
+        },
+        {
+          "name": "SetDefaultMirror",
+          "signature": "HRESULT SetDefaultMirror(TMirrors aMirror)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aMirror",
+              "type": "TMirrors"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "IDeviceChangeEvent",
+      "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
       "methods": []
     },
     {
       "name": "IDevices",
       "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
-      "methods": []
+      "methods": [
+        {
+          "name": "CreateDevice",
+          "signature": "HRESULT CreateDevice(IDevice** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IDevice**"
+            }
+          ]
+        },
+        {
+          "name": "Add",
+          "signature": "HRESULT Add(IDevice* aDevice)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aDevice",
+              "type": "IDevice*"
+            }
+          ]
+        },
+        {
+          "name": "DeleteByIndex",
+          "signature": "HRESULT DeleteByIndex(unsigned aIndex)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aIndex",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "DeleteById",
+          "signature": "HRESULT DeleteById(std::int64_t aId)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aId",
+              "type": "std::int64_t"
+            }
+          ]
+        },
+        {
+          "name": "Remove",
+          "signature": "HRESULT Remove(IDevice* aDevice)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aDevice",
+              "type": "IDevice*"
+            }
+          ]
+        },
+        {
+          "name": "IndexOfByObject",
+          "signature": "HRESULT IndexOfByObject(IDevice* aDevice, int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aDevice",
+              "type": "IDevice*"
+            },
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "IndexOfById",
+          "signature": "HRESULT IndexOfById(std::int64_t aId, int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aId",
+              "type": "std::int64_t"
+            },
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "FindDuplicate",
+          "signature": "HRESULT FindDuplicate(IDevice* aDevice, DelphiBool aCheckTitle, IDevice** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aDevice",
+              "type": "IDevice*"
+            },
+            {
+              "name": "aCheckTitle",
+              "type": "DelphiBool"
+            },
+            {
+              "name": "result",
+              "type": "IDevice**"
+            }
+          ]
+        },
+        {
+          "name": "FindByTitle",
+          "signature": "HRESULT FindByTitle(BSTR aTitle, IDevice** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aTitle",
+              "type": "BSTR"
+            },
+            {
+              "name": "result",
+              "type": "IDevice**"
+            }
+          ]
+        },
+        {
+          "name": "FindUniqueName",
+          "signature": "HRESULT FindUniqueName(BSTR aBaseName, BSTR* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aBaseName",
+              "type": "BSTR"
+            },
+            {
+              "name": "result",
+              "type": "BSTR*"
+            }
+          ]
+        },
+        {
+          "name": "CheckUniqueName",
+          "signature": "HRESULT CheckUniqueName(BSTR aTitle, IDevice* aIgnoreDevice, DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aTitle",
+              "type": "BSTR"
+            },
+            {
+              "name": "aIgnoreDevice",
+              "type": "IDevice*"
+            },
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "CheckUniqueNameByDevice",
+          "signature": "HRESULT CheckUniqueNameByDevice(IDevice* aDevice, DelphiBool aAutoFix, DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aDevice",
+              "type": "IDevice*"
+            },
+            {
+              "name": "aAutoFix",
+              "type": "DelphiBool"
+            },
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "GetCount",
+          "signature": "HRESULT GetCount(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "GetByIndex",
+          "signature": "HRESULT GetByIndex(unsigned aIndex, IDevice** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aIndex",
+              "type": "unsigned"
+            },
+            {
+              "name": "result",
+              "type": "IDevice**"
+            }
+          ]
+        },
+        {
+          "name": "GetById",
+          "signature": "HRESULT GetById(std::int64_t aId, IDevice** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aId",
+              "type": "std::int64_t"
+            },
+            {
+              "name": "result",
+              "type": "IDevice**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnAdd",
+          "signature": "HRESULT GetOnAdd(IDeviceChangeEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IDeviceChangeEvent**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnRemove",
+          "signature": "HRESULT GetOnRemove(IDeviceChangeEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IDeviceChangeEvent**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnChange",
+          "signature": "HRESULT GetOnChange(INotifyEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "INotifyEvent**"
+            }
+          ]
+        },
+        {
+          "name": "BeginUpdate",
+          "signature": "HRESULT BeginUpdate()",
+          "returnType": "HRESULT",
+          "parameters": []
+        },
+        {
+          "name": "EndUpdate",
+          "signature": "HRESULT EndUpdate()",
+          "returnType": "HRESULT",
+          "parameters": []
+        },
+        {
+          "name": "IsUpdating",
+          "signature": "HRESULT IsUpdating(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "Reload",
+          "signature": "HRESULT Reload()",
+          "returnType": "HRESULT",
+          "parameters": []
+        }
+      ]
     },
     {
       "name": "IFormat",
@@ -20138,8 +21207,519 @@
               "type": "IMaterial*"
             }
           ]
+        },
+        {
+          "name": "GetSurplus",
+          "signature": "HRESULT GetSurplus(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetSurplus",
+          "signature": "HRESULT SetSurplus(unsigned aSurplus)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aSurplus",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetMargin",
+          "signature": "HRESULT GetMargin(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetMargin",
+          "signature": "HRESULT SetMargin(unsigned aMargin)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aMargin",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetBanding",
+          "signature": "HRESULT GetBanding(IBanding** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IBanding**"
+            }
+          ]
+        },
+        {
+          "name": "GetGrinds",
+          "signature": "HRESULT GetGrinds(IGrinds** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IGrinds**"
+            }
+          ]
+        },
+        {
+          "name": "GetColor",
+          "signature": "HRESULT GetColor(BSTR* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "BSTR*"
+            }
+          ]
+        },
+        {
+          "name": "SetColor",
+          "signature": "HRESULT SetColor(BSTR aColor)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aColor",
+              "type": "BSTR"
+            }
+          ]
+        },
+        {
+          "name": "GetPriority",
+          "signature": "HRESULT GetPriority(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "SetPriority",
+          "signature": "HRESULT SetPriority(int aPriority)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aPriority",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "name": "GetWeight",
+          "signature": "HRESULT GetWeight(double* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "double*"
+            }
+          ]
+        },
+        {
+          "name": "SetWeight",
+          "signature": "HRESULT SetWeight(double aWeight)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aWeight",
+              "type": "double"
+            }
+          ]
+        },
+        {
+          "name": "GetWeightModifier",
+          "signature": "HRESULT GetWeightModifier(double* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "double*"
+            }
+          ]
+        },
+        {
+          "name": "SetWeightModifier",
+          "signature": "HRESULT SetWeightModifier(double aModifier)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aModifier",
+              "type": "double"
+            }
+          ]
+        },
+        {
+          "name": "GetGroup",
+          "signature": "HRESULT GetGroup(unsigned short* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned short*"
+            }
+          ]
+        },
+        {
+          "name": "SetGroup",
+          "signature": "HRESULT SetGroup(unsigned short aGroup)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aGroup",
+              "type": "unsigned short"
+            }
+          ]
+        },
+        {
+          "name": "GetOrder",
+          "signature": "HRESULT GetOrder(unsigned short* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned short*"
+            }
+          ]
+        },
+        {
+          "name": "SetOrder",
+          "signature": "HRESULT SetOrder(unsigned short aOrder)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aOrder",
+              "type": "unsigned short"
+            }
+          ]
+        },
+        {
+          "name": "GetSellingPrice",
+          "signature": "HRESULT GetSellingPrice(TTcPrice* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcPrice*"
+            }
+          ]
+        },
+        {
+          "name": "SetSellingPrice",
+          "signature": "HRESULT SetSellingPrice(TTcPrice aPrice)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aPrice",
+              "type": "TTcPrice"
+            }
+          ]
+        },
+        {
+          "name": "GetStorageCost",
+          "signature": "HRESULT GetStorageCost(TTcPrice* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcPrice*"
+            }
+          ]
+        },
+        {
+          "name": "SetStorageCost",
+          "signature": "HRESULT SetStorageCost(TTcPrice aCost)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCost",
+              "type": "TTcPrice"
+            }
+          ]
+        },
+        {
+          "name": "GetCustomData",
+          "signature": "HRESULT GetCustomData(BSTR* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "BSTR*"
+            }
+          ]
+        },
+        {
+          "name": "SetCustomData",
+          "signature": "HRESULT SetCustomData(BSTR aData)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aData",
+              "type": "BSTR"
+            }
+          ]
+        },
+        {
+          "name": "ReservedGetAlgorithmData",
+          "signature": "HRESULT ReservedGetAlgorithmData(ITcAlgorithmData** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "ITcAlgorithmData**"
+            }
+          ]
+        },
+        {
+          "name": "GetEffectivePriority",
+          "signature": "HRESULT GetEffectivePriority(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "GetLeftQuantity",
+          "signature": "HRESULT GetLeftQuantity(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetTotalSurplus",
+          "signature": "HRESULT GetTotalSurplus(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetTotalMargin",
+          "signature": "HRESULT GetTotalMargin(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetTotalLength",
+          "signature": "HRESULT GetTotalLength(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetTotalWidth",
+          "signature": "HRESULT GetTotalWidth(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetTotalField",
+          "signature": "HRESULT GetTotalField(TField* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TField*"
+            }
+          ]
+        },
+        {
+          "name": "GetGrossLength",
+          "signature": "HRESULT GetGrossLength(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetGrossWidth",
+          "signature": "HRESULT GetGrossWidth(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetShapePathAsString",
+          "signature": "HRESULT GetShapePathAsString(double aRotation, DelphiBool aMirror, DelphiBool aWithOffset, DelphiBool aBBoxOrigin, BSTR* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aRotation",
+              "type": "double"
+            },
+            {
+              "name": "aMirror",
+              "type": "DelphiBool"
+            },
+            {
+              "name": "aWithOffset",
+              "type": "DelphiBool"
+            },
+            {
+              "name": "aBBoxOrigin",
+              "type": "DelphiBool"
+            },
+            {
+              "name": "result",
+              "type": "BSTR*"
+            }
+          ]
+        },
+        {
+          "name": "GetShapeOffsetInsideBoundingBox",
+          "signature": "HRESULT GetShapeOffsetInsideBoundingBox(double aRotation, DelphiBool aMirror, double* aX, double* aY)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aRotation",
+              "type": "double"
+            },
+            {
+              "name": "aMirror",
+              "type": "DelphiBool"
+            },
+            {
+              "name": "aX",
+              "type": "double*"
+            },
+            {
+              "name": "aY",
+              "type": "double*"
+            }
+          ]
+        },
+        {
+          "name": "Assign",
+          "signature": "HRESULT Assign(IFormat* aOther, IProject* aProject)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aOther",
+              "type": "IFormat*"
+            },
+            {
+              "name": "aProject",
+              "type": "IProject*"
+            }
+          ]
+        },
+        {
+          "name": "GetOnChange",
+          "signature": "HRESULT GetOnChange(INotifyEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "INotifyEvent**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnIdChange",
+          "signature": "HRESULT GetOnIdChange(IIdChangeEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IIdChangeEvent**"
+            }
+          ]
+        },
+        {
+          "name": "UpdateEffectivePriority",
+          "signature": "HRESULT UpdateEffectivePriority(DelphiBool aTriggerChange)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aTriggerChange",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "BeginUpdate",
+          "signature": "HRESULT BeginUpdate()",
+          "returnType": "HRESULT",
+          "parameters": []
+        },
+        {
+          "name": "EndUpdate",
+          "signature": "HRESULT EndUpdate()",
+          "returnType": "HRESULT",
+          "parameters": []
+        },
+        {
+          "name": "GetPreviewColor",
+          "signature": "HRESULT GetPreviewColor(TTcColor* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcColor*"
+            }
+          ]
+        },
+        {
+          "name": "SetPreviewColor",
+          "signature": "HRESULT SetPreviewColor(TTcColor aColor)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aColor",
+              "type": "TTcColor"
+            }
+          ]
         }
       ]
+    },
+    {
+      "name": "IFormatChangeEvent",
+      "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
+      "methods": []
     },
     {
       "name": "IFormats",
@@ -20367,8 +21947,207 @@
               "type": "IFormat**"
             }
           ]
+        },
+        {
+          "name": "GetById",
+          "signature": "HRESULT GetById(std::int64_t aId, IFormat** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aId",
+              "type": "std::int64_t"
+            },
+            {
+              "name": "result",
+              "type": "IFormat**"
+            }
+          ]
+        },
+        {
+          "name": "LoadByProjectInto",
+          "signature": "HRESULT LoadByProjectInto(IProject* aProject, IFormats* aFormats)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aProject",
+              "type": "IProject*"
+            },
+            {
+              "name": "aFormats",
+              "type": "IFormats*"
+            }
+          ]
+        },
+        {
+          "name": "LoadByProject",
+          "signature": "HRESULT LoadByProject(IProject* aProject)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aProject",
+              "type": "IProject*"
+            }
+          ]
+        },
+        {
+          "name": "GetByProject",
+          "signature": "HRESULT GetByProject(IProject* aProject, IFormats** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aProject",
+              "type": "IProject*"
+            },
+            {
+              "name": "result",
+              "type": "IFormats**"
+            }
+          ]
+        },
+        {
+          "name": "UnloadByProject",
+          "signature": "HRESULT UnloadByProject(IProject* aProject)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aProject",
+              "type": "IProject*"
+            }
+          ]
+        },
+        {
+          "name": "UnloadFormat",
+          "signature": "HRESULT UnloadFormat(IFormat* aFormat)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aFormat",
+              "type": "IFormat*"
+            }
+          ]
+        },
+        {
+          "name": "CalcMaxLength",
+          "signature": "HRESULT CalcMaxLength(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetField",
+          "signature": "HRESULT GetField(TField* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TField*"
+            }
+          ]
+        },
+        {
+          "name": "GetQuantity",
+          "signature": "HRESULT GetQuantity(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetLoading",
+          "signature": "HRESULT GetLoading(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetLoading",
+          "signature": "HRESULT SetLoading(DelphiBool aLoading)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aLoading",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetOnAdd",
+          "signature": "HRESULT GetOnAdd(IFormatChangeEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IFormatChangeEvent**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnRemove",
+          "signature": "HRESULT GetOnRemove(IFormatChangeEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IFormatChangeEvent**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnChange",
+          "signature": "HRESULT GetOnChange(INotifyEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "INotifyEvent**"
+            }
+          ]
+        },
+        {
+          "name": "BeginUpdate",
+          "signature": "HRESULT BeginUpdate()",
+          "returnType": "HRESULT",
+          "parameters": []
+        },
+        {
+          "name": "EndUpdate",
+          "signature": "HRESULT EndUpdate()",
+          "returnType": "HRESULT",
+          "parameters": []
+        },
+        {
+          "name": "IsUpdating",
+          "signature": "HRESULT IsUpdating(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
         }
       ]
+    },
+    {
+      "name": "IGrinds",
+      "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
+      "methods": []
+    },
+    {
+      "name": "IIdChangeEvent",
+      "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
+      "methods": []
     },
     {
       "name": "IMaterial",
@@ -20483,6 +22262,1195 @@
               "type": "unsigned"
             }
           ]
+        },
+        {
+          "name": "GetHasOrnament",
+          "signature": "HRESULT GetHasOrnament(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetHasOrnament",
+          "signature": "HRESULT SetHasOrnament(DelphiBool aHasOrnament)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aHasOrnament",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetCanRotate",
+          "signature": "HRESULT GetCanRotate(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetCanRotate",
+          "signature": "HRESULT SetCanRotate(DelphiBool aCanRotate)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCanRotate",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetCanMirror",
+          "signature": "HRESULT GetCanMirror(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetCanMirror",
+          "signature": "HRESULT SetCanMirror(DelphiBool aCanMirror)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCanMirror",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetSurplus",
+          "signature": "HRESULT GetSurplus(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetSurplus",
+          "signature": "HRESULT SetSurplus(unsigned aSurplus)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aSurplus",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetSurplusEditable",
+          "signature": "HRESULT GetSurplusEditable(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetSurplusEditable",
+          "signature": "HRESULT SetSurplusEditable(DelphiBool aEditable)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aEditable",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetMargin",
+          "signature": "HRESULT GetMargin(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetMargin",
+          "signature": "HRESULT SetMargin(unsigned aMargin)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aMargin",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetMarginEditable",
+          "signature": "HRESULT GetMarginEditable(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetMarginEditable",
+          "signature": "HRESULT SetMarginEditable(DelphiBool aEditable)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aEditable",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetDefaultEdging",
+          "signature": "HRESULT GetDefaultEdging(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetDefaultEdging",
+          "signature": "HRESULT SetDefaultEdging(unsigned aEdging)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aEdging",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetCuttingDimensions",
+          "signature": "HRESULT GetCuttingDimensions(TCuttingDimensions* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TCuttingDimensions*"
+            }
+          ]
+        },
+        {
+          "name": "SetCuttingDimensions",
+          "signature": "HRESULT SetCuttingDimensions(TCuttingDimensions aCuttingDimensions)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCuttingDimensions",
+              "type": "TCuttingDimensions"
+            }
+          ]
+        },
+        {
+          "name": "GetBandable",
+          "signature": "HRESULT GetBandable(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetBandable",
+          "signature": "HRESULT SetBandable(DelphiBool aBandable)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aBandable",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetGrindable",
+          "signature": "HRESULT GetGrindable(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetGrindable",
+          "signature": "HRESULT SetGrindable(DelphiBool aGrindable)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aGrindable",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetColorable",
+          "signature": "HRESULT GetColorable(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetColorable",
+          "signature": "HRESULT SetColorable(DelphiBool aColorable)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aColorable",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetDevice",
+          "signature": "HRESULT GetDevice(IDevice** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IDevice**"
+            }
+          ]
+        },
+        {
+          "name": "SetDevice",
+          "signature": "HRESULT SetDevice(IDevice* aDevice)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aDevice",
+              "type": "IDevice*"
+            }
+          ]
+        },
+        {
+          "name": "ReservedGetAlgorithm",
+          "signature": "HRESULT ReservedGetAlgorithm(DelphiUnicodeStringSlot* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiUnicodeStringSlot*"
+            }
+          ]
+        },
+        {
+          "name": "ReservedSetAlgorithm",
+          "signature": "HRESULT ReservedSetAlgorithm(DelphiUnicodeStringSlot aAlgorithm)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aAlgorithm",
+              "type": "DelphiUnicodeStringSlot"
+            }
+          ]
+        },
+        {
+          "name": "GetQualityLevel",
+          "signature": "HRESULT GetQualityLevel(TQualityLevel* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TQualityLevel*"
+            }
+          ]
+        },
+        {
+          "name": "SetQualityLevel",
+          "signature": "HRESULT SetQualityLevel(TQualityLevel aQualityLevel)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aQualityLevel",
+              "type": "TQualityLevel"
+            }
+          ]
+        },
+        {
+          "name": "GetReuseWaste",
+          "signature": "HRESULT GetReuseWaste(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetReuseWaste",
+          "signature": "HRESULT SetReuseWaste(DelphiBool aReuse)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aReuse",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetMinShorterRecycleSize",
+          "signature": "HRESULT GetMinShorterRecycleSize(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetMinShorterRecycleSize",
+          "signature": "HRESULT SetMinShorterRecycleSize(unsigned aSize)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aSize",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetMinLongerRecycleSize",
+          "signature": "HRESULT GetMinLongerRecycleSize(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetMinLongerRecycleSize",
+          "signature": "HRESULT SetMinLongerRecycleSize(unsigned aSize)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aSize",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetMaxShorterRecycleSize",
+          "signature": "HRESULT GetMaxShorterRecycleSize(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetMaxShorterRecycleSize",
+          "signature": "HRESULT SetMaxShorterRecycleSize(unsigned aSize)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aSize",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetMaxLongerRecycleSize",
+          "signature": "HRESULT GetMaxLongerRecycleSize(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetMaxLongerRecycleSize",
+          "signature": "HRESULT SetMaxLongerRecycleSize(unsigned aSize)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aSize",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetPrefShorterRecycleSize",
+          "signature": "HRESULT GetPrefShorterRecycleSize(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetPrefShorterRecycleSize",
+          "signature": "HRESULT SetPrefShorterRecycleSize(unsigned aSize)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aSize",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetPrefLongerRecycleSize",
+          "signature": "HRESULT GetPrefLongerRecycleSize(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetPrefLongerRecycleSize",
+          "signature": "HRESULT SetPrefLongerRecycleSize(unsigned aSize)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aSize",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetEffectiveMinShorterRecycleSize",
+          "signature": "HRESULT GetEffectiveMinShorterRecycleSize(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetEffectiveMinLongerRecycleSize",
+          "signature": "HRESULT GetEffectiveMinLongerRecycleSize(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetEffectiveMaxShorterRecycleSize",
+          "signature": "HRESULT GetEffectiveMaxShorterRecycleSize(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetEffectiveMaxLongerRecycleSize",
+          "signature": "HRESULT GetEffectiveMaxLongerRecycleSize(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetEffectivePrefShorterRecycleSize",
+          "signature": "HRESULT GetEffectivePrefShorterRecycleSize(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetEffectivePrefLongerRecycleSize",
+          "signature": "HRESULT GetEffectivePrefLongerRecycleSize(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetKerf",
+          "signature": "HRESULT GetKerf(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetKerf",
+          "signature": "HRESULT SetKerf(unsigned aKerf)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aKerf",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetMinEdgeDistance",
+          "signature": "HRESULT GetMinEdgeDistance(IRectangle** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IRectangle**"
+            }
+          ]
+        },
+        {
+          "name": "GetAllowEdgeCuts",
+          "signature": "HRESULT GetAllowEdgeCuts(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetAllowEdgeCuts",
+          "signature": "HRESULT SetAllowEdgeCuts(DelphiBool aAllow)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aAllow",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetRecycleEdgingOn",
+          "signature": "HRESULT GetRecycleEdgingOn(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetRecycleEdgingOn",
+          "signature": "HRESULT SetRecycleEdgingOn(DelphiBool aOn)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aOn",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetRecycleEdging",
+          "signature": "HRESULT GetRecycleEdging(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetRecycleEdging",
+          "signature": "HRESULT SetRecycleEdging(unsigned aMargins)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aMargins",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetStackCutting",
+          "signature": "HRESULT GetStackCutting(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetStackCutting",
+          "signature": "HRESULT SetStackCutting(DelphiBool aStackCutting)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aStackCutting",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetStackSize",
+          "signature": "HRESULT GetStackSize(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetStackSize",
+          "signature": "HRESULT SetStackSize(unsigned aSize)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aSize",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetAllowPartialStack",
+          "signature": "HRESULT GetAllowPartialStack(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetAllowPartialStack",
+          "signature": "HRESULT SetAllowPartialStack(DelphiBool aAllow)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aAllow",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetMinStackSize",
+          "signature": "HRESULT GetMinStackSize(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetMinStackSize",
+          "signature": "HRESULT SetMinStackSize(unsigned aSize)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aSize",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetPricePerSqM",
+          "signature": "HRESULT GetPricePerSqM(TTcPrice* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcPrice*"
+            }
+          ]
+        },
+        {
+          "name": "SetPricePerSqM",
+          "signature": "HRESULT SetPricePerSqM(TTcPrice aCost)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCost",
+              "type": "TTcPrice"
+            }
+          ]
+        },
+        {
+          "name": "GetWeightOfSqM",
+          "signature": "HRESULT GetWeightOfSqM(TTcWeight* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcWeight*"
+            }
+          ]
+        },
+        {
+          "name": "SetWeightOfSqM",
+          "signature": "HRESULT SetWeightOfSqM(TTcWeight aWeight)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aWeight",
+              "type": "TTcWeight"
+            }
+          ]
+        },
+        {
+          "name": "GetPricePerMeter",
+          "signature": "HRESULT GetPricePerMeter(TTcPrice* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcPrice*"
+            }
+          ]
+        },
+        {
+          "name": "SetPricePerMeter",
+          "signature": "HRESULT SetPricePerMeter(TTcPrice aCost)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCost",
+              "type": "TTcPrice"
+            }
+          ]
+        },
+        {
+          "name": "GetWeightOfMeter",
+          "signature": "HRESULT GetWeightOfMeter(TTcWeight* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcWeight*"
+            }
+          ]
+        },
+        {
+          "name": "SetWeightOfMeter",
+          "signature": "HRESULT SetWeightOfMeter(TTcWeight aWeight)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aWeight",
+              "type": "TTcWeight"
+            }
+          ]
+        },
+        {
+          "name": "GetCutCostPerMeter",
+          "signature": "HRESULT GetCutCostPerMeter(TTcPrice* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcPrice*"
+            }
+          ]
+        },
+        {
+          "name": "SetCutCostPerMeter",
+          "signature": "HRESULT SetCutCostPerMeter(TTcPrice aCost)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCost",
+              "type": "TTcPrice"
+            }
+          ]
+        },
+        {
+          "name": "GetReuseCost",
+          "signature": "HRESULT GetReuseCost(TTcPrice* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcPrice*"
+            }
+          ]
+        },
+        {
+          "name": "SetReuseCost",
+          "signature": "HRESULT SetReuseCost(TTcPrice aCost)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCost",
+              "type": "TTcPrice"
+            }
+          ]
+        },
+        {
+          "name": "GetUtilizationCostPerKg",
+          "signature": "HRESULT GetUtilizationCostPerKg(TTcPrice* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcPrice*"
+            }
+          ]
+        },
+        {
+          "name": "SetUtilizationCostPerKg",
+          "signature": "HRESULT SetUtilizationCostPerKg(TTcPrice aCost)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCost",
+              "type": "TTcPrice"
+            }
+          ]
+        },
+        {
+          "name": "GetSegmentShiftCost",
+          "signature": "HRESULT GetSegmentShiftCost(TTcPrice* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcPrice*"
+            }
+          ]
+        },
+        {
+          "name": "SetSegmentShiftCost",
+          "signature": "HRESULT SetSegmentShiftCost(TTcPrice aCost)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCost",
+              "type": "TTcPrice"
+            }
+          ]
+        },
+        {
+          "name": "GetSegmentRotationCost",
+          "signature": "HRESULT GetSegmentRotationCost(TTcPrice* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcPrice*"
+            }
+          ]
+        },
+        {
+          "name": "SetSegmentRotationCost",
+          "signature": "HRESULT SetSegmentRotationCost(TTcPrice aCost)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCost",
+              "type": "TTcPrice"
+            }
+          ]
+        },
+        {
+          "name": "GetPriceToCostMultiplier",
+          "signature": "HRESULT GetPriceToCostMultiplier(double* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "double*"
+            }
+          ]
+        },
+        {
+          "name": "SetPriceToCostMultiplier",
+          "signature": "HRESULT SetPriceToCostMultiplier(double aMultiplier)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aMultiplier",
+              "type": "double"
+            }
+          ]
+        },
+        {
+          "name": "GetReusableWasteExpectedUsage",
+          "signature": "HRESULT GetReusableWasteExpectedUsage(double* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "double*"
+            }
+          ]
+        },
+        {
+          "name": "SetReusableWasteExpectedUsage",
+          "signature": "HRESULT SetReusableWasteExpectedUsage(double aExpectedUsage)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aExpectedUsage",
+              "type": "double"
+            }
+          ]
+        },
+        {
+          "name": "GetCutExcess",
+          "signature": "HRESULT GetCutExcess(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "SetCutExcess",
+          "signature": "HRESULT SetCutExcess(int aCutExcess)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCutExcess",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "name": "GetCutShiftTotalLimit",
+          "signature": "HRESULT GetCutShiftTotalLimit(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "SetCutShiftTotalLimit",
+          "signature": "HRESULT SetCutShiftTotalLimit(int aLimit)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aLimit",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "name": "GetCutShiftHorzLimit",
+          "signature": "HRESULT GetCutShiftHorzLimit(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "SetCutShiftHorzLimit",
+          "signature": "HRESULT SetCutShiftHorzLimit(int aLimit)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aLimit",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "name": "GetCutShiftVertLimit",
+          "signature": "HRESULT GetCutShiftVertLimit(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "SetCutShiftVertLimit",
+          "signature": "HRESULT SetCutShiftVertLimit(int aLimit)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aLimit",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "name": "GetCustomData",
+          "signature": "HRESULT GetCustomData(BSTR* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "BSTR*"
+            }
+          ]
+        },
+        {
+          "name": "SetCustomData",
+          "signature": "HRESULT SetCustomData(BSTR aData)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aData",
+              "type": "BSTR"
+            }
+          ]
+        },
+        {
+          "name": "ReservedGetAlgorithmData",
+          "signature": "HRESULT ReservedGetAlgorithmData(ITcAlgorithmData** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "ITcAlgorithmData**"
+            }
+          ]
+        },
+        {
+          "name": "GetStandardSheets",
+          "signature": "HRESULT GetStandardSheets(IStandardSheets** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IStandardSheets**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnChange",
+          "signature": "HRESULT GetOnChange(INotifyEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "INotifyEvent**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnIdChange",
+          "signature": "HRESULT GetOnIdChange(IIdChangeEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IIdChangeEvent**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnStandardSheetAdd",
+          "signature": "HRESULT GetOnStandardSheetAdd(IStandardSheetChangeEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IStandardSheetChangeEvent**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnStandardSheetRemove",
+          "signature": "HRESULT GetOnStandardSheetRemove(IStandardSheetChangeEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IStandardSheetChangeEvent**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnStandardSheetChange",
+          "signature": "HRESULT GetOnStandardSheetChange(IStandardSheetChangeEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IStandardSheetChangeEvent**"
+            }
+          ]
+        },
+        {
+          "name": "Assign",
+          "signature": "HRESULT Assign(IMaterial* aOther)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aOther",
+              "type": "IMaterial*"
+            }
+          ]
+        },
+        {
+          "name": "BeginUpdate",
+          "signature": "HRESULT BeginUpdate()",
+          "returnType": "HRESULT",
+          "parameters": []
+        },
+        {
+          "name": "EndUpdate",
+          "signature": "HRESULT EndUpdate()",
+          "returnType": "HRESULT",
+          "parameters": []
         }
       ]
     },
@@ -20837,6 +23805,452 @@
               "type": "BSTR"
             }
           ]
+        },
+        {
+          "name": "GetDescription",
+          "signature": "HRESULT GetDescription(BSTR* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "BSTR*"
+            }
+          ]
+        },
+        {
+          "name": "SetDescription",
+          "signature": "HRESULT SetDescription(BSTR aDescription)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aDescription",
+              "type": "BSTR"
+            }
+          ]
+        },
+        {
+          "name": "GetPriority",
+          "signature": "HRESULT GetPriority(TProjectPriority* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TProjectPriority*"
+            }
+          ]
+        },
+        {
+          "name": "SetPriority",
+          "signature": "HRESULT SetPriority(TProjectPriority aPriority)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aPriority",
+              "type": "TProjectPriority"
+            }
+          ]
+        },
+        {
+          "name": "GetCreateDate",
+          "signature": "HRESULT GetCreateDate(TDateTime* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TDateTime*"
+            }
+          ]
+        },
+        {
+          "name": "SetCreateDate",
+          "signature": "HRESULT SetCreateDate(TDateTime aCreateDate)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCreateDate",
+              "type": "TDateTime"
+            }
+          ]
+        },
+        {
+          "name": "GetTargetDate",
+          "signature": "HRESULT GetTargetDate(TDateTime* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TDateTime*"
+            }
+          ]
+        },
+        {
+          "name": "SetTargetDate",
+          "signature": "HRESULT SetTargetDate(TDateTime aTargetDate)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aTargetDate",
+              "type": "TDateTime"
+            }
+          ]
+        },
+        {
+          "name": "GetState",
+          "signature": "HRESULT GetState(TProjectState* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TProjectState*"
+            }
+          ]
+        },
+        {
+          "name": "SetState",
+          "signature": "HRESULT SetState(TProjectState aState)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aState",
+              "type": "TProjectState"
+            }
+          ]
+        },
+        {
+          "name": "GetPieceCount",
+          "signature": "HRESULT GetPieceCount(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetPieceCount",
+          "signature": "HRESULT SetPieceCount(unsigned aCount)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCount",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetPieceField2D",
+          "signature": "HRESULT GetPieceField2D(TField* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TField*"
+            }
+          ]
+        },
+        {
+          "name": "SetPieceField2D",
+          "signature": "HRESULT SetPieceField2D(TField aField)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aField",
+              "type": "TField"
+            }
+          ]
+        },
+        {
+          "name": "GetPieceLength1D",
+          "signature": "HRESULT GetPieceLength1D(TField* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TField*"
+            }
+          ]
+        },
+        {
+          "name": "SetPieceLength1D",
+          "signature": "HRESULT SetPieceLength1D(TField aLength)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aLength",
+              "type": "TField"
+            }
+          ]
+        },
+        {
+          "name": "GetProcessedCount",
+          "signature": "HRESULT GetProcessedCount(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "SetProcessedCount",
+          "signature": "HRESULT SetProcessedCount(int aCount)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCount",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "name": "GetProcessedField2D",
+          "signature": "HRESULT GetProcessedField2D(TField* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TField*"
+            }
+          ]
+        },
+        {
+          "name": "SetProcessedField2D",
+          "signature": "HRESULT SetProcessedField2D(TField aField)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aField",
+              "type": "TField"
+            }
+          ]
+        },
+        {
+          "name": "GetProcessedLength1D",
+          "signature": "HRESULT GetProcessedLength1D(TField* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TField*"
+            }
+          ]
+        },
+        {
+          "name": "SetProcessedLength1D",
+          "signature": "HRESULT SetProcessedLength1D(TField aLength)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aLength",
+              "type": "TField"
+            }
+          ]
+        },
+        {
+          "name": "GetMaterialGroupCount",
+          "signature": "HRESULT GetMaterialGroupCount(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetMaterialGroupCount",
+          "signature": "HRESULT SetMaterialGroupCount(unsigned aCount)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCount",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetLoading",
+          "signature": "HRESULT GetLoading(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetLoading",
+          "signature": "HRESULT SetLoading(DelphiBool aLoading)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aLoading",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetLoaded",
+          "signature": "HRESULT GetLoaded(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetLoaded",
+          "signature": "HRESULT SetLoaded(DelphiBool aLoaded)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aLoaded",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetOnChange",
+          "signature": "HRESULT GetOnChange(INotifyEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "INotifyEvent**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnIdChange",
+          "signature": "HRESULT GetOnIdChange(IIdChangeEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IIdChangeEvent**"
+            }
+          ]
+        },
+        {
+          "name": "Clone",
+          "signature": "HRESULT Clone(IProject** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IProject**"
+            }
+          ]
+        },
+        {
+          "name": "Assign",
+          "signature": "HRESULT Assign(IProject* aOther)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aOther",
+              "type": "IProject*"
+            }
+          ]
+        },
+        {
+          "name": "UpdateStats",
+          "signature": "HRESULT UpdateStats(IUnknown* aAllFormats)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aAllFormats",
+              "type": "IUnknown*"
+            }
+          ]
+        },
+        {
+          "name": "FormatAdded",
+          "signature": "HRESULT FormatAdded(IUnknown* aFormat)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aFormat",
+              "type": "IUnknown*"
+            }
+          ]
+        },
+        {
+          "name": "FormatRemoved",
+          "signature": "HRESULT FormatRemoved(IUnknown* aFormat)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aFormat",
+              "type": "IUnknown*"
+            }
+          ]
+        },
+        {
+          "name": "FormatChanged",
+          "signature": "HRESULT FormatChanged(IUnknown* aFormat)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aFormat",
+              "type": "IUnknown*"
+            }
+          ]
+        },
+        {
+          "name": "FormatIdChanged",
+          "signature": "HRESULT FormatIdChanged(IUnknown* aFormat, std::int64_t aNewId, std::int64_t aOldId)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aFormat",
+              "type": "IUnknown*"
+            },
+            {
+              "name": "aNewId",
+              "type": "std::int64_t"
+            },
+            {
+              "name": "aOldId",
+              "type": "std::int64_t"
+            }
+          ]
+        },
+        {
+          "name": "GetFormats",
+          "signature": "HRESULT GetFormats(IUnknown* aFormats, IUnknown* aAllFormats, DelphiBool aKeepOrder)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aFormats",
+              "type": "IUnknown*"
+            },
+            {
+              "name": "aAllFormats",
+              "type": "IUnknown*"
+            },
+            {
+              "name": "aKeepOrder",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "BeginUpdate",
+          "signature": "HRESULT BeginUpdate()",
+          "returnType": "HRESULT",
+          "parameters": []
+        },
+        {
+          "name": "EndUpdate",
+          "signature": "HRESULT EndUpdate()",
+          "returnType": "HRESULT",
+          "parameters": []
         }
       ]
     },
@@ -21146,6 +24560,11 @@
       ]
     },
     {
+      "name": "IRectangle",
+      "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
+      "methods": []
+    },
+    {
       "name": "IResults",
       "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
       "methods": []
@@ -21356,11 +24775,357 @@
               "type": "IMaterial*"
             }
           ]
+        },
+        {
+          "name": "GetEdging",
+          "signature": "HRESULT GetEdging(IRectangle** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IRectangle**"
+            }
+          ]
+        },
+        {
+          "name": "GetMinEdgeDistance",
+          "signature": "HRESULT GetMinEdgeDistance(IRectangle** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IRectangle**"
+            }
+          ]
+        },
+        {
+          "name": "GetPriority",
+          "signature": "HRESULT GetPriority(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "SetPriority",
+          "signature": "HRESULT SetPriority(int aPriority)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aPriority",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "name": "GetCutShiftHorzLimit",
+          "signature": "HRESULT GetCutShiftHorzLimit(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "SetCutShiftHorzLimit",
+          "signature": "HRESULT SetCutShiftHorzLimit(int aLimit)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aLimit",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "name": "GetCutShiftVertLimit",
+          "signature": "HRESULT GetCutShiftVertLimit(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "SetCutShiftVertLimit",
+          "signature": "HRESULT SetCutShiftVertLimit(int aLimit)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aLimit",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "name": "GetEffectiveCutShiftHorzLimit",
+          "signature": "HRESULT GetEffectiveCutShiftHorzLimit(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "GetEffectiveCutShiftVertLimit",
+          "signature": "HRESULT GetEffectiveCutShiftVertLimit(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "GetExtractionCost",
+          "signature": "HRESULT GetExtractionCost(TTcPrice* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcPrice*"
+            }
+          ]
+        },
+        {
+          "name": "SetExtractionCost",
+          "signature": "HRESULT SetExtractionCost(TTcPrice aCost)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCost",
+              "type": "TTcPrice"
+            }
+          ]
+        },
+        {
+          "name": "GetCustomData",
+          "signature": "HRESULT GetCustomData(BSTR* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "BSTR*"
+            }
+          ]
+        },
+        {
+          "name": "SetCustomData",
+          "signature": "HRESULT SetCustomData(BSTR aData)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aData",
+              "type": "BSTR"
+            }
+          ]
+        },
+        {
+          "name": "ReservedGetAlgorithmData",
+          "signature": "HRESULT ReservedGetAlgorithmData(ITcAlgorithmData** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "ITcAlgorithmData**"
+            }
+          ]
+        },
+        {
+          "name": "GetDefects",
+          "signature": "HRESULT GetDefects(ISheetDefects** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "ISheetDefects**"
+            }
+          ]
+        },
+        {
+          "name": "GetHoles",
+          "signature": "HRESULT GetHoles(ISheetDefects** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "ISheetDefects**"
+            }
+          ]
+        },
+        {
+          "name": "GetAvailableQuantity",
+          "signature": "HRESULT GetAvailableQuantity(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetField",
+          "signature": "HRESULT GetField(TField* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TField*"
+            }
+          ]
+        },
+        {
+          "name": "GetFieldOfAll",
+          "signature": "HRESULT GetFieldOfAll(TField* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TField*"
+            }
+          ]
+        },
+        {
+          "name": "IsStandard",
+          "signature": "HRESULT IsStandard(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "Assign",
+          "signature": "HRESULT Assign(ISheet* aSheet)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aSheet",
+              "type": "ISheet*"
+            }
+          ]
+        },
+        {
+          "name": "GetOnChange",
+          "signature": "HRESULT GetOnChange(INotifyEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "INotifyEvent**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnIdChange",
+          "signature": "HRESULT GetOnIdChange(IIdChangeEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IIdChangeEvent**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnDefectAdd",
+          "signature": "HRESULT GetOnDefectAdd(ISheetDefectChangeEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "ISheetDefectChangeEvent**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnDefectRemove",
+          "signature": "HRESULT GetOnDefectRemove(ISheetDefectChangeEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "ISheetDefectChangeEvent**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnDefectChange",
+          "signature": "HRESULT GetOnDefectChange(ISheetDefectChangeEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "ISheetDefectChangeEvent**"
+            }
+          ]
+        },
+        {
+          "name": "BeginUpdate",
+          "signature": "HRESULT BeginUpdate()",
+          "returnType": "HRESULT",
+          "parameters": []
+        },
+        {
+          "name": "EndUpdate",
+          "signature": "HRESULT EndUpdate()",
+          "returnType": "HRESULT",
+          "parameters": []
+        },
+        {
+          "name": "GetPricePerSqM",
+          "signature": "HRESULT GetPricePerSqM(TTcPrice* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcPrice*"
+            }
+          ]
+        },
+        {
+          "name": "SetPricePerSqM",
+          "signature": "HRESULT SetPricePerSqM(TTcPrice aPrice)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aPrice",
+              "type": "TTcPrice"
+            }
+          ]
         }
       ]
     },
     {
+      "name": "ISheetChangeEvent",
+      "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
+      "methods": []
+    },
+    {
       "name": "ISheetDefect",
+      "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
+      "methods": []
+    },
+    {
+      "name": "ISheetDefectChangeEvent",
+      "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
+      "methods": []
+    },
+    {
+      "name": "ISheetDefects",
       "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
       "methods": []
     },
@@ -21512,6 +25277,116 @@
               "type": "ISheet**"
             }
           ]
+        },
+        {
+          "name": "GetById",
+          "signature": "HRESULT GetById(std::int64_t aId, ISheet** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aId",
+              "type": "std::int64_t"
+            },
+            {
+              "name": "result",
+              "type": "ISheet**"
+            }
+          ]
+        },
+        {
+          "name": "CalcMaxLength",
+          "signature": "HRESULT CalcMaxLength(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetField",
+          "signature": "HRESULT GetField(TField* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TField*"
+            }
+          ]
+        },
+        {
+          "name": "GetAvailableQuantity",
+          "signature": "HRESULT GetAvailableQuantity(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetOnAdd",
+          "signature": "HRESULT GetOnAdd(ISheetChangeEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "ISheetChangeEvent**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnRemove",
+          "signature": "HRESULT GetOnRemove(ISheetChangeEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "ISheetChangeEvent**"
+            }
+          ]
+        },
+        {
+          "name": "GetOnChange",
+          "signature": "HRESULT GetOnChange(INotifyEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "INotifyEvent**"
+            }
+          ]
+        },
+        {
+          "name": "BeginUpdate",
+          "signature": "HRESULT BeginUpdate()",
+          "returnType": "HRESULT",
+          "parameters": []
+        },
+        {
+          "name": "EndUpdate",
+          "signature": "HRESULT EndUpdate()",
+          "returnType": "HRESULT",
+          "parameters": []
+        },
+        {
+          "name": "IsUpdating",
+          "signature": "HRESULT IsUpdating(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "Reload",
+          "signature": "HRESULT Reload()",
+          "returnType": "HRESULT",
+          "parameters": []
         }
       ]
     },
@@ -21542,6 +25417,58 @@
             {
               "name": "result",
               "type": "ISolutionSheet**"
+            }
+          ]
+        },
+        {
+          "name": "GetTechnologicalWasteField",
+          "signature": "HRESULT GetTechnologicalWasteField(TField* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TField*"
+            }
+          ]
+        },
+        {
+          "name": "GetEdgingWasteField",
+          "signature": "HRESULT GetEdgingWasteField(TField* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TField*"
+            }
+          ]
+        },
+        {
+          "name": "GetKerfWasteField",
+          "signature": "HRESULT GetKerfWasteField(TField* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TField*"
+            }
+          ]
+        },
+        {
+          "name": "CalcCutsInfoByMaterial",
+          "signature": "HRESULT CalcCutsInfoByMaterial(IMaterial* aMaterial, int* aCount, double* aLength)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aMaterial",
+              "type": "IMaterial*"
+            },
+            {
+              "name": "aCount",
+              "type": "int*"
+            },
+            {
+              "name": "aLength",
+              "type": "double*"
             }
           ]
         }
@@ -21718,9 +25645,97 @@
       ]
     },
     {
+      "name": "ISolutionFormat",
+      "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
+      "methods": [
+        {
+          "name": "GetFormat",
+          "signature": "HRESULT GetFormat(IFormat** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IFormat**"
+            }
+          ]
+        },
+        {
+          "name": "GetX",
+          "signature": "HRESULT GetX(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetY",
+          "signature": "HRESULT GetY(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetRotation",
+          "signature": "HRESULT GetRotation(unsigned short* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned short*"
+            }
+          ]
+        },
+        {
+          "name": "GetMirrored",
+          "signature": "HRESULT GetMirrored(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "ISolutionFormats",
       "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
-      "methods": []
+      "methods": [
+        {
+          "name": "GetCount",
+          "signature": "HRESULT GetCount(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "GetByIndex",
+          "signature": "HRESULT GetByIndex(unsigned aIndex, ISolutionFormat** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aIndex",
+              "type": "unsigned"
+            },
+            {
+              "name": "result",
+              "type": "ISolutionFormat**"
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "ISolutionSheet",
@@ -22026,16 +26041,197 @@
               "type": "unsigned*"
             }
           ]
+        },
+        {
+          "name": "CalcRecycledField",
+          "signature": "HRESULT CalcRecycledField(int aMinShorterRecycleSize, int aMinLongerRecycleSize, TField* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aMinShorterRecycleSize",
+              "type": "int"
+            },
+            {
+              "name": "aMinLongerRecycleSize",
+              "type": "int"
+            },
+            {
+              "name": "result",
+              "type": "TField*"
+            }
+          ]
+        },
+        {
+          "name": "CalcCutsInfo",
+          "signature": "HRESULT CalcCutsInfo(int* aCount, double* aLength)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCount",
+              "type": "int*"
+            },
+            {
+              "name": "aLength",
+              "type": "double*"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ISolutionWaste",
+      "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
+      "methods": [
+        {
+          "name": "GetX",
+          "signature": "HRESULT GetX(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetY",
+          "signature": "HRESULT GetY(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetLength",
+          "signature": "HRESULT GetLength(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetWidth",
+          "signature": "HRESULT GetWidth(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "GetShape",
+          "signature": "HRESULT GetShape(IShape** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "IShape**"
+            }
+          ]
+        },
+        {
+          "name": "GetField",
+          "signature": "HRESULT GetField(TField* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TField*"
+            }
+          ]
+        },
+        {
+          "name": "GetIdentifier",
+          "signature": "HRESULT GetIdentifier(BSTR* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "BSTR*"
+            }
+          ]
+        },
+        {
+          "name": "GetShapePathAsString",
+          "signature": "HRESULT GetShapePathAsString(BSTR* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "BSTR*"
+            }
+          ]
+        },
+        {
+          "name": "GetHoles",
+          "signature": "HRESULT GetHoles(ISheetDefects** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "ISheetDefects**"
+            }
+          ]
         }
       ]
     },
     {
       "name": "ISolutionWastes",
       "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
-      "methods": []
+      "methods": [
+        {
+          "name": "GetCount",
+          "signature": "HRESULT GetCount(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "GetByIndex",
+          "signature": "HRESULT GetByIndex(unsigned aIndex, ISolutionWaste** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aIndex",
+              "type": "unsigned"
+            },
+            {
+              "name": "result",
+              "type": "ISolutionWaste**"
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "IStandardSheet",
+      "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
+      "methods": []
+    },
+    {
+      "name": "IStandardSheetChangeEvent",
+      "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
+      "methods": []
+    },
+    {
+      "name": "IStandardSheets",
+      "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
+      "methods": []
+    },
+    {
+      "name": "ITcAlgorithmData",
       "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
       "methods": []
     },
@@ -22067,7 +26263,591 @@
     {
       "name": "ITcPlotterInfo",
       "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
-      "methods": []
+      "methods": [
+        {
+          "name": "GetPlotterType",
+          "signature": "HRESULT GetPlotterType(TTcPlotterType* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcPlotterType*"
+            }
+          ]
+        },
+        {
+          "name": "SetPlotterType",
+          "signature": "HRESULT SetPlotterType(TTcPlotterType aPlotterType)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aPlotterType",
+              "type": "TTcPlotterType"
+            }
+          ]
+        },
+        {
+          "name": "GetMaterialKinds",
+          "signature": "HRESULT GetMaterialKinds(TMaterialKinds* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TMaterialKinds*"
+            }
+          ]
+        },
+        {
+          "name": "SetMaterialKinds",
+          "signature": "HRESULT SetMaterialKinds(TMaterialKinds aMaterialKinds)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aMaterialKinds",
+              "type": "TMaterialKinds"
+            }
+          ]
+        },
+        {
+          "name": "GetAxisX",
+          "signature": "HRESULT GetAxisX(TTcAxisDirection* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcAxisDirection*"
+            }
+          ]
+        },
+        {
+          "name": "SetAxisX",
+          "signature": "HRESULT SetAxisX(TTcAxisDirection aAxisX)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aAxisX",
+              "type": "TTcAxisDirection"
+            }
+          ]
+        },
+        {
+          "name": "GetAxisY",
+          "signature": "HRESULT GetAxisY(TTcAxisDirection* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcAxisDirection*"
+            }
+          ]
+        },
+        {
+          "name": "SetAxisY",
+          "signature": "HRESULT SetAxisY(TTcAxisDirection aAxisY)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aAxisY",
+              "type": "TTcAxisDirection"
+            }
+          ]
+        },
+        {
+          "name": "GetSizeX",
+          "signature": "HRESULT GetSizeX(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetSizeX",
+          "signature": "HRESULT SetSizeX(unsigned aSizeX)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aSizeX",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetSizeY",
+          "signature": "HRESULT GetSizeY(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetSizeY",
+          "signature": "HRESULT SetSizeY(unsigned aSizeY)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aSizeY",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetCanCrossCuts",
+          "signature": "HRESULT GetCanCrossCuts(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetCanCrossCuts",
+          "signature": "HRESULT SetCanCrossCuts(DelphiBool aCanCrossCuts)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCanCrossCuts",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetFullCutsOnly",
+          "signature": "HRESULT GetFullCutsOnly(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetFullCutsOnly",
+          "signature": "HRESULT SetFullCutsOnly(DelphiBool aFullCutsOnly)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aFullCutsOnly",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetCanCutAnyShapes",
+          "signature": "HRESULT GetCanCutAnyShapes(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetCanCutAnyShapes",
+          "signature": "HRESULT SetCanCutAnyShapes(DelphiBool aCanCutAnyShapes)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCanCutAnyShapes",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetStripCuts",
+          "signature": "HRESULT GetStripCuts(TStripCutting* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TStripCutting*"
+            }
+          ]
+        },
+        {
+          "name": "SetStripCuts",
+          "signature": "HRESULT SetStripCuts(TStripCutting aStripCuts)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aStripCuts",
+              "type": "TStripCutting"
+            }
+          ]
+        },
+        {
+          "name": "GetMaxStripeWidth",
+          "signature": "HRESULT GetMaxStripeWidth(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "SetMaxStripeWidth",
+          "signature": "HRESULT SetMaxStripeWidth(int aMaxWidth)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aMaxWidth",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "name": "GetCutsDepthOn",
+          "signature": "HRESULT GetCutsDepthOn(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetCutsDepthOn",
+          "signature": "HRESULT SetCutsDepthOn(DelphiBool aCutsDepthOn)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCutsDepthOn",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetCutsDepth",
+          "signature": "HRESULT GetCutsDepth(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetCutsDepth",
+          "signature": "HRESULT SetCutsDepth(unsigned aCutsDepth)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCutsDepth",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetCutsDepthIncMargins",
+          "signature": "HRESULT GetCutsDepthIncMargins(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetCutsDepthIncMargins",
+          "signature": "HRESULT SetCutsDepthIncMargins(DelphiBool aCutsDepthIncMargins)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aCutsDepthIncMargins",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetTwoDimensionMoves",
+          "signature": "HRESULT GetTwoDimensionMoves(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "SetTwoDimensionMoves",
+          "signature": "HRESULT SetTwoDimensionMoves(DelphiBool aTwoDimensionMoves)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aTwoDimensionMoves",
+              "type": "DelphiBool"
+            }
+          ]
+        },
+        {
+          "name": "GetPrefferedDirection",
+          "signature": "HRESULT GetPrefferedDirection(TTcMoveDirection* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcMoveDirection*"
+            }
+          ]
+        },
+        {
+          "name": "SetPrefferedDirection",
+          "signature": "HRESULT SetPrefferedDirection(TTcMoveDirection aPrefferedDirection)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aPrefferedDirection",
+              "type": "TTcMoveDirection"
+            }
+          ]
+        },
+        {
+          "name": "GetMarginWest",
+          "signature": "HRESULT GetMarginWest(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetMarginWest",
+          "signature": "HRESULT SetMarginWest(unsigned aMarginWest)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aMarginWest",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetMarginNorth",
+          "signature": "HRESULT GetMarginNorth(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetMarginNorth",
+          "signature": "HRESULT SetMarginNorth(unsigned aMarginNorth)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aMarginNorth",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetMarginEast",
+          "signature": "HRESULT GetMarginEast(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetMarginEast",
+          "signature": "HRESULT SetMarginEast(unsigned aMarginEast)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aMarginEast",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetMarginSouth",
+          "signature": "HRESULT GetMarginSouth(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetMarginSouth",
+          "signature": "HRESULT SetMarginSouth(unsigned aMarginSouth)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aMarginSouth",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetBridgeMoveDirection",
+          "signature": "HRESULT GetBridgeMoveDirection(TTcMoveDirection* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TTcMoveDirection*"
+            }
+          ]
+        },
+        {
+          "name": "SetBridgeMoveDirection",
+          "signature": "HRESULT SetBridgeMoveDirection(TTcMoveDirection aBridgeMoveDirection)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aBridgeMoveDirection",
+              "type": "TTcMoveDirection"
+            }
+          ]
+        },
+        {
+          "name": "GetBridgeSize",
+          "signature": "HRESULT GetBridgeSize(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetBridgeSize",
+          "signature": "HRESULT SetBridgeSize(unsigned aBridgeSize)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aBridgeSize",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetHeadSize",
+          "signature": "HRESULT GetHeadSize(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetHeadSize",
+          "signature": "HRESULT SetHeadSize(unsigned aHeadSize)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aHeadSize",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetHeadKnifeSpace",
+          "signature": "HRESULT GetHeadKnifeSpace(unsigned* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "unsigned*"
+            }
+          ]
+        },
+        {
+          "name": "SetHeadKnifeSpace",
+          "signature": "HRESULT SetHeadKnifeSpace(unsigned aHeadKnifeSpace)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aHeadKnifeSpace",
+              "type": "unsigned"
+            }
+          ]
+        },
+        {
+          "name": "GetDefaultRotation",
+          "signature": "HRESULT GetDefaultRotation(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "SetDefaultRotation",
+          "signature": "HRESULT SetDefaultRotation(int aDefaultRotation)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aDefaultRotation",
+              "type": "int"
+            }
+          ]
+        },
+        {
+          "name": "GetDefaultMirror",
+          "signature": "HRESULT GetDefaultMirror(TMirrors* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "TMirrors*"
+            }
+          ]
+        },
+        {
+          "name": "SetDefaultMirror",
+          "signature": "HRESULT SetDefaultMirror(TMirrors aDefaultMirror)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aDefaultMirror",
+              "type": "TMirrors"
+            }
+          ]
+        },
+        {
+          "name": "Assign",
+          "signature": "HRESULT Assign(ITcPlotterInfo* aOther)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aOther",
+              "type": "ITcPlotterInfo*"
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "ITcPlugin",
@@ -23010,5 +27790,5 @@
       ]
     }
   ],
-  "generationFingerprint": "34711ee7fa632b4c2fa21dccaf85cf64f51d40909a259d81cffe6e24b4bb3636"
+  "generationFingerprint": "d370eb2ec927c530fd8fff5aae9ef07c675b817647e40574ca60bd0f97a2c83b"
 }

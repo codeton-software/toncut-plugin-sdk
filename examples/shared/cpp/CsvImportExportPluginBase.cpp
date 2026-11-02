@@ -1,72 +1,28 @@
 #include "CsvImportExportPluginBase.hpp"
 
+#include "StarterPlotterInfo.hpp"
+
 #include <algorithm>
 #include <cmath>
-#include <cwctype>
+#include <cstdint>
+#include <cwchar>
 #include <limits>
+#include <string>
+#include <utility>
 
 namespace toncut {
 
 namespace {
 
-std::wstring NormalizeTitleKey(const std::wstring& value) {
-  std::wstring normalized = value;
-  std::transform(
-    normalized.begin(),
-    normalized.end(),
-    normalized.begin(),
-    [](wchar_t ch) { return static_cast<wchar_t>(std::towlower(ch)); });
-  return normalized;
-}
+// HPGL plotter units: 40 per millimeter. TonCut lengths are 0.01 mm
+// (cLengthMultiplier per mm), so one internal unit is 40 / 100 = 0.4 HPGL
+// units.
+constexpr double kHpglUnitsPerMillimeter = 40.0;
+constexpr double kHpglUnitsPerInternalUnit =
+  kHpglUnitsPerMillimeter / static_cast<double>(cLengthMultiplier);
 
-unsigned EffectiveMaterialWidth(TMaterialKind kind, unsigned width) {
-  return kind == mk1D ? width : 0u;
-}
-
-std::wstring MakeMaterialKey(
-  const std::wstring& title,
-  TMaterialKind kind,
-  unsigned width,
-  unsigned thickness
-) {
-  return NormalizeTitleKey(title) +
-         L"|" +
-         std::to_wstring(static_cast<unsigned>(kind)) +
-         L"|" +
-         std::to_wstring(EffectiveMaterialWidth(kind, width)) +
-         L"|" +
-         std::to_wstring(thickness);
-}
-
-std::shared_ptr<IMaterial> ShareMaterial(IMaterial* material) {
-  if (material == nullptr) {
-    return {};
-  }
-
-  material->AddRef();
-  return std::shared_ptr<IMaterial>(
-    material,
-    [](IMaterial* value) {
-      if (value != nullptr) {
-        value->Release();
-      }
-    });
-}
-
-std::shared_ptr<IProject> ShareProject(IProject* project) {
-  if (project == nullptr) {
-    return {};
-  }
-
-  project->AddRef();
-  return std::shared_ptr<IProject>(
-    project,
-    [](IProject* value) {
-      if (value != nullptr) {
-        value->Release();
-      }
-    });
-}
+constexpr wchar_t kCsvExtension[] = L".csv";
+constexpr wchar_t kPltExtension[] = L".plt";
 
 HRESULT PutBstr(const std::wstring& value, BSTR* result) {
   if (result == nullptr) {
@@ -95,15 +51,26 @@ HRESULT ReplaceBstr(const std::wstring& value, BSTR* target) {
   return S_OK;
 }
 
-HRESULT UnexpectedPluginException(TTcpResult* result) noexcept {
-  if (result != nullptr) {
-    *result = cprException;
-  }
-  return E_UNEXPECTED;
+// Reports a plugin result. TonCut treats a failed HRESULT as a plugin crash
+// and disables the plugin, so the HRESULT stays S_OK whenever a result
+// pointer exists.
+HRESULT Report(TTcpResult* result, TTcpResult value) noexcept {
+  *result = value;
+  return S_OK;
 }
 
-int ToPlotterUnit(double value, double scale) {
-  return static_cast<int>(std::lround(value * scale));
+bool HasExtension(const std::wstring& path, const wchar_t* extension) {
+  const std::size_t length = std::char_traits<wchar_t>::length(extension);
+  return path.size() >= length &&
+         _wcsicmp(path.c_str() + (path.size() - length), extension) == 0;
+}
+
+unsigned EffectiveMaterialWidth(TMaterialKind kind, unsigned width) {
+  return kind == mk1D ? width : 0u;
+}
+
+int ToPlotterUnit(int value) {
+  return static_cast<int>(std::lround(static_cast<double>(value) * kHpglUnitsPerInternalUnit));
 }
 
 bool TryFromCsvMillimeters(unsigned value, unsigned& scaled) {
@@ -120,6 +87,19 @@ unsigned ToCsvMillimeters(unsigned value) {
     (static_cast<std::uint64_t>(value) + (cLengthMultiplier / 2u)) /
     cLengthMultiplier
   );
+}
+
+// Internal units (0.01 mm) as a millimeter decimal with two places.
+std::wstring FormatMillimeters(unsigned value) {
+  const unsigned hundredths = value % cLengthMultiplier;
+  return std::to_wstring(value / cLengthMultiplier) +
+         (hundredths < 10 ? L".0" : L".") +
+         std::to_wstring(hundredths);
+}
+
+// TRotation (0.1 degree) as degrees with one decimal place.
+std::wstring FormatDegrees(unsigned short rotation) {
+  return std::to_wstring(rotation / 10u) + L"." + std::to_wstring(rotation % 10u);
 }
 
 void AppendMoveCommand(
@@ -212,6 +192,26 @@ bool WriteAsciiLines(
   return ok && closed != 0;
 }
 
+// Balanced BeginUpdate/EndUpdate on a staging collection (IProjects,
+// IFormats, ISheets). Optional during LoadFile; it only batches change
+// notifications.
+template <typename Collection>
+class UpdateScope final {
+ public:
+  explicit UpdateScope(Collection* collection)
+      : collection_(SUCCEEDED(collection->BeginUpdate()) ? collection : nullptr) {}
+  ~UpdateScope() {
+    if (collection_ != nullptr) {
+      collection_->EndUpdate();
+    }
+  }
+  UpdateScope(const UpdateScope&) = delete;
+  UpdateScope& operator=(const UpdateScope&) = delete;
+
+ private:
+  Collection* collection_;
+};
+
 }  // namespace
 
 CsvImportExportPluginBase::CsvImportExportPluginBase(
@@ -263,11 +263,13 @@ HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::GetEngineVersion(int* resul
   if (result == nullptr) {
     return E_POINTER;
   }
+  // The host activates the plugin only when this equals its own value.
   *result = cEngineVersion;
   return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::GetName(BSTR* result) {
+  // Unique, ASCII: the host narrows it to an ANSI ShortString.
   return PutBstr(pluginName_, result);
 }
 
@@ -275,7 +277,7 @@ HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::GetVersion(TTcpVersion* res
   if (result == nullptr) {
     return E_POINTER;
   }
-  *result = MakeTcpVersion(1, 0, 0, 0);
+  *result = MakeTcpVersion(1, 1, 0, 0);
   return S_OK;
 }
 
@@ -336,21 +338,21 @@ HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::GetFeatures(TTcpFeatures* r
   if (result == nullptr) {
     return E_POINTER;
   }
+  // Advertise only what is implemented. feSaveResultToFile makes
+  // GetPlotterInfo mandatory. Configure is not implemented, so its flag is
+  // not set either.
   *result =
     FeatureMask(feImport) |
     FeatureMask(feExport) |
     FeatureMask(feSaveResultToFile) |
-    FeatureMask(feConfigure) |
     FeatureMask(feAbout);
   return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::GetPlotterInfo(ITcPlotterInfo** result) {
-  if (result == nullptr) {
-    return E_POINTER;
-  }
-  *result = nullptr;
-  return S_OK;
+  // Never nullptr while a save or plot feature is advertised: the host copies
+  // the returned object and disables the plugin on a nil pointer.
+  return StarterPlotterInfo::Create(result);
 }
 
 HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::Initialize(BSTR aRegRoot, int aLanguageId, ITonCut* aTonCut, TTcpResult* result) {
@@ -358,6 +360,7 @@ HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::Initialize(BSTR aRegRoot, i
     return E_POINTER;
   }
 
+  // The host never calls Initialize; TcpInitializeV2 does.
   try {
     regRoot_ = FromBstr(aRegRoot);
     languageId_ = aLanguageId;
@@ -368,10 +371,9 @@ HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::Initialize(BSTR aRegRoot, i
       tonCut_->Release();
     }
     tonCut_ = aTonCut;
-    *result = cprOK;
-    return S_OK;
+    return Report(result, cprOK);
   } catch (...) {
-    return UnexpectedPluginException(result);
+    return Report(result, cprException);
   }
 }
 
@@ -379,29 +381,20 @@ HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::Finalize(TTcpResult* result
   if (result == nullptr) {
     return E_POINTER;
   }
+  // Called once before unload. Release every host object kept so far.
   if (tonCut_ != nullptr) {
     tonCut_->Release();
     tonCut_ = nullptr;
   }
-  *result = cprOK;
-  return S_OK;
+  return Report(result, cprOK);
 }
 
-HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::Configure(HWND aWindow, TTcpResult* result) {
+HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::Configure(HWND, TTcpResult* result) {
   if (result == nullptr) {
     return E_POINTER;
   }
-
-  if (aWindow != nullptr) {
-    ::MessageBoxW(
-      aWindow,
-      L"This starter plugin does not expose configurable options yet.",
-      pluginTitle_.c_str(),
-      MB_OK | MB_ICONINFORMATION
-    );
-  }
-  *result = cprOK;
-  return S_OK;
+  // Not advertised through feConfigure, so the host never calls it.
+  return Report(result, cprNotImplemented);
 }
 
 HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::About(HWND aWindow, TTcpResult* result) {
@@ -409,105 +402,95 @@ HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::About(HWND aWindow, TTcpRes
     return E_POINTER;
   }
 
-  if (aWindow != nullptr) {
-    ::MessageBoxW(
-      aWindow,
-      L"CSV import/export plus single-sheet PLT result export.",
-      pluginTitle_.c_str(),
-      MB_OK | MB_ICONINFORMATION
-    );
+  try {
+    if (aWindow != nullptr) {
+      ::MessageBoxW(
+        aWindow,
+        L"CSV import/export plus single-sheet result export (HPGL cutting paths or CSV sheet layout).",
+        pluginTitle_.c_str(),
+        MB_OK | MB_ICONINFORMATION
+      );
+    }
+    return Report(result, cprOK);
+  } catch (...) {
+    return Report(result, cprException);
   }
-  *result = cprOK;
-  return S_OK;
 }
 
 HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::LoadConfig(BSTR, BSTR, TTcpResult* result) {
   if (result == nullptr) {
     return E_POINTER;
   }
-  *result = cprOK;
-  return S_OK;
+  return Report(result, cprOK);
 }
 
 HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::SaveConfig(BSTR, TTcpResult* result) {
   if (result == nullptr) {
     return E_POINTER;
   }
-  *result = cprOK;
-  return S_OK;
+  return Report(result, cprOK);
 }
 
 HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::BackupConfig(BSTR* aBackup, TTcpResult* result) {
-  if (aBackup == nullptr || result == nullptr) {
+  if (result == nullptr) {
     return E_POINTER;
   }
+  if (aBackup == nullptr) {
+    return Report(result, cprFailed);
+  }
   const HRESULT hr = ReplaceBstr(L"", aBackup);
-  *result = SUCCEEDED(hr) ? cprOK : cprFailed;
-  return hr;
+  return Report(result, SUCCEEDED(hr) ? cprOK : cprFailed);
 }
 
 HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::RestoreConfig(BSTR, TConfigurationParts, TTcpResult* result) {
   if (result == nullptr) {
     return E_POINTER;
   }
-  *result = cprOK;
-  return S_OK;
+  return Report(result, cprOK);
 }
 
 HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::EnumExtensions(TTcpExtensionType aType, ITcEnumExtensionsCallback* aEnumCb, TTcpResult* result) {
-  if (aEnumCb == nullptr || result == nullptr) {
-    return E_POINTER;
-  }
-
-  if (aType == etImport || aType == etExport) {
-    BstrValue ext(L".csv");
-    BstrValue name(pluginTitle_);
-    if (!ext || !name) {
-      *result = cprFailed;
-      return E_OUTOFMEMORY;
-    }
-    const HRESULT hr = aEnumCb->Invoke(aType, ext.get(), name.get());
-    if (FAILED(hr)) {
-      *result = cprFailed;
-      return hr;
-    }
-  } else if (aType == etExportResults) {
-    BstrValue ext(L".plt");
-    BstrValue name(pluginTitle_);
-    if (!ext || !name) {
-      *result = cprFailed;
-      return E_OUTOFMEMORY;
-    }
-    const HRESULT hr = aEnumCb->Invoke(aType, ext.get(), name.get());
-    if (FAILED(hr)) {
-      *result = cprFailed;
-      return hr;
-    }
-  }
-
-  *result = cprOK;
-  return S_OK;
-}
-
-HRESULT CsvImportExportPluginBase::ValidateHeader(const std::wstring& fileName, TTcpResult* result) {
   if (result == nullptr) {
     return E_POINTER;
   }
+  if (aEnumCb == nullptr) {
+    return Report(result, cprFailed);
+  }
 
-  if (fileName.size() < 4 || _wcsicmp(fileName.substr(fileName.size() - 4).c_str(), L".csv") != 0) {
-    *result = cprNo;
-    return S_OK;
+  try {
+    // Each Invoke adds one file-dialog filter "Name (*ext)|*ext". The
+    // extension must include the leading dot.
+    auto invoke = [&](const wchar_t* extension, const std::wstring& name) {
+      BstrValue ext{std::wstring(extension)};
+      BstrValue title(name);
+      return (!ext || !title) ? E_OUTOFMEMORY : aEnumCb->Invoke(aType, ext.get(), title.get());
+    };
+
+    HRESULT hr = S_OK;
+    if (aType == etImport || aType == etExport) {
+      hr = invoke(kCsvExtension, pluginTitle_);
+    } else if (aType == etExportResults) {
+      hr = invoke(kPltExtension, pluginTitle_ + L" - cutting paths (HPGL)");
+      hr = SUCCEEDED(hr) ? invoke(kCsvExtension, pluginTitle_ + L" - sheet layout") : hr;
+    }
+    return Report(result, SUCCEEDED(hr) ? cprOK : cprFailed);
+  } catch (...) {
+    return Report(result, cprException);
+  }
+}
+
+HRESULT CsvImportExportPluginBase::ValidateHeader(const std::wstring& fileName, TTcpResult* result) {
+  if (!HasExtension(fileName, kCsvExtension)) {
+    return Report(result, cprNo);
   }
 
   std::vector<std::vector<std::wstring>> rows;
   std::wstring error;
   if (!ParseUtf8CsvFile(fileName, rows, error)) {
-    *result = cprFailed;
-    return S_OK;
+    return Report(result, cprFailed);
   }
 
-  *result = (!rows.empty() && HasRequiredHeader(rows.front())) ? cprOK : cprNo;
-  return S_OK;
+  return Report(result, (!rows.empty() && HasRequiredHeader(rows.front())) ? cprOK : cprNo);
 }
 
 HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::IsMyFile(BSTR aFileName, TTcpResult* result) {
@@ -517,192 +500,166 @@ HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::IsMyFile(BSTR aFileName, TT
   try {
     return ValidateHeader(FromBstr(aFileName), result);
   } catch (...) {
-    return UnexpectedPluginException(result);
+    return Report(result, cprException);
   }
 }
 
-HRESULT CsvImportExportPluginBase::EnsureProject(
+HRESULT CsvImportExportPluginBase::FindOrCreateProject(
   IProjects* projects,
   const std::wstring& title,
-  ProjectCache& projectCache,
   ComPtr<IProject>& project
 ) {
-  const std::wstring effectiveTitle = title.empty() ? L"CSV Import" : title;
-  const std::wstring requestedKey = NormalizeTitleKey(effectiveTitle);
-  auto cacheIt = projectCache.find(requestedKey);
-  if (cacheIt != projectCache.end() && cacheIt->second) {
-    IProject* cachedProject = cacheIt->second.get();
-    cachedProject->AddRef();
-    *project.put() = cachedProject;
-    return S_OK;
-  }
-
-  BstrValue bstrTitle(effectiveTitle);
-  if (!bstrTitle) {
-    return E_OUTOFMEMORY;
-  }
-  HRESULT hr = tonCut_->CreateProject(bstrTitle.get(), project.put());
-  if (FAILED(hr) || !project) {
-    return FAILED(hr) ? hr : E_FAIL;
-  }
-  hr = projects->Add(project.get());
-  if (FAILED(hr)) {
-    return hr;
-  }
-
-  projectCache[requestedKey] = ShareProject(project.get());
-  return S_OK;
-}
-
-HRESULT CsvImportExportPluginBase::FindMaterialByTitle(
-  IMaterials* materials,
-  const std::wstring& title,
-  TMaterialKind kind,
-  unsigned width,
-  unsigned thickness,
-  ComPtr<IMaterial>& material
-) {
-  if (materials == nullptr) {
-    return E_POINTER;
-  }
-
+  // LoadFile receives empty staging collections, so FindByTitle sees only the
+  // projects this import already added.
   BstrValue bstrTitle(title);
   if (!bstrTitle) {
     return E_OUTOFMEMORY;
   }
-  return materials->FindByTitle(
-    bstrTitle.get(),
-    kind,
-    EffectiveMaterialWidth(kind, width),
-    thickness,
-    material.put());
+  HRESULT hr = projects->FindByTitle(bstrTitle.get(), project.put());
+  if (FAILED(hr) || project) {
+    return hr;
+  }
+
+  // Plain constructor: no dialog, not inserted until Add.
+  hr = projects->CreateProject(project.put());
+  if (FAILED(hr) || !project) {
+    return FAILED(hr) ? hr : E_FAIL;
+  }
+  hr = project->SetTitle(bstrTitle.get());
+  return SUCCEEDED(hr) ? projects->Add(project.get()) : hr;
 }
 
-HRESULT CsvImportExportPluginBase::EnsureMaterial(
+HRESULT CsvImportExportPluginBase::FindDeviceForKind(TMaterialKind kind, ComPtr<IDevice>& device) {
+  // A staged material needs a cutting device from the live ITonCut::Devices;
+  // devices added to the LoadFile staging collection are ignored by the host.
+  ComPtr<IDevices> devices;
+  HRESULT hr = tonCut_->GetDevices(devices.put());
+  if (FAILED(hr) || !devices) {
+    return FAILED(hr) ? hr : E_FAIL;
+  }
+
+  int count = 0;
+  hr = devices->GetCount(&count);
+  if (FAILED(hr)) {
+    return hr;
+  }
+
+  for (int i = 0; i < count; ++i) {
+    ComPtr<IDevice> candidate;
+    hr = devices->GetByIndex(static_cast<unsigned>(i), candidate.put());
+    if (FAILED(hr) || !candidate) {
+      return FAILED(hr) ? hr : E_FAIL;
+    }
+    TMaterialKind deviceKind = mkUnknown;
+    hr = candidate->GetMaterialKind(&deviceKind);
+    if (FAILED(hr)) {
+      return hr;
+    }
+    if (deviceKind == kind || !device) {
+      // Keep the first device as a fallback; stop at the first exact match.
+      device.reset();
+      candidate->AddRef();
+      *device.put() = candidate.get();
+      if (deviceKind == kind) {
+        return S_OK;
+      }
+    }
+  }
+  return device ? S_OK : HRESULT_FROM_WIN32(ERROR_NOT_FOUND);
+}
+
+HRESULT CsvImportExportPluginBase::FindOrCreateMaterial(
   IMaterials* materials,
   const std::wstring& title,
   TMaterialKind kind,
   unsigned width,
   unsigned thickness,
-  MaterialCache& materialCache,
   ComPtr<IMaterial>& material
 ) {
   const std::wstring effectiveTitle = title.empty() ? L"CSV Material" : title;
+  // Width is significant only for 1D materials; 2D materials use 0.
   const unsigned effectiveWidth = EffectiveMaterialWidth(kind, width);
-  const std::wstring requestedKey = MakeMaterialKey(effectiveTitle, kind, effectiveWidth, thickness);
-  auto cacheIt = materialCache.find(requestedKey);
-  if (cacheIt != materialCache.end() && cacheIt->second) {
-    IMaterial* cachedMaterial = cacheIt->second.get();
-    cachedMaterial->AddRef();
-    *material.put() = cachedMaterial;
-    return S_OK;
-  }
-
   BstrValue bstrTitle(effectiveTitle);
   if (!bstrTitle) {
     return E_OUTOFMEMORY;
   }
-  HRESULT hr = FindMaterialByTitle(materials, effectiveTitle, kind, effectiveWidth, thickness, material);
-  if (FAILED(hr)) {
-    return hr;
-  }
-  if (material) {
-    auto sharedMaterial = ShareMaterial(material.get());
-    materialCache[requestedKey] = sharedMaterial;
-    BstrValue materialTitle;
-    TMaterialKind actualKind = mkUnknown;
-    unsigned actualWidth = 0;
-    unsigned actualThickness = 0;
-    hr = material->GetTitle(materialTitle.put());
-    hr = SUCCEEDED(hr) ? material->GetKind(&actualKind) : hr;
-    hr = SUCCEEDED(hr) ? material->GetWidth(&actualWidth) : hr;
-    hr = SUCCEEDED(hr) ? material->GetThickness(&actualThickness) : hr;
-    if (SUCCEEDED(hr)) {
-      const std::wstring actualTitle = FromBstr(materialTitle.get());
-      if (!actualTitle.empty()) {
-        materialCache[MakeMaterialKey(actualTitle, actualKind, actualWidth, actualThickness)] = sharedMaterial;
-      }
-    }
-    return S_OK;
-  }
 
-  DelphiBool isUnique = 0;
-  hr = materials->CheckUniqueName(
-    bstrTitle.get(),
-    kind,
-    effectiveWidth,
-    thickness,
-    nullptr,
-    &isUnique);
-  if (FAILED(hr)) {
-    return hr;
-  }
-  if (isUnique == 0) {
-    return HRESULT_FROM_WIN32(ERROR_ALREADY_EXISTS);
-  }
-
-  hr = tonCut_->CreateMaterial(
+  // Exact, case-sensitive match on title, kind, width and thickness within
+  // the staging collection of this LoadFile call.
+  HRESULT hr = materials->FindByTitle(
     bstrTitle.get(),
     kind,
     effectiveWidth,
     thickness,
     material.put());
+  if (FAILED(hr) || material) {
+    return hr;
+  }
+
+  ComPtr<IDevice> device;
+  hr = FindDeviceForKind(kind, device);
+  if (FAILED(hr)) {
+    return hr;
+  }
+
+  // Plain constructor: no dialog, not inserted until Add. Never use
+  // ITonCut::CreateMaterial here: it opens a dialog and commits to the live
+  // database immediately.
+  hr = materials->CreateMaterial(material.put());
   if (FAILED(hr) || !material) {
     return FAILED(hr) ? hr : E_FAIL;
   }
-
-  auto sharedMaterial = ShareMaterial(material.get());
-  materialCache[requestedKey] = sharedMaterial;
-  BstrValue materialTitle;
-  TMaterialKind actualKind = mkUnknown;
-  unsigned actualWidth = 0;
-  unsigned actualThickness = 0;
-  hr = material->GetTitle(materialTitle.put());
-  hr = SUCCEEDED(hr) ? material->GetKind(&actualKind) : hr;
-  hr = SUCCEEDED(hr) ? material->GetWidth(&actualWidth) : hr;
-  hr = SUCCEEDED(hr) ? material->GetThickness(&actualThickness) : hr;
-  if (SUCCEEDED(hr)) {
-    const std::wstring actualTitle = FromBstr(materialTitle.get());
-    if (!actualTitle.empty()) {
-      materialCache[MakeMaterialKey(actualTitle, actualKind, actualWidth, actualThickness)] = sharedMaterial;
-    }
-  }
-  return S_OK;
+  hr = material->SetTitle(bstrTitle.get());
+  hr = SUCCEEDED(hr) ? material->SetKind(kind) : hr;
+  hr = SUCCEEDED(hr) ? material->SetWidth(effectiveWidth) : hr;
+  hr = SUCCEEDED(hr) ? material->SetThickness(thickness) : hr;
+  hr = SUCCEEDED(hr) ? material->SetDevice(device.get()) : hr;
+  return SUCCEEDED(hr) ? materials->Add(material.get()) : hr;
 }
 
 HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::LoadFile(HWND, BSTR aFileName, IDevices*, IMaterials* aMaterials, IBands*, IProjects* aProjects, IFormats* aFormats, ISheets* aSheets, TTcpResult* result) {
-  if (aMaterials == nullptr || aProjects == nullptr || aFormats == nullptr || aSheets == nullptr || result == nullptr) {
+  if (result == nullptr) {
     return E_POINTER;
   }
   try {
+  if (aMaterials == nullptr || aProjects == nullptr || aFormats == nullptr || aSheets == nullptr) {
+    return Report(result, cprFailed);
+  }
   if (tonCut_ == nullptr) {
-    *result = cprNotInitialized;
-    return S_OK;
+    return Report(result, cprNotInitialized);
   }
 
+  const std::wstring fileName = FromBstr(aFileName);
   TTcpResult headerResult = cprFailed;
-  ValidateHeader(FromBstr(aFileName), &headerResult);
+  ValidateHeader(fileName, &headerResult);
   if (headerResult != cprOK) {
-    *result = headerResult;
-    return S_OK;
+    return Report(result, cprFailed);
   }
 
   std::vector<std::vector<std::wstring>> rows;
   std::wstring error;
-  if (!ParseUtf8CsvFile(FromBstr(aFileName), rows, error)) {
-    *result = cprFailed;
-    return S_OK;
+  if (!ParseUtf8CsvFile(fileName, rows, error)) {
+    return Report(result, cprFailed);
   }
 
   std::vector<CsvRowRecord> records;
   if (!DecodeCsvRows(rows, records, error)) {
-    *result = cprFailed;
-    return S_OK;
+    return Report(result, cprFailed);
   }
 
-  ProjectCache projectCache;
-  MaterialCache materialCache;
+  // Without projects mode the host assigns every piece to its single flat
+  // project, so the CSV ProjectTitle is used only when projects are on.
+  DelphiBool usingProjects = 0;
+  if (FAILED(tonCut_->GetUsingProjects(&usingProjects))) {
+    return Report(result, cprFailed);
+  }
+
+  UpdateScope<IProjects> projectsUpdate(aProjects);
+  UpdateScope<IFormats> formatsUpdate(aFormats);
+  UpdateScope<ISheets> sheetsUpdate(aSheets);
+
   for (const CsvRowRecord& record : records) {
+    // CSV sizes are millimeters; TonCut lengths are 0.01 mm.
     unsigned materialWidth = 0;
     unsigned materialThickness = 0;
     unsigned length = 0;
@@ -711,92 +668,68 @@ HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::LoadFile(HWND, BSTR aFileNa
         !TryFromCsvMillimeters(record.materialThickness, materialThickness) ||
         !TryFromCsvMillimeters(record.length, length) ||
         !TryFromCsvMillimeters(record.width, width)) {
-      *result = cprFailed;
-      return S_OK;
+      return Report(result, cprFailed);
     }
-    if (
-      _wcsicmp(record.recordType.c_str(), L"SHEET") == 0 &&
-      record.quantity > static_cast<unsigned>((std::numeric_limits<int>::max)())
-    ) {
-      *result = cprFailed;
-      return S_OK;
+    const bool isSheet = _wcsicmp(record.recordType.c_str(), L"SHEET") == 0;
+    if (isSheet && record.quantity > static_cast<unsigned>((std::numeric_limits<int>::max)())) {
+      return Report(result, cprFailed);
     }
 
-    if (_wcsicmp(record.recordType.c_str(), L"FORMAT") == 0) {
+    ComPtr<IMaterial> material;
+    HRESULT hr = FindOrCreateMaterial(
+      aMaterials,
+      record.materialTitle,
+      record.materialKind,
+      materialWidth,
+      materialThickness,
+      material);
+    if (FAILED(hr) || !material) {
+      return Report(result, cprFailed);
+    }
+
+    BstrValue identifier(record.identifier);
+    BstrValue description(record.description);
+    if (!identifier || !description) {
+      return Report(result, cprFailed);
+    }
+
+    if (!isSheet) {
       ComPtr<IProject> project;
-      HRESULT hr = EnsureProject(aProjects, record.projectTitle, projectCache, project);
-      if (FAILED(hr)) {
-        *result = cprFailed;
-        return S_OK;
+      if (usingProjects != 0 && !record.projectTitle.empty()) {
+        hr = FindOrCreateProject(aProjects, record.projectTitle, project);
+        if (FAILED(hr) || !project) {
+          return Report(result, cprFailed);
+        }
       }
-
-      ComPtr<IMaterial> material;
-      hr = EnsureMaterial(
-        aMaterials,
-        record.materialTitle,
-        record.materialKind,
-        materialWidth,
-        materialThickness,
-        materialCache,
-        material);
-      if (FAILED(hr) || !material) {
-        *result = cprFailed;
-        return S_OK;
-      }
+      // With projects on and no project, the host creates one named after
+      // the imported file.
 
       ComPtr<IFormat> format;
       hr = aFormats->CreateFormat(format.put());
       if (FAILED(hr) || !format) {
-        *result = cprFailed;
-        return S_OK;
+        return Report(result, cprFailed);
       }
 
-      BstrValue identifier(record.identifier);
-      BstrValue description(record.description);
-      if (!identifier || !description) {
-        *result = cprFailed;
-        return E_OUTOFMEMORY;
-      }
-      hr = format->SetProject(project.get());
+      // A 1D piece always has the width of its bar material.
+      const unsigned pieceWidth = record.materialKind == mk1D ? materialWidth : width;
+      hr = project ? format->SetProject(project.get()) : S_OK;
       hr = SUCCEEDED(hr) ? format->SetMaterial(material.get()) : hr;
       hr = SUCCEEDED(hr) ? format->SetLength(length) : hr;
-      hr = SUCCEEDED(hr) ? format->SetWidth(width) : hr;
+      hr = SUCCEEDED(hr) ? format->SetWidth(pieceWidth) : hr;
       hr = SUCCEEDED(hr) ? format->SetQuantity(record.quantity) : hr;
       hr = SUCCEEDED(hr) ? format->SetIdentifier(identifier.get()) : hr;
       hr = SUCCEEDED(hr) ? format->SetDescription(description.get()) : hr;
       hr = SUCCEEDED(hr) ? aFormats->Add(format.get()) : hr;
       if (FAILED(hr)) {
-        *result = cprFailed;
-        return S_OK;
+        return Report(result, cprFailed);
       }
     } else {
-      ComPtr<IMaterial> material;
-      HRESULT hr = EnsureMaterial(
-        aMaterials,
-        record.materialTitle,
-        record.materialKind,
-        materialWidth,
-        materialThickness,
-        materialCache,
-        material);
-      if (FAILED(hr) || !material) {
-        *result = cprFailed;
-        return S_OK;
-      }
-
       ComPtr<ISheet> sheet;
       hr = aSheets->CreateSheet(sheet.put());
       if (FAILED(hr) || !sheet) {
-        *result = cprFailed;
-        return S_OK;
+        return Report(result, cprFailed);
       }
 
-      BstrValue identifier(record.identifier);
-      BstrValue description(record.description);
-      if (!identifier || !description) {
-        *result = cprFailed;
-        return E_OUTOFMEMORY;
-      }
       hr = sheet->SetMaterial(material.get());
       hr = SUCCEEDED(hr) ? sheet->SetLength(length) : hr;
       hr = SUCCEEDED(hr) ? sheet->SetWidth(width) : hr;
@@ -805,40 +738,41 @@ HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::LoadFile(HWND, BSTR aFileNa
       hr = SUCCEEDED(hr) ? sheet->SetDescription(description.get()) : hr;
       hr = SUCCEEDED(hr) ? aSheets->Add(sheet.get()) : hr;
       if (FAILED(hr)) {
-        *result = cprFailed;
-        return S_OK;
+        return Report(result, cprFailed);
       }
     }
   }
 
-  *result = cprOK;
-  return S_OK;
+  // The host now shows its Import dialog and merges the staged data.
+  return Report(result, cprOK);
   } catch (...) {
-    return UnexpectedPluginException(result);
+    return Report(result, cprException);
   }
 }
 
 HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::SaveFile(HWND, BSTR aFileName, IFormats* aFormats, ISheets* aSheets, TTcpResult* result) {
-  if (aFormats == nullptr || aSheets == nullptr || result == nullptr) {
+  if (result == nullptr) {
     return E_POINTER;
   }
   try {
+  if (aFormats == nullptr || aSheets == nullptr) {
+    return Report(result, cprFailed);
+  }
 
+  // aFormats and aSheets are the live collections: read only.
   std::vector<CsvRowRecord> records;
   int formatCount = 0;
   int sheetCount = 0;
   HRESULT hr = aFormats->GetCount(&formatCount);
   if (FAILED(hr)) {
-    *result = cprFailed;
-    return S_OK;
+    return Report(result, cprFailed);
   }
 
   for (int i = 0; i < formatCount; ++i) {
     ComPtr<IFormat> format;
     hr = aFormats->GetByIndex(static_cast<unsigned>(i), format.put());
     if (FAILED(hr) || !format) {
-      *result = cprFailed;
-      return S_OK;
+      return Report(result, cprFailed);
     }
 
     ComPtr<IProject> project;
@@ -857,8 +791,7 @@ HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::SaveFile(HWND, BSTR aFileNa
     hr = SUCCEEDED(hr) ? format->GetIdentifier(identifier.put()) : hr;
     hr = SUCCEEDED(hr) ? format->GetDescription(description.put()) : hr;
     if (FAILED(hr) || !material) {
-      *result = cprFailed;
-      return S_OK;
+      return Report(result, cprFailed);
     }
 
     BstrValue projectTitle;
@@ -874,8 +807,7 @@ HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::SaveFile(HWND, BSTR aFileNa
     hr = SUCCEEDED(hr) ? material->GetWidth(&materialWidth) : hr;
     hr = SUCCEEDED(hr) ? material->GetThickness(&materialThickness) : hr;
     if (FAILED(hr)) {
-      *result = cprFailed;
-      return S_OK;
+      return Report(result, cprFailed);
     }
 
     records.push_back({
@@ -893,18 +825,17 @@ HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::SaveFile(HWND, BSTR aFileNa
     });
   }
 
+  std::wstring sheetLines;
   hr = aSheets->GetCount(&sheetCount);
   if (FAILED(hr)) {
-    *result = cprFailed;
-    return S_OK;
+    return Report(result, cprFailed);
   }
 
   for (int i = 0; i < sheetCount; ++i) {
     ComPtr<ISheet> sheet;
     hr = aSheets->GetByIndex(static_cast<unsigned>(i), sheet.put());
     if (FAILED(hr) || !sheet) {
-      *result = cprFailed;
-      return S_OK;
+      return Report(result, cprFailed);
     }
 
     ComPtr<IMaterial> material;
@@ -921,8 +852,7 @@ HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::SaveFile(HWND, BSTR aFileNa
     hr = SUCCEEDED(hr) ? sheet->GetIdentifier(identifier.put()) : hr;
     hr = SUCCEEDED(hr) ? sheet->GetDescription(description.put()) : hr;
     if (FAILED(hr) || !material) {
-      *result = cprFailed;
-      return S_OK;
+      return Report(result, cprFailed);
     }
 
     BstrValue materialTitle;
@@ -934,35 +864,34 @@ HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::SaveFile(HWND, BSTR aFileNa
     hr = SUCCEEDED(hr) ? material->GetWidth(&materialWidth) : hr;
     hr = SUCCEEDED(hr) ? material->GetThickness(&materialThickness) : hr;
     if (FAILED(hr)) {
-      *result = cprFailed;
-      return S_OK;
+      return Report(result, cprFailed);
     }
 
-    records.push_back({
+    // ISheet::GetQuantity is a signed Integer: write it unchanged. On import a
+    // missing, invalid (negative included) or zero Quantity becomes 1.
+    sheetLines += EncodeCsvLine({
       L"SHEET",
       L"",
       FromBstr(materialTitle.get()),
-      materialKind,
-      ToCsvMillimeters(EffectiveMaterialWidth(materialKind, materialWidth)),
-      ToCsvMillimeters(materialThickness),
-      ToCsvMillimeters(length),
-      ToCsvMillimeters(width),
-      static_cast<unsigned>(quantity > 0 ? quantity : 1),
+      MaterialKindToText(materialKind),
+      std::to_wstring(ToCsvMillimeters(EffectiveMaterialWidth(materialKind, materialWidth))),
+      std::to_wstring(ToCsvMillimeters(materialThickness)),
+      std::to_wstring(ToCsvMillimeters(length)),
+      std::to_wstring(ToCsvMillimeters(width)),
+      std::to_wstring(quantity),
       FromBstr(identifier.get()),
       FromBstr(description.get())
-    });
+    }) + L"\r\n";
   }
 
   std::wstring error;
-  if (!WriteUtf8CsvFile(FromBstr(aFileName), EncodeCsvRows(records), error)) {
-    *result = cprFailed;
-    return S_OK;
+  if (!WriteUtf8CsvFile(FromBstr(aFileName), EncodeCsvRows(records) + sheetLines, error)) {
+    return Report(result, cprFailed);
   }
 
-  *result = cprOK;
-  return S_OK;
+  return Report(result, cprOK);
   } catch (...) {
-    return UnexpectedPluginException(result);
+    return Report(result, cprException);
   }
 }
 
@@ -970,30 +899,11 @@ bool CsvImportExportPluginBase::ExportSolutionSheetAsPlt(
   ISolutionSheet* solutionSheet,
   std::vector<std::string>& commands
 ) {
-  if (solutionSheet == nullptr) {
-    return false;
-  }
-
-  unsigned sheetLength = 0;
-  unsigned sheetWidth = 0;
-  unsigned marginLeft = 0;
-  unsigned marginTop = 0;
-  unsigned marginRight = 0;
-  unsigned marginBottom = 0;
-  HRESULT hr = solutionSheet->CalcEffectiveLayout(
-    &sheetLength,
-    &sheetWidth,
-    &marginLeft,
-    &marginTop,
-    &marginRight,
-    &marginBottom
-  );
-  if (FAILED(hr) || sheetLength == 0 || sheetWidth == 0) {
-    return false;
-  }
-
+  // SolutionCuts are already in the effective output frame (sheet and
+  // plotter rotation and mirror applied by the host). Do not pass them
+  // through CalcPoint/CalcPointF; only scale 0.01 mm to HPGL units.
   ComPtr<ISolutionCuts> solutionCuts;
-  hr = solutionSheet->GetSolutionCuts(solutionCuts.put());
+  HRESULT hr = solutionSheet->GetSolutionCuts(solutionCuts.put());
   if (FAILED(hr) || !solutionCuts) {
     return false;
   }
@@ -1004,7 +914,6 @@ bool CsvImportExportPluginBase::ExportSolutionSheetAsPlt(
     return false;
   }
 
-  const double scale = 40.0 / 25.4;
   commands.clear();
   commands.push_back("IN;");
   commands.push_back("PA;");
@@ -1017,16 +926,12 @@ bool CsvImportExportPluginBase::ExportSolutionSheetAsPlt(
     }
 
     TCutKind kind = ckLine;
-    hr = cut->GetKind(&kind);
-    if (FAILED(hr)) {
-      return false;
-    }
-
     int posX = 0;
     int posY = 0;
     int tarX = 0;
     int tarY = 0;
-    hr = cut->GetPosX(&posX);
+    hr = cut->GetKind(&kind);
+    hr = SUCCEEDED(hr) ? cut->GetPosX(&posX) : hr;
     hr = SUCCEEDED(hr) ? cut->GetPosY(&posY) : hr;
     hr = SUCCEEDED(hr) ? cut->GetTarX(&tarX) : hr;
     hr = SUCCEEDED(hr) ? cut->GetTarY(&tarY) : hr;
@@ -1034,20 +939,10 @@ bool CsvImportExportPluginBase::ExportSolutionSheetAsPlt(
       return false;
     }
 
-    double x0 = static_cast<double>(posX);
-    double y0 = static_cast<double>(posY);
-    double x3 = static_cast<double>(tarX);
-    double y3 = static_cast<double>(tarY);
-
-    hr = solutionSheet->CalcPointF(&x0, &y0);
-    hr = SUCCEEDED(hr) ? solutionSheet->CalcPointF(&x3, &y3) : hr;
-    if (FAILED(hr)) {
-      return false;
-    }
-
-    AppendMoveCommand(commands, "PU", ToPlotterUnit(x0, scale), ToPlotterUnit(y0, scale));
+    AppendMoveCommand(commands, "PU", ToPlotterUnit(posX), ToPlotterUnit(posY));
 
     if (kind == ckCurve) {
+      // Cubic Bezier: start, two control points, end.
       int posXp = 0;
       int posYp = 0;
       int tarXp = 0;
@@ -1060,28 +955,17 @@ bool CsvImportExportPluginBase::ExportSolutionSheetAsPlt(
         return false;
       }
 
-      double x1 = static_cast<double>(posXp);
-      double y1 = static_cast<double>(posYp);
-      double x2 = static_cast<double>(tarXp);
-      double y2 = static_cast<double>(tarYp);
-
-      hr = solutionSheet->CalcPointF(&x1, &y1);
-      hr = SUCCEEDED(hr) ? solutionSheet->CalcPointF(&x2, &y2) : hr;
-      if (FAILED(hr)) {
-        return false;
-      }
-
       AppendBezierCommand(
         commands,
-        ToPlotterUnit(x1, scale),
-        ToPlotterUnit(y1, scale),
-        ToPlotterUnit(x2, scale),
-        ToPlotterUnit(y2, scale),
-        ToPlotterUnit(x3, scale),
-        ToPlotterUnit(y3, scale)
+        ToPlotterUnit(posXp),
+        ToPlotterUnit(posYp),
+        ToPlotterUnit(tarXp),
+        ToPlotterUnit(tarYp),
+        ToPlotterUnit(tarX),
+        ToPlotterUnit(tarY)
       );
     } else {
-      AppendMoveCommand(commands, "PD", ToPlotterUnit(x3, scale), ToPlotterUnit(y3, scale));
+      AppendMoveCommand(commands, "PD", ToPlotterUnit(tarX), ToPlotterUnit(tarY));
     }
   }
 
@@ -1090,76 +974,216 @@ bool CsvImportExportPluginBase::ExportSolutionSheetAsPlt(
   return true;
 }
 
+bool CsvImportExportPluginBase::ExportSolutionSheetLayout(
+  ISolutionSheet* solutionSheet,
+  std::wstring& content
+) {
+  // One layout (one ISolutionSheet) is cut SheetQuantity times: the parts and
+  // waste rows describe one sheet, so totals are rows x SheetQuantity.
+  // X/Y are in the native sheet frame (origin at sheet corner (0,0), X along
+  // the sheet length, Y along its width, before output rotation or mirror);
+  // map them with CalcPoint only if a consumer needs the output frame.
+  ComPtr<ISheet> sheet;
+  ComPtr<IMaterial> material;
+  ComPtr<ISolutionFormats> parts;
+  ComPtr<ISolutionWastes> wastes;
+  int sheetIndex = 0;
+  int sheetQuantity = 0;
+  unsigned sheetLength = 0;
+  unsigned sheetWidth = 0;
+  BstrValue sheetIdentifier;
+  BstrValue sheetDescription;
+  BstrValue materialTitle;
+
+  HRESULT hr = solutionSheet->GetSheet(sheet.put());
+  hr = SUCCEEDED(hr) ? solutionSheet->GetIndex(&sheetIndex) : hr;
+  hr = SUCCEEDED(hr) ? solutionSheet->GetQuantity(&sheetQuantity) : hr;
+  hr = SUCCEEDED(hr) ? solutionSheet->GetSolutionFormats(parts.put()) : hr;
+  hr = SUCCEEDED(hr) ? solutionSheet->GetSolutionWastes(wastes.put()) : hr;
+  if (FAILED(hr) || !sheet || !parts || !wastes) {
+    return false;
+  }
+  hr = sheet->GetLength(&sheetLength);
+  hr = SUCCEEDED(hr) ? sheet->GetWidth(&sheetWidth) : hr;
+  hr = SUCCEEDED(hr) ? sheet->GetIdentifier(sheetIdentifier.put()) : hr;
+  hr = SUCCEEDED(hr) ? sheet->GetDescription(sheetDescription.put()) : hr;
+  hr = SUCCEEDED(hr) ? sheet->GetMaterial(material.put()) : hr;
+  if (SUCCEEDED(hr) && material) {
+    hr = material->GetTitle(materialTitle.put());
+  }
+  if (FAILED(hr)) {
+    return false;
+  }
+
+  const std::wstring index = std::to_wstring(sheetIndex);
+  const std::wstring quantity = std::to_wstring(sheetQuantity);
+  const std::wstring materialName = FromBstr(materialTitle.get());
+  content = EncodeCsvLine({
+    L"RecordType", L"SheetIndex", L"SheetQuantity", L"MaterialTitle",
+    L"X", L"Y", L"Length", L"Width", L"Rotation", L"Mirrored",
+    L"Identifier", L"Description"
+  }) + L"\r\n";
+  content += EncodeCsvLine({
+    L"SHEET", index, quantity, materialName,
+    FormatMillimeters(0), FormatMillimeters(0),
+    FormatMillimeters(sheetLength), FormatMillimeters(sheetWidth), L"", L"",
+    FromBstr(sheetIdentifier.get()), FromBstr(sheetDescription.get())
+  }) + L"\r\n";
+
+  int partCount = 0;
+  hr = parts->GetCount(&partCount);
+  if (FAILED(hr)) {
+    return false;
+  }
+  for (int i = 0; i < partCount; ++i) {
+    ComPtr<ISolutionFormat> part;
+    ComPtr<IFormat> format;
+    unsigned x = 0;
+    unsigned y = 0;
+    unsigned short rotation = 0;
+    DelphiBool mirrored = 0;
+    unsigned length = 0;
+    unsigned width = 0;
+    BstrValue identifier;
+    BstrValue description;
+    hr = parts->GetByIndex(static_cast<unsigned>(i), part.put());
+    if (FAILED(hr) || !part) {
+      return false;
+    }
+    hr = part->GetFormat(format.put());
+    hr = SUCCEEDED(hr) ? part->GetX(&x) : hr;
+    hr = SUCCEEDED(hr) ? part->GetY(&y) : hr;
+    hr = SUCCEEDED(hr) ? part->GetRotation(&rotation) : hr;
+    hr = SUCCEEDED(hr) ? part->GetMirrored(&mirrored) : hr;
+    if (FAILED(hr) || !format) {
+      return false;
+    }
+    // X/Y: lower corner of the placed footprint's bounding box.
+    // Length/Width: the piece as entered, before rotation.
+    hr = format->GetLength(&length);
+    hr = SUCCEEDED(hr) ? format->GetWidth(&width) : hr;
+    hr = SUCCEEDED(hr) ? format->GetIdentifier(identifier.put()) : hr;
+    hr = SUCCEEDED(hr) ? format->GetDescription(description.put()) : hr;
+    if (FAILED(hr)) {
+      return false;
+    }
+    content += EncodeCsvLine({
+      L"PART", index, quantity, materialName,
+      FormatMillimeters(x), FormatMillimeters(y),
+      FormatMillimeters(length), FormatMillimeters(width),
+      FormatDegrees(rotation), mirrored != 0 ? L"1" : L"0",
+      FromBstr(identifier.get()), FromBstr(description.get())
+    }) + L"\r\n";
+  }
+
+  int wasteCount = 0;
+  hr = wastes->GetCount(&wasteCount);
+  if (FAILED(hr)) {
+    return false;
+  }
+  for (int i = 0; i < wasteCount; ++i) {
+    // All waste pieces, reusable or not, as rectangles along X/Y.
+    ComPtr<ISolutionWaste> waste;
+    unsigned x = 0;
+    unsigned y = 0;
+    unsigned length = 0;
+    unsigned width = 0;
+    BstrValue identifier;
+    hr = wastes->GetByIndex(static_cast<unsigned>(i), waste.put());
+    if (FAILED(hr) || !waste) {
+      return false;
+    }
+    hr = waste->GetX(&x);
+    hr = SUCCEEDED(hr) ? waste->GetY(&y) : hr;
+    hr = SUCCEEDED(hr) ? waste->GetLength(&length) : hr;
+    hr = SUCCEEDED(hr) ? waste->GetWidth(&width) : hr;
+    hr = SUCCEEDED(hr) ? waste->GetIdentifier(identifier.put()) : hr;
+    if (FAILED(hr)) {
+      return false;
+    }
+    content += EncodeCsvLine({
+      L"WASTE", index, quantity, materialName,
+      FormatMillimeters(x), FormatMillimeters(y),
+      FormatMillimeters(length), FormatMillimeters(width), L"", L"",
+      FromBstr(identifier.get()), L""
+    }) + L"\r\n";
+  }
+  return true;
+}
+
 HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::SaveResult(HWND, BSTR aFileName, ISolutionSheet* aSolutionSheet, TTcpResult* result) {
   if (result == nullptr) {
     return E_POINTER;
   }
   try {
-
-  std::vector<std::string> commands;
-  if (!ExportSolutionSheetAsPlt(aSolutionSheet, commands)) {
-    *result = cprFailed;
-    return S_OK;
+  if (aSolutionSheet == nullptr) {
+    return Report(result, cprFailed);
   }
 
-  if (!WriteAsciiLines(FromBstr(aFileName), commands)) {
-    *result = cprFailed;
-    return S_OK;
+  // The host appends the chosen filter's extension when the user typed none.
+  const std::wstring fileName = FromBstr(aFileName);
+  bool written = false;
+  if (HasExtension(fileName, kCsvExtension)) {
+    std::wstring content;
+    std::wstring error;
+    written = ExportSolutionSheetLayout(aSolutionSheet, content) &&
+              WriteUtf8CsvFile(fileName, content, error);
+  } else {
+    std::vector<std::string> commands;
+    written = ExportSolutionSheetAsPlt(aSolutionSheet, commands) &&
+              WriteAsciiLines(fileName, commands);
+  }
+  if (!written) {
+    return Report(result, cprFailed);
   }
 
-  if (aSolutionSheet != nullptr) {
-    const HRESULT hr = aSolutionSheet->SetIsSaved(1);
-    if (FAILED(hr)) {
-      *result = cprException;
-      return hr;
-    }
+  // Mark the page as saved: "Save one" and the next-unsaved selection read it.
+  const HRESULT hr = aSolutionSheet->SetIsSaved(1);
+  if (FAILED(hr)) {
+    return Report(result, cprFailed);
   }
 
-  *result = cprOK;
-  return S_OK;
+  return Report(result, cprOK);
   } catch (...) {
-    return UnexpectedPluginException(result);
+    return Report(result, cprException);
   }
 }
 
+// The callbacks below are not advertised in GetFeatures, so the host never
+// calls them. They still return a valid result.
 HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::BatchSaveResult(HWND, TTcpSaveTarget, BSTR, ISolution*, TTcpResult* result) {
   if (result == nullptr) {
     return E_POINTER;
   }
-  *result = cprNotImplemented;
-  return S_OK;
+  return Report(result, cprNotImplemented);
 }
 
 HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::Plot(HWND, ISolutionSheet*, TTcpResult* result) {
   if (result == nullptr) {
     return E_POINTER;
   }
-  *result = cprNotImplemented;
-  return S_OK;
+  return Report(result, cprNotImplemented);
 }
 
 HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::BatchPlot(HWND, ISolution*, TTcpResult* result) {
   if (result == nullptr) {
     return E_POINTER;
   }
-  *result = cprNotImplemented;
-  return S_OK;
+  return Report(result, cprNotImplemented);
 }
 
 HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::SavePlot(HWND, BSTR, ISolutionSheet*, TTcpResult* result) {
   if (result == nullptr) {
     return E_POINTER;
   }
-  *result = cprNotImplemented;
-  return S_OK;
+  return Report(result, cprNotImplemented);
 }
 
 HRESULT STDMETHODCALLTYPE CsvImportExportPluginBase::BatchSavePlot(HWND, TTcpSaveTarget, BSTR, ISolution*, TTcpResult* result) {
   if (result == nullptr) {
     return E_POINTER;
   }
-  *result = cprNotImplemented;
-  return S_OK;
+  return Report(result, cprNotImplemented);
 }
 
 }  // namespace toncut

@@ -91,6 +91,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\shared\cpp\CsvCodec.hpp" />
     <ClInclude Include="..\..\shared\cpp\CsvImportExportPluginBase.hpp" />
+    <ClInclude Include="..\..\shared\cpp\StarterPlotterInfo.hpp" />
     <ClInclude Include="..\..\..\include\cpp\TonCutPluginSdk.hpp" />
   </ItemGroup>
   <ItemGroup>

@@ -37,7 +37,8 @@ solution-cut view exposes `NeedShift`, then `CalcLength`, then the appended
 `DefaultMirror` (a `TMirrors` set, default empty) in TonCut 8.5. They are the
 device's persisted default orientation, appended after the existing members so
 every established vtable slot keeps its position. The plugin interface version
-stays `cEngineVersion = 24`. The C++ header keeps `IDevice` opaque, as before.
+stays `cEngineVersion = 24`. The C++ header projects the complete `IDevice`
+interface, including `DefaultRotation` and `DefaultMirror`.
 
 **BREAKING CHANGE:** `ISheet.Priority` (`GetPriority`/`SetPriority`) changed
 from the 1-byte `TStockPriority` enum to a numeric `Integer`,
@@ -55,10 +56,10 @@ engine writes 4 bytes into it (memory corruption), and a stale
 `SetPriority(spNormal)` arrives as priority `0` = LOW. Loading a plugin built
 against the enum is undefined behaviour: **every plugin binary must be
 rebuilt against this SDK before it is loaded again.** The C++ view of
-`ISheet` in `TonCutPluginSdk.hpp` remains an intentional 18-method prefix
-that stops before `GetEdging`, so `Priority` was never projected there and
-needs no C++ change; see "ABI Mapping Rules" in `plugin-contract-and-abi.md`
-for why a prefix may not skip slots.
+`ISheet` in `TonCutPluginSdk.hpp` projects the complete interface, so
+`GetPriority`/`SetPriority` appear there with the `int` signature; see "ABI
+Mapping Rules" in `plugin-contract-and-abi.md` for why a projection may not
+skip slots.
 
 `ISheet` also gained two methods, `GetPricePerSqM`/`SetPricePerSqM`, appended
 at the end of the interface directly after `EndUpdate`, and the
@@ -73,7 +74,8 @@ the caller. Setting `cStockPriceAbsent` clears a stock item's own price; any
 other value supplied to `SetPricePerSqM` must be finite and `>= 0`. Because
 the two methods are appended after every earlier method, no existing vtable
 slot moved, but every class implementing `ISheet` must add both methods to
-remain a valid implementation. The C++ `ISheet` prefix view is unaffected.
+remain a valid implementation (host-side; plugins only consume `ISheet`). The
+C++ `ISheet` view declares both methods at its end.
 
 `IBand` and `IFormat` each gained `GetPreviewColor`/`SetPreviewColor`, appended
 at the end of the interface directly after `EndUpdate`, and a
@@ -91,9 +93,9 @@ adds the `TTcColor = Integer` type and two special values:
 
 No existing slot of either interface moved, but every class implementing
 `IBand` or `IFormat` must add both methods to remain a valid implementation.
-The C++ header does not reach these slots: `IBand` is projected only as its
-`IUnknown` prefix, and the `IFormat` view is a prefix that ends at
-`SetMaterial`, so neither needs a C++ change.
+Plugins only consume these interfaces. In the C++ header `IBand` stays opaque
+(its `IUnknown` prefix only), and the complete `IFormat` view ends with
+`GetPreviewColor`/`SetPreviewColor`.
 
 `TSheetOrder` in `uICommon.pas` gains `soAllPermutations`, appended after
 `soCustom` as ordinal `4`; the ordinals of `soFromLarge`, `soFromSmall`,

@@ -16,6 +16,12 @@ compatible with a Win64 build.
 
 Note: the C++Builder example has not been compiled or tested by the maintainers and is provided as-is; see `SDK/README.md` for how to report problems.
 
+## What The Starters Do
+
+All four starters implement the same plugin: CSV import and export of pieces and stock sheets, and export of one cut sheet either as HPGL cutting paths (`.plt`) or as a CSV sheet layout with placed parts and waste (`.csv`). See `../manuals/getting-started.md` and `../manuals/csv-schema.md`.
+
+Every starter builds a Win32 `.plg`; install it in the `Plugins\` folder next to `TonCut.exe`.
+
 ## Example Ids
 
 - `delphi`

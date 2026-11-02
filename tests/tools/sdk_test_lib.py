@@ -512,6 +512,92 @@ def parse_cpp_integer_constants() -> dict[str, int]:
     }
 
 
+# Pascal units whose integer constants the C++ header may project.
+PASCAL_CONSTANT_UNITS = ("uICommon.pas", "uITcPluginCommon.pas", "uISheet.pas")
+
+
+def evaluate_pascal_integer_constants() -> dict[str, int]:
+    """Evaluate the Pascal integer constants a C++ constant may mirror.
+
+    Supports integer literals, `A * B` of known constants, and
+    `Round(N / U)` where U is a known real constant (the TRotation values).
+    Constants with any other expression are left out, so a C++ constant that
+    mirrors them fails the cross-check instead of passing unverified.
+    """
+    expressions: dict[str, str] = {}
+    for file_name in PASCAL_CONSTANT_UNITS:
+        text = strip_pascal_comments(
+            read_text(SDK_ROOT / "include" / "pascal" / file_name)
+        )
+        for match in re.finditer(
+            r"^\s*(c[A-Za-z0-9_]*)\s*=\s*([^;'\n]+?)\s*;",
+            text,
+            re.MULTILINE,
+        ):
+            expressions.setdefault(match.group(1), normalize_whitespace(match.group(2)))
+
+    reals: dict[str, float] = {}
+    values: dict[str, int] = {}
+    for _ in range(3):
+        for name, expression in expressions.items():
+            if name in values:
+                continue
+            if re.fullmatch(r"-?[0-9]+", expression):
+                values[name] = int(expression)
+                continue
+            if re.fullmatch(r"-?[0-9]+\.[0-9]+", expression):
+                reals[name] = float(expression)
+                continue
+            product = re.fullmatch(r"([A-Za-z_]\w*)\s*\*\s*([A-Za-z_]\w*)", expression)
+            if product and product.group(1) in values and product.group(2) in values:
+                values[name] = values[product.group(1)] * values[product.group(2)]
+                continue
+            rounded = re.fullmatch(
+                r"Round\(\s*([0-9]+)\s*/\s*([A-Za-z_]\w*)\s*\)", expression
+            )
+            if rounded and rounded.group(2) in reals:
+                values[name] = int(
+                    round(int(rounded.group(1)) / reals[rounded.group(2)])
+                )
+    return values
+
+
+def parse_pascal_interface_guids() -> dict[str, str]:
+    result: dict[str, str] = {}
+    for unit_path in sorted((SDK_ROOT / "include" / "pascal").glob("*.pas")):
+        text = re.sub(r"//.*$", "", read_text(unit_path), flags=re.MULTILINE)
+        for match in re.finditer(
+            r"\b([A-Za-z_]\w*)\s*=\s*interface\s*(?:\(\s*\w+\s*\))?\s*"
+            r"\[\s*'\{([0-9A-Fa-f-]{36})\}'\s*\]",
+            text,
+        ):
+            result[match.group(1)] = match.group(2).upper()
+    return result
+
+
+def parse_cpp_iids() -> dict[str, str]:
+    text = read_text(SDK_ROOT / "include" / "cpp" / "TonCutPluginSdk.hpp")
+    result: dict[str, str] = {}
+    for match in re.finditer(
+        r"^\s*constexpr\s+GUID\s+IID_([A-Za-z_]\w*)\s*=\s*\{\s*0x([0-9A-Fa-f]{8})\s*,"
+        r"\s*0x([0-9A-Fa-f]{4})\s*,\s*0x([0-9A-Fa-f]{4})\s*,\s*\{([^}]*)\}\s*\}\s*;",
+        text,
+        re.MULTILINE,
+    ):
+        tail = [item.strip() for item in match.group(5).split(",")]
+        if len(tail) != 8 or not all(
+            re.fullmatch(r"0x[0-9A-Fa-f]{2}", item) for item in tail
+        ):
+            result[match.group(1)] = "malformed"
+            continue
+        data4 = "".join(item[2:] for item in tail)
+        result[match.group(1)] = (
+            f"{match.group(2)}-{match.group(3)}-{match.group(4)}-"
+            f"{data4[:4]}-{data4[4:]}"
+        ).upper()
+    return result
+
+
 def cpp_integer_type_for_byte_count(byte_count: int) -> str | None:
     return {
         1: "std::uint8_t",
@@ -563,6 +649,9 @@ def validate_cpp_data_types() -> None:
         "TTcpFeatures": cpp_set_type_for_enum(pascal_enums["TTcpFeature"]),
         "TOrnaments": cpp_set_type_for_enum(pascal_enums["TOrnament"]),
         "TMirrors": cpp_set_type_for_enum(pascal_enums["TMirror"]),
+        "TMaterialKinds": cpp_set_type_for_enum(pascal_enums["TMaterialKind"]),
+        "TField": "std::int64_t",
+        "TTcColor": "int",
     }
     common_text = strip_pascal_comments(
         read_text(SDK_ROOT / "include" / "pascal" / "uICommon.pas")
@@ -600,6 +689,34 @@ def validate_cpp_data_types() -> None:
                 f"C++ {constant_name}={cpp_constants.get(constant_name)} differs from "
                 f"Pascal {pascal_constants.get(constant_name)}"
             )
+    # Every integer constant the header projects must equal its Pascal source.
+    evaluated_constants = evaluate_pascal_integer_constants()
+    for constant_name, cpp_value in sorted(cpp_constants.items()):
+        if constant_name not in evaluated_constants:
+            errors.append(
+                f"C++ constant {constant_name} has no evaluable Pascal source in "
+                + ", ".join(PASCAL_CONSTANT_UNITS)
+            )
+        elif cpp_value != evaluated_constants[constant_name]:
+            errors.append(
+                f"C++ {constant_name}={cpp_value} differs from Pascal "
+                f"{evaluated_constants[constant_name]}"
+            )
+
+    # Interface IDs must equal the Pascal GUIDs, and every projected interface
+    # with a Pascal GUID must publish its IID.
+    pascal_guids = parse_pascal_interface_guids()
+    cpp_iids = parse_cpp_iids()
+    for interface_name, iid in sorted(cpp_iids.items()):
+        if pascal_guids.get(interface_name) != iid:
+            errors.append(
+                f"C++ IID_{interface_name}={iid} differs from Pascal "
+                f"{pascal_guids.get(interface_name)}"
+            )
+    for cpp_interface in parse_cpp_header():
+        name = cpp_interface["name"]
+        if cpp_interface["methods"] and name in pascal_guids and name not in cpp_iids:
+            errors.append(f"projected C++ interface {name} has no IID_{name} constant")
 
     cpp_text = read_text(SDK_ROOT / "include" / "cpp" / "TonCutPluginSdk.hpp")
     if "#pragma pack(push, 8)" not in cpp_text or "#pragma pack(pop)" not in cpp_text:
@@ -665,6 +782,9 @@ PASCAL_CPP_ABI_TYPES = {
     "integer": {"int", "std::int32_t"},
     "int64": {"std::int64_t"},
     "single": {"float"},
+    # A Delphi String (UnicodeString) is not a COM type. The C++ header keeps
+    # such a slot only for vtable alignment, under a configured reserved name.
+    "string": {"DelphiUnicodeStringSlot"},
     "tfield": {"std::int64_t", "TField"},
     "thandle": {"HWND"},
     "trotation": {"unsigned short", "std::uint16_t"},
@@ -939,6 +1059,56 @@ def validate_cpp_projections(manifest: dict[str, Any], config: dict[str, Any]) -
                     f"{pascal_name} -> {cpp_name}"
                 )
 
+    method_aliases = projection.get("methodAliases", {})
+    for interface_name, slots in projection.get("reservedSlots", {}).items():
+        cpp_interface = cpp_by_name.get(interface_name)
+        pascal_interface = pascal_by_name.get(interface_name)
+        if cpp_interface is None or pascal_interface is None:
+            errors.append(
+                f"reserved slots for {interface_name} reference a missing interface"
+            )
+            continue
+        for raw_index in slots:
+            try:
+                index = int(raw_index)
+            except (TypeError, ValueError):
+                errors.append(
+                    f"reserved slot {interface_name}[{raw_index}] has a non-integer slot"
+                )
+                continue
+            if (
+                index < 0
+                or index >= len(cpp_interface["methods"])
+                or index >= len(pascal_interface["methods"])
+            ):
+                errors.append(
+                    f"reserved slot {interface_name}[{index}] references a missing slot"
+                )
+                continue
+            pascal_name = pascal_interface["methods"][index]["name"]
+            expected_cpp_name = f"Reserved{pascal_name}"
+            alias = method_aliases.get(interface_name, {}).get(str(index))
+            if (
+                cpp_interface["methods"][index]["name"] != expected_cpp_name
+                or not isinstance(alias, dict)
+                or alias.get("cpp") != expected_cpp_name
+            ):
+                errors.append(
+                    f"reserved slot {interface_name}[{index}] must be the aliased "
+                    f"C++ method {expected_cpp_name}"
+                )
+
+    reserved_slots = projection.get("reservedSlots", {})
+    for cpp_interface in manifest["cppInterfaces"]:
+        for index, method in enumerate(cpp_interface["methods"]):
+            if method["name"].startswith("Reserved") and str(index) not in reserved_slots.get(
+                cpp_interface["name"], {}
+            ):
+                errors.append(
+                    f"C++ method {cpp_interface['name']}[{index}] {method['name']} "
+                    "is not listed in reservedSlots"
+                )
+
     for cpp_interface in manifest["cppInterfaces"]:
         diff = diff_cpp_interface_against_pascal(
             cpp_interface,
@@ -969,8 +1139,21 @@ def build_cpp_interface_support(
     projection: dict[str, Any],
 ) -> dict[str, Any]:
     cpp_method_count = len(cpp_interface["methods"])
-    exposed_pascal_methods = pascal_interface["methods"][:cpp_method_count]
+    reserved_indexes = {
+        int(raw_index)
+        for raw_index in projection.get("reservedSlots", {}).get(
+            cpp_interface["name"], {}
+        )
+    }
+    exposed_pascal_methods = [
+        method
+        for index, method in enumerate(pascal_interface["methods"][:cpp_method_count])
+        if index not in reserved_indexes
+    ]
     exposed_pascal_names = {method["name"] for method in exposed_pascal_methods}
+    unsupported_indexes = sorted(
+        index for index in reserved_indexes if index < cpp_method_count
+    ) + list(range(cpp_method_count, len(pascal_interface["methods"])))
     unsupported_properties: list[dict[str, Any]] = []
     supported_property_accessors: list[str] = []
 
@@ -994,24 +1177,35 @@ def build_cpp_interface_support(
         else:
             supported_property_accessors.append(prop["name"])
 
+    usable_cpp_methods = [
+        method["name"]
+        for index, method in enumerate(cpp_interface["methods"])
+        if index not in reserved_indexes
+    ]
     return {
         "name": cpp_interface["name"],
         "file": cpp_interface["file"],
-        "methodCount": cpp_method_count,
+        "methodCount": len(usable_cpp_methods),
         "propertyCount": 0,
-        "methods": [method["name"] for method in cpp_interface["methods"]],
+        "methods": usable_cpp_methods,
+        "reservedMethods": [
+            {
+                "slot": index,
+                "name": cpp_interface["methods"][index]["name"],
+                "pascalName": pascal_interface["methods"][index]["name"],
+            }
+            for index in sorted(reserved_indexes)
+            if index < cpp_method_count
+        ],
         "properties": [],
         "supportedPropertyAccessors": supported_property_accessors,
         "unsupportedMethods": [
             {
                 "slot": index,
-                "name": method["name"],
-                "signature": method["signature"],
+                "name": pascal_interface["methods"][index]["name"],
+                "signature": pascal_interface["methods"][index]["signature"],
             }
-            for index, method in enumerate(
-                pascal_interface["methods"][cpp_method_count:],
-                start=cpp_method_count,
-            )
+            for index in unsupported_indexes
         ],
         "unsupportedProperties": unsupported_properties,
         "diff": diff_cpp_interface_against_pascal(

@@ -1,6 +1,6 @@
 # TonCut Plugin SDK
 
-This folder is the external-facing SDK package for TonCut Desktop plugins. It contains the public Pascal interface units, the translated C++ contract header, buildable CSV + PLT starter examples, and Markdown manuals for external developers.
+This folder is the external-facing SDK package for TonCut Desktop plugins. It contains the public Pascal interface units, the translated C++ contract header, buildable CSV import/export and result-export starter examples, and Markdown manuals for external developers.
 
 ## Start Here
 
@@ -15,7 +15,7 @@ This folder is the external-facing SDK package for TonCut Desktop plugins. It co
 - Plugin engine interface version: 24 (`cEngineVersion` in `include/pascal/uITcPluginCommon.pas`, mirrored in `include/cpp/TonCutPluginSdk.hpp`). The host refuses a plugin that reports a different value, so rebuild every plugin against this SDK.
 - Documentation: the Plugin API reference is published at https://docs.toncut.com/tc-plugin-sdk/.
 
-The shipped SDK assumes the TonCut Win32 ABI used by the Delphi plugins, including quad-word record alignment.
+TonCut Desktop is a 32-bit application: every plugin must be a Win32 (x86) DLL named `*.plg` (lowercase) in the `Plugins\` folder next to `TonCut.exe`. The shipped SDK assumes the TonCut Win32 ABI used by the Delphi plugins, including quad-word record alignment. A C# plugin is a native C++ shim; TonCut does not load .NET assemblies directly (see `manuals/support-by-language.md`).
 
 > **C++Builder is untested.** The Delphi, VS C++, and C# examples are built by the maintainers. The C++Builder example (`examples/cppbuilder/`) and the C++Builder build path in the example and test drivers have never been compiled or tested by the maintainers, so they are provided as-is and may need adjustments. If you find a problem, please [open an issue](https://github.com/codeton-software/toncut-plugin-sdk/issues) or send a [pull request](https://github.com/codeton-software/toncut-plugin-sdk/pulls).
 

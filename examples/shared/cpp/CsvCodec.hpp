@@ -26,6 +26,8 @@ bool ParseUtf8CsvFile(const std::wstring& path, std::vector<std::vector<std::wst
 bool HasRequiredHeader(const std::vector<std::wstring>& header);
 bool DecodeCsvRows(const std::vector<std::vector<std::wstring>>& rows, std::vector<CsvRowRecord>& records, std::wstring& error);
 std::wstring EncodeCsvRows(const std::vector<CsvRowRecord>& records);
+// Encodes one RFC4180 line (no line terminator) for other CSV layouts.
+std::wstring EncodeCsvLine(const std::vector<std::wstring>& fields);
 bool TryParseMaterialKind(const std::wstring& text, TMaterialKind& kind);
 std::wstring MaterialKindToText(TMaterialKind kind);
 bool WriteUtf8CsvFile(const std::wstring& path, const std::wstring& content, std::wstring& error);

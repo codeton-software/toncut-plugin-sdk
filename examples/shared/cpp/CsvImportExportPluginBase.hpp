@@ -3,15 +3,23 @@
 #include "CsvCodec.hpp"
 
 #include <atomic>
-#include <memory>
-#include <unordered_map>
+#include <string>
+#include <vector>
 
 namespace toncut {
 
-class CsvImportExportPluginBase : public ITcPlugin {
+// Shared starter plugin used by the MSVC, C++Builder and C# shim examples.
+//
+// - CSV import (LoadFile) and export (SaveFile) of pieces and stock sheets.
+// - Result export (SaveResult) of one solution sheet, either as HPGL cutting
+//   paths (.plt) or as a CSV sheet layout with placed parts and waste (.csv).
+//
+// Every method that returns a TTcpResult reports failures through that
+// result and returns S_OK: a failed HRESULT or an escaping C++ exception makes
+// TonCut disable the plugin.
+class CsvImportExportPluginBase final : public ITcPlugin {
  public:
   CsvImportExportPluginBase(std::wstring pluginName, std::wstring pluginTitle);
-  ~CsvImportExportPluginBase();
 
   HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void** object) override;
   ULONG STDMETHODCALLTYPE AddRef() override;
@@ -50,14 +58,15 @@ class CsvImportExportPluginBase : public ITcPlugin {
   HRESULT STDMETHODCALLTYPE BatchSavePlot(HWND aWindow, TTcpSaveTarget aSaveTarget, BSTR aPath, ISolution* aSolution, TTcpResult* result) override;
 
  private:
-  using ProjectCache = std::unordered_map<std::wstring, std::shared_ptr<IProject>>;
-  using MaterialCache = std::unordered_map<std::wstring, std::shared_ptr<IMaterial>>;
+  // Destroyed only by the final Release().
+  ~CsvImportExportPluginBase();
 
   HRESULT ValidateHeader(const std::wstring& fileName, TTcpResult* result);
-  HRESULT EnsureProject(IProjects* projects, const std::wstring& title, ProjectCache& projectCache, ComPtr<IProject>& project);
-  HRESULT FindMaterialByTitle(IMaterials* materials, const std::wstring& title, TMaterialKind kind, unsigned width, unsigned thickness, ComPtr<IMaterial>& material);
-  HRESULT EnsureMaterial(IMaterials* materials, const std::wstring& title, TMaterialKind kind, unsigned width, unsigned thickness, MaterialCache& materialCache, ComPtr<IMaterial>& material);
+  HRESULT FindOrCreateProject(IProjects* projects, const std::wstring& title, ComPtr<IProject>& project);
+  HRESULT FindOrCreateMaterial(IMaterials* materials, const std::wstring& title, TMaterialKind kind, unsigned width, unsigned thickness, ComPtr<IMaterial>& material);
+  HRESULT FindDeviceForKind(TMaterialKind kind, ComPtr<IDevice>& device);
   bool ExportSolutionSheetAsPlt(ISolutionSheet* solutionSheet, std::vector<std::string>& commands);
+  bool ExportSolutionSheetLayout(ISolutionSheet* solutionSheet, std::wstring& content);
 
   std::atomic<ULONG> refCount_;
   std::wstring pluginName_;

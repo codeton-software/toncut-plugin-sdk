@@ -23,6 +23,17 @@ constexpr auto kPluginTitle = L"CSV Import/Export + PLT Result Template (C#)";
 
 }  // namespace
 
+// The only export TonCut resolves. The host declares it as
+//   function TcpInitializeV2(const aRegRoot: PChar; aLanguageId: Integer;
+//     aTonCut: ITonCut): ITcPlugin; stdcall;
+// A Delphi interface result is a hidden out parameter passed FIRST, so the
+// native signature starts with ITcPlugin** aResult. aRegRoot is a temporary
+// UTF-16 HKEY_CURRENT_USER-relative key path: copy it. The host never calls
+// ITcPlugin::Initialize, so this export does. *aResult receives the one
+// reference the host releases at unload; leave it nullptr on failure.
+// Win32 __stdcall decorates the name (_TcpInitializeV2@16); the .def file
+// exports it under the plain name TcpInitializeV2. Never let an exception
+// escape this function.
 extern "C" __declspec(dllexport) void __stdcall TcpInitializeV2(
   ITcPlugin** aResult,
   const wchar_t* aRegRoot,

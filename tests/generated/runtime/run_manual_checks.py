@@ -41,8 +41,8 @@ PLUGIN_ENTRIES = json.loads(r'''[
   }
 ]''')
 DEFAULTS = json.loads(r'''{
-  "generatedAt": "2026-10-30T08:10:17.626Z",
-  "generationFingerprint": "34711ee7fa632b4c2fa21dccaf85cf64f51d40909a259d81cffe6e24b4bb3636",
+  "generatedAt": "2026-11-02T13:20:03.257Z",
+  "generationFingerprint": "d370eb2ec927c530fd8fff5aae9ef07c675b817647e40574ca60bd0f97a2c83b",
   "harnessPath": "generated/harness/delphi/Win32/Debug/ContractHostHarness.exe",
   "managedProbePath": "generated/probes/csharp-managed/bin/Debug/ManagedCoreProbe.exe",
   "sampleCsvPath": "../examples/shared/csv/example.csv",
