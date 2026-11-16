@@ -3,6 +3,7 @@ unit uIMaterials;
 interface
 
 uses
+  uINotifyEvent,
   uICommon,
   uIMaterial,
   uIStandardSheet,
@@ -37,11 +38,19 @@ type
 
     procedure Reload(); safecall;
 
+    // Nested updates suppress OnAdd/OnRemove; changed batches emit one OnChange.
+    // Balance BeginUpdate with EndUpdate in finally; IsUpdating tracks nesting.
+    procedure BeginUpdate(); safecall;
+    procedure EndUpdate(); safecall;
+    function IsUpdating(): Boolean; safecall;
+    function GetOnChange(): INotifyEvent; safecall;
+
     property Count: Integer read GetCount;
     property Items[aIndex: Cardinal]: IMaterial read GetByIndex; default;
 
     property OnAdd: IMaterialChangeEvent read GetOnAdd;
     property OnRemove: IMaterialChangeEvent read GetOnRemove;
+    property OnChange: INotifyEvent read GetOnChange;
   end;
 
 implementation

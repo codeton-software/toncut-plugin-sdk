@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-11-02T15:19:45.923Z",
+  "generatedAt": "2026-11-16T10:28:23.022Z",
   "sourceRoot": "SDK/include",
   "totals": {
     "interfaceCount": 65,
-    "methodCount": 975,
-    "propertyCount": 431,
+    "methodCount": 991,
+    "propertyCount": 435,
     "cppInterfaceCount": 44,
-    "cppMethodCount": 650
+    "cppMethodCount": 654
   },
   "interfaces": [
     {
@@ -1275,6 +1275,46 @@
           "parameters": [],
           "order": 20,
           "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "procedure BeginUpdate()",
+          "name": "BeginUpdate",
+          "procedureKind": "procedure",
+          "returnType": null,
+          "parameters": [],
+          "order": 21,
+          "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "procedure EndUpdate()",
+          "name": "EndUpdate",
+          "procedureKind": "procedure",
+          "returnType": null,
+          "parameters": [],
+          "order": 22,
+          "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "function IsUpdating(): Boolean",
+          "name": "IsUpdating",
+          "procedureKind": "function",
+          "returnType": "Boolean",
+          "parameters": [],
+          "order": 23,
+          "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "function GetOnChange(): INotifyEvent",
+          "name": "GetOnChange",
+          "procedureKind": "function",
+          "returnType": "INotifyEvent",
+          "parameters": [],
+          "order": 24,
+          "accessor": true
         }
       ],
       "properties": [
@@ -1331,6 +1371,18 @@
           "writable": false,
           "defaultProperty": false,
           "order": 3
+        },
+        {
+          "kind": "property",
+          "signature": "property OnChange: INotifyEvent read GetOnChange",
+          "name": "OnChange",
+          "type": "INotifyEvent",
+          "parameters": [],
+          "readAccessor": "GetOnChange",
+          "writeAccessor": null,
+          "writable": false,
+          "defaultProperty": false,
+          "order": 4
         }
       ]
     },
@@ -8574,6 +8626,46 @@
           "parameters": [],
           "order": 18,
           "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "procedure BeginUpdate()",
+          "name": "BeginUpdate",
+          "procedureKind": "procedure",
+          "returnType": null,
+          "parameters": [],
+          "order": 19,
+          "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "procedure EndUpdate()",
+          "name": "EndUpdate",
+          "procedureKind": "procedure",
+          "returnType": null,
+          "parameters": [],
+          "order": 20,
+          "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "function IsUpdating(): Boolean",
+          "name": "IsUpdating",
+          "procedureKind": "function",
+          "returnType": "Boolean",
+          "parameters": [],
+          "order": 21,
+          "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "function GetOnChange(): INotifyEvent",
+          "name": "GetOnChange",
+          "procedureKind": "function",
+          "returnType": "INotifyEvent",
+          "parameters": [],
+          "order": 22,
+          "accessor": true
         }
       ],
       "properties": [
@@ -8630,6 +8722,18 @@
           "writable": false,
           "defaultProperty": false,
           "order": 3
+        },
+        {
+          "kind": "property",
+          "signature": "property OnChange: INotifyEvent read GetOnChange",
+          "name": "OnChange",
+          "type": "INotifyEvent",
+          "parameters": [],
+          "readAccessor": "GetOnChange",
+          "writeAccessor": null,
+          "writable": false,
+          "defaultProperty": false,
+          "order": 4
         }
       ]
     },
@@ -11435,6 +11539,46 @@
           "parameters": [],
           "order": 12,
           "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "procedure BeginUpdate()",
+          "name": "BeginUpdate",
+          "procedureKind": "procedure",
+          "returnType": null,
+          "parameters": [],
+          "order": 13,
+          "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "procedure EndUpdate()",
+          "name": "EndUpdate",
+          "procedureKind": "procedure",
+          "returnType": null,
+          "parameters": [],
+          "order": 14,
+          "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "function IsUpdating(): Boolean",
+          "name": "IsUpdating",
+          "procedureKind": "function",
+          "returnType": "Boolean",
+          "parameters": [],
+          "order": 15,
+          "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "function GetOnChange(): INotifyEvent",
+          "name": "GetOnChange",
+          "procedureKind": "function",
+          "returnType": "INotifyEvent",
+          "parameters": [],
+          "order": 16,
+          "accessor": true
         }
       ],
       "properties": [
@@ -11491,6 +11635,18 @@
           "writable": false,
           "defaultProperty": false,
           "order": 3
+        },
+        {
+          "kind": "property",
+          "signature": "property OnChange: INotifyEvent read GetOnChange",
+          "name": "OnChange",
+          "type": "INotifyEvent",
+          "parameters": [],
+          "readAccessor": "GetOnChange",
+          "writeAccessor": null,
+          "writable": false,
+          "defaultProperty": false,
+          "order": 4
         }
       ]
     },
@@ -19141,6 +19297,46 @@
           "parameters": [],
           "order": 15,
           "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "procedure BeginUpdate()",
+          "name": "BeginUpdate",
+          "procedureKind": "procedure",
+          "returnType": null,
+          "parameters": [],
+          "order": 16,
+          "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "procedure EndUpdate()",
+          "name": "EndUpdate",
+          "procedureKind": "procedure",
+          "returnType": null,
+          "parameters": [],
+          "order": 17,
+          "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "function IsUpdating(): Boolean",
+          "name": "IsUpdating",
+          "procedureKind": "function",
+          "returnType": "Boolean",
+          "parameters": [],
+          "order": 18,
+          "accessor": false
+        },
+        {
+          "kind": "method",
+          "signature": "function GetOnChange(): INotifyEvent",
+          "name": "GetOnChange",
+          "procedureKind": "function",
+          "returnType": "INotifyEvent",
+          "parameters": [],
+          "order": 19,
+          "accessor": true
         }
       ],
       "properties": [
@@ -19197,6 +19393,18 @@
           "writable": false,
           "defaultProperty": false,
           "order": 3
+        },
+        {
+          "kind": "property",
+          "signature": "property OnChange: INotifyEvent read GetOnChange",
+          "name": "OnChange",
+          "type": "INotifyEvent",
+          "parameters": [],
+          "readAccessor": "GetOnChange",
+          "writeAccessor": null,
+          "writable": false,
+          "defaultProperty": false,
+          "order": 4
         }
       ]
     },
@@ -23750,6 +23958,40 @@
           "signature": "HRESULT Reload()",
           "returnType": "HRESULT",
           "parameters": []
+        },
+        {
+          "name": "BeginUpdate",
+          "signature": "HRESULT BeginUpdate()",
+          "returnType": "HRESULT",
+          "parameters": []
+        },
+        {
+          "name": "EndUpdate",
+          "signature": "HRESULT EndUpdate()",
+          "returnType": "HRESULT",
+          "parameters": []
+        },
+        {
+          "name": "IsUpdating",
+          "signature": "HRESULT IsUpdating(DelphiBool* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "DelphiBool*"
+            }
+          ]
+        },
+        {
+          "name": "GetOnChange",
+          "signature": "HRESULT GetOnChange(INotifyEvent** result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "INotifyEvent**"
+            }
+          ]
         }
       ]
     },
@@ -27790,5 +28032,5 @@
       ]
     }
   ],
-  "generationFingerprint": "3200c63f7b72f04258405aabd9436fee64969c5d86a7104291275d9dc03c9466"
+  "generationFingerprint": "012638434d0b14ce7a70c7de5ed1c97436ad4d6ec868d978cbadb476f34cc2a2"
 }

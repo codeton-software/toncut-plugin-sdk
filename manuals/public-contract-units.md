@@ -6,7 +6,8 @@ The SDK ships the public Pascal interface units unchanged under:
 
 The current mirror contains 55 units and is byte-for-byte synchronized with
 the canonical TonCut Desktop interface sources. `uITcPluginCommon.pas` sets
-`cEngineVersion = 24`, which carries the `ISheet.Priority` break, the
+`cEngineVersion = 25`, which adds collection batch updates and retains the
+version 24 changes: the `ISheet.Priority` break, the
 appended `ISheet.PricePerSqM` slots, the appended `IBand.PreviewColor` and
 `IFormat.PreviewColor` slots, and the `soAllPermutations` stock order described
 below.
@@ -36,14 +37,14 @@ solution-cut view exposes `NeedShift`, then `CalcLength`, then the appended
 `IDevice` gained `DefaultRotation` (`0`, `90`, `180` or `270`, default `0`) and
 `DefaultMirror` (a `TMirrors` set, default empty) in TonCut 8.5. They are the
 device's persisted default orientation, appended after the existing members so
-every established vtable slot keeps its position. The plugin interface version
-stays `cEngineVersion = 24`. The C++ header projects the complete `IDevice`
+every established vtable slot keeps its position. This addition did not change
+the then-current interface version, 24. The C++ header projects the complete `IDevice`
 interface, including `DefaultRotation` and `DefaultMirror`.
 
 `IMaterial.Algorithm` (`GetAlgorithm`/`SetAlgorithm`) is a `WideString` (`BSTR`
 in C++) since the 2026-11 contract correction at engine version 24. Earlier
 SDKs declared a Delphi `String` there, which cannot cross a module boundary;
-the two slots did not move and `cEngineVersion` stays `24`. Plugins built
+the two slots did not move and that correction retained version `24`. Plugins built
 against an older SDK must not use `IMaterial.Algorithm`.
 
 **BREAKING CHANGE:** `ISheet.Priority` (`GetPriority`/`SetPriority`) changed
@@ -112,10 +113,18 @@ No interface method takes or returns `TSheetOrder`, so no vtable slot changes,
 but code that switches over `TSheetOrder` must handle the new value. The C++
 header does not declare `TSheetOrder`.
 
-**Engine version 24.** `cEngineVersion` advances to `24` for this SDK: version
-24 carries the `ISheet.Priority` break, the appended `ISheet.PricePerSqM`
-slots, the appended `IBand`/`IFormat` `PreviewColor` slots, and the
-`soAllPermutations` stock order. The host's plugin gate refuses a plugin whose reported engine version
+**Engine version 25.** `IBands`, `IMaterials`, `IResults` and `ITemplates`
+append `BeginUpdate`, `EndUpdate`, `IsUpdating` and `GetOnChange`, in that
+order, after every existing method. Their GUIDs and earlier vtable slots stay
+unchanged; the `OnChange: INotifyEvent` property occupies no slot itself.
+Balance each `BeginUpdate` with `EndUpdate` in a `finally` block. Nested
+updates suppress `OnAdd`/`OnRemove`; a changed batch emits one `OnChange`
+when its outermost update ends, and `IsUpdating` reports the nesting state.
+The complete C++ `IMaterials` projection appends all four slots. `IBands`,
+`IResults` and `ITemplates` retain their ownership-only C++ projections.
+Implementations of these Pascal interfaces must provide the new methods.
+
+`cEngineVersion` advances to `25` for this SDK. The host's plugin gate refuses a plugin whose reported engine version
 does not match, so a plugin built against an earlier SDK is not loaded, and a
 plugin built against this SDK is not loaded by an older host that lacks the
 new slots. Rebuild every plugin against this SDK.

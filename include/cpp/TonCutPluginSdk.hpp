@@ -64,8 +64,8 @@ static_assert(sizeof(TField) == 8, "Delphi TField (Int64) ABI must remain eight 
 static_assert(sizeof(TTcColor) == 4, "Delphi TTcColor (Integer) ABI must remain four bytes");
 
 // Plugin engine interface version. The host activates a plugin only when
-// GetEngineVersion returns exactly this value (24 = TonCut Desktop 8.5).
-constexpr int cEngineVersion = 24;
+// GetEngineVersion returns exactly this value (25 = collection batch updates).
+constexpr int cEngineVersion = 25;
 // Internal length unit: 1 mm = 100 units (0.01 mm), for every length and
 // position in this contract regardless of ITonCut::GetUnits.
 constexpr unsigned cLengthMultiplier = 100;
@@ -813,7 +813,7 @@ struct IProjects : IUnknown {
   virtual HRESULT STDMETHODCALLTYPE IsUpdating(DelphiBool* result) = 0;
 };
 
-// uIMaterials.pas {49E95AA5-2437-47E1-8D38-21BEC146C6AD}: complete projection, 19 Pascal methods in vtable slots 3-21.
+// uIMaterials.pas {49E95AA5-2437-47E1-8D38-21BEC146C6AD}: complete projection, 23 Pascal methods in vtable slots 3-25.
 struct IMaterials : IUnknown {
   virtual HRESULT STDMETHODCALLTYPE CreateMaterial(IMaterial** result) = 0;
   virtual HRESULT STDMETHODCALLTYPE CreateStandardSheet(IStandardSheet** result) = 0;
@@ -834,6 +834,10 @@ struct IMaterials : IUnknown {
   virtual HRESULT STDMETHODCALLTYPE GetOnAdd(IMaterialChangeEvent** result) = 0;
   virtual HRESULT STDMETHODCALLTYPE GetOnRemove(IMaterialChangeEvent** result) = 0;
   virtual HRESULT STDMETHODCALLTYPE Reload() = 0;
+  virtual HRESULT STDMETHODCALLTYPE BeginUpdate() = 0;
+  virtual HRESULT STDMETHODCALLTYPE EndUpdate() = 0;
+  virtual HRESULT STDMETHODCALLTYPE IsUpdating(DelphiBool* result) = 0;
+  virtual HRESULT STDMETHODCALLTYPE GetOnChange(INotifyEvent** result) = 0;
 };
 
 // uIFormats.pas {42199936-3DD0-4680-93DE-433D43E6573B}: complete projection, 32 Pascal methods in vtable slots 3-34.

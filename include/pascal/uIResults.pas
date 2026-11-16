@@ -3,6 +3,7 @@ unit uIResults;
 interface
 
 uses
+  uINotifyEvent,
   uIResult,
   uIResultChangeEvent;
 
@@ -27,11 +28,19 @@ type
 
     procedure Reload(); safecall;
 
+    // Nested updates suppress OnAdd/OnRemove; changed batches emit one OnChange.
+    // Balance BeginUpdate with EndUpdate in finally; IsUpdating tracks nesting.
+    procedure BeginUpdate(); safecall;
+    procedure EndUpdate(); safecall;
+    function IsUpdating(): Boolean; safecall;
+    function GetOnChange(): INotifyEvent; safecall;
+
     property Count: Integer read GetCount;
     property Items[aIndex: Cardinal]: IResult read GetByIndex; default;
 
     property OnAdd: IResultChangeEvent read GetOnAdd;
     property OnRemove: IResultChangeEvent read GetOnRemove;
+    property OnChange: INotifyEvent read GetOnChange;
   end;
 
 implementation

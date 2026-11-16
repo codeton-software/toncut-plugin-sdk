@@ -360,6 +360,10 @@ void TouchIMaterials(toncut::IMaterials* aValue) {
   aValue->GetOnAdd(nullptr);
   aValue->GetOnRemove(nullptr);
   aValue->Reload();
+  aValue->BeginUpdate();
+  aValue->EndUpdate();
+  aValue->IsUpdating(nullptr);
+  aValue->GetOnChange(nullptr);
 }
 
 void TouchIProject(toncut::IProject* aValue) {

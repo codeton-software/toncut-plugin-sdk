@@ -151,6 +151,7 @@ begin
   var __Items1Value := aValue.Items[1];
   var __OnAdd2Value := aValue.OnAdd;
   var __OnRemove3Value := aValue.OnRemove;
+  var __OnChange4Value := aValue.OnChange;
   var __CreateBand0Result := aValue.CreateBand();
   aValue.Add(Default(IBand));
   aValue.DeleteByIndex(1);
@@ -168,6 +169,9 @@ begin
   var __LoadMaterialBandsFromHistory18Result := aValue.LoadMaterialBandsFromHistory(Default(IMaterial), 1);
   var __LoadMaterialBands19Result := aValue.LoadMaterialBands(Default(IMaterial));
   aValue.Reload();
+  aValue.BeginUpdate();
+  aValue.EndUpdate();
+  var __IsUpdating23Result := aValue.IsUpdating();
 end;
 
 procedure TouchIDevice(const aValue: IDevice);
@@ -622,6 +626,7 @@ begin
   var __Items1Value := aValue.Items[1];
   var __OnAdd2Value := aValue.OnAdd;
   var __OnRemove3Value := aValue.OnRemove;
+  var __OnChange4Value := aValue.OnChange;
   var __CreateMaterial0Result := aValue.CreateMaterial();
   var __CreateStandardSheet1Result := aValue.CreateStandardSheet();
   aValue.Add(Default(IMaterial));
@@ -637,6 +642,9 @@ begin
   var __CheckUniqueName12Result := aValue.CheckUniqueName(Default(IMaterial), True);
   var __GetById15Result := aValue.GetById(1);
   aValue.Reload();
+  aValue.BeginUpdate();
+  aValue.EndUpdate();
+  var __IsUpdating21Result := aValue.IsUpdating();
 end;
 
 procedure TouchINotifyEvent(const aValue: INotifyEvent);
@@ -837,6 +845,7 @@ begin
   var __Items1Value := aValue.Items[1];
   var __OnAdd2Value := aValue.OnAdd;
   var __OnRemove3Value := aValue.OnRemove;
+  var __OnChange4Value := aValue.OnChange;
   var __CreateResult0Result := aValue.CreateResult();
   aValue.Add(Default(IResult));
   aValue.DeleteByIndex(1);
@@ -846,6 +855,9 @@ begin
   var __IndexOf6Result := aValue.IndexOf(1);
   var __GetById9Result := aValue.GetById(1);
   aValue.Reload();
+  aValue.BeginUpdate();
+  aValue.EndUpdate();
+  var __IsUpdating15Result := aValue.IsUpdating();
 end;
 
 procedure TouchIShape(const aValue: IShape);
@@ -1380,6 +1392,7 @@ begin
   var __Items1Value := aValue.Items[1];
   var __OnAdd2Value := aValue.OnAdd;
   var __OnRemove3Value := aValue.OnRemove;
+  var __OnChange4Value := aValue.OnChange;
   var __CreateTemplate0Result := aValue.CreateTemplate();
   var __CreateFormat1Result := aValue.CreateFormat();
   aValue.Add(Default(ITemplate));
@@ -1392,6 +1405,9 @@ begin
   var __CheckUniqueName9Result := aValue.CheckUniqueName(Default(ITemplate));
   var __GetById12Result := aValue.GetById(1);
   aValue.Reload();
+  aValue.BeginUpdate();
+  aValue.EndUpdate();
+  var __IsUpdating18Result := aValue.IsUpdating();
 end;
 
 procedure TouchITonCut(const aValue: ITonCut);

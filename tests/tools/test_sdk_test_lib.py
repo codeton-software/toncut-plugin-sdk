@@ -62,6 +62,24 @@ def make_interface(name: str, method_names: list[str]) -> dict:
 
 
 class CppProjectionValidationTests(unittest.TestCase):
+    def test_collection_batch_update_slots_are_appended(self) -> None:
+        pascal = {item["name"]: item for item in parse_pascal_units()}
+        expected = ["BeginUpdate", "EndUpdate", "IsUpdating", "GetOnChange"]
+        for name in ("IBands", "IMaterials", "IResults", "ITemplates"):
+            with self.subTest(interface=name):
+                methods = pascal[name]["methods"]
+                self.assertEqual([method["name"] for method in methods[-4:]], expected)
+                self.assertEqual(methods[-2]["returnType"], "Boolean")
+                self.assertEqual(methods[-1]["returnType"], "INotifyEvent")
+        cpp = {item["name"]: item for item in parse_cpp_header()}["IMaterials"]
+        self.assertEqual(len(cpp["methods"]), 23)
+        self.assertEqual([method["name"] for method in cpp["methods"][-5:]],
+                         ["Reload", *expected])
+        self.assertEqual([p["type"] for p in cpp["methods"][-2]["parameters"]],
+                         ["DelphiBool*"])
+        self.assertEqual([p["type"] for p in cpp["methods"][-1]["parameters"]],
+                         ["INotifyEvent**"])
+
     def test_public_narrative_keeps_algorithm_payloads_and_internals_opaque(
         self,
     ) -> None:

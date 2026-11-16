@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-11-02T15:19:45.923Z",
+  "generatedAt": "2026-11-16T10:28:23.022Z",
   "totals": {
     "interfaceCount": 65,
-    "methodCount": 975,
-    "propertyCount": 431,
+    "methodCount": 991,
+    "propertyCount": 435,
     "cppInterfaceCount": 44,
-    "cppMethodCount": 650
+    "cppMethodCount": 654
   },
   "lanes": {
     "delphi": {
@@ -138,8 +138,8 @@
         {
           "name": "IBands",
           "file": "SDK/include/pascal/uIBands.pas",
-          "methodCount": 21,
-          "propertyCount": 4,
+          "methodCount": 25,
+          "propertyCount": 5,
           "methods": [
             "CreateBand",
             "Add",
@@ -161,13 +161,18 @@
             "AddMaterialBandToHistory",
             "LoadMaterialBandsFromHistory",
             "LoadMaterialBands",
-            "Reload"
+            "Reload",
+            "BeginUpdate",
+            "EndUpdate",
+            "IsUpdating",
+            "GetOnChange"
           ],
           "properties": [
             "Count",
             "Items",
             "OnAdd",
-            "OnRemove"
+            "OnRemove",
+            "OnChange"
           ]
         },
         {
@@ -843,8 +848,8 @@
         {
           "name": "IMaterials",
           "file": "SDK/include/pascal/uIMaterials.pas",
-          "methodCount": 19,
-          "propertyCount": 4,
+          "methodCount": 23,
+          "propertyCount": 5,
           "methods": [
             "CreateMaterial",
             "CreateStandardSheet",
@@ -864,13 +869,18 @@
             "GetById",
             "GetOnAdd",
             "GetOnRemove",
-            "Reload"
+            "Reload",
+            "BeginUpdate",
+            "EndUpdate",
+            "IsUpdating",
+            "GetOnChange"
           ],
           "properties": [
             "Count",
             "Items",
             "OnAdd",
-            "OnRemove"
+            "OnRemove",
+            "OnChange"
           ]
         },
         {
@@ -1157,8 +1167,8 @@
         {
           "name": "IResults",
           "file": "SDK/include/pascal/uIResults.pas",
-          "methodCount": 13,
-          "propertyCount": 4,
+          "methodCount": 17,
+          "propertyCount": 5,
           "methods": [
             "CreateResult",
             "Add",
@@ -1172,13 +1182,18 @@
             "GetById",
             "GetOnAdd",
             "GetOnRemove",
-            "Reload"
+            "Reload",
+            "BeginUpdate",
+            "EndUpdate",
+            "IsUpdating",
+            "GetOnChange"
           ],
           "properties": [
             "Count",
             "Items",
             "OnAdd",
-            "OnRemove"
+            "OnRemove",
+            "OnChange"
           ]
         },
         {
@@ -1966,8 +1981,8 @@
         {
           "name": "ITemplates",
           "file": "SDK/include/pascal/uITemplates.pas",
-          "methodCount": 16,
-          "propertyCount": 4,
+          "methodCount": 20,
+          "propertyCount": 5,
           "methods": [
             "CreateTemplate",
             "CreateFormat",
@@ -1984,13 +1999,18 @@
             "GetById",
             "GetOnAdd",
             "GetOnRemove",
-            "Reload"
+            "Reload",
+            "BeginUpdate",
+            "EndUpdate",
+            "IsUpdating",
+            "GetOnChange"
           ],
           "properties": [
             "Count",
             "Items",
             "OnAdd",
-            "OnRemove"
+            "OnRemove",
+            "OnChange"
           ]
         },
         {
@@ -2757,7 +2777,7 @@
         {
           "name": "IMaterials",
           "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
-          "methodCount": 19,
+          "methodCount": 23,
           "propertyCount": 0,
           "methods": [
             "CreateMaterial",
@@ -2778,7 +2798,11 @@
             "GetById",
             "GetOnAdd",
             "GetOnRemove",
-            "Reload"
+            "Reload",
+            "BeginUpdate",
+            "EndUpdate",
+            "IsUpdating",
+            "GetOnChange"
           ],
           "reservedMethods": [],
           "properties": [],
@@ -2786,7 +2810,8 @@
             "Count",
             "Items",
             "OnAdd",
-            "OnRemove"
+            "OnRemove",
+            "OnChange"
           ],
           "unsupportedMethods": [],
           "unsupportedProperties": [],
@@ -2794,8 +2819,8 @@
             "status": "ok",
             "safe": true,
             "projection": "full",
-            "cppMethodCount": 19,
-            "pascalMethodCount": 19,
+            "cppMethodCount": 23,
+            "pascalMethodCount": 23,
             "acceptedAliases": [
               {
                 "index": 6,
@@ -4184,6 +4209,26 @@
               "slot": 20,
               "name": "Reload",
               "signature": "procedure Reload()"
+            },
+            {
+              "slot": 21,
+              "name": "BeginUpdate",
+              "signature": "procedure BeginUpdate()"
+            },
+            {
+              "slot": 22,
+              "name": "EndUpdate",
+              "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 23,
+              "name": "IsUpdating",
+              "signature": "function IsUpdating(): Boolean"
+            },
+            {
+              "slot": 24,
+              "name": "GetOnChange",
+              "signature": "function GetOnChange(): INotifyEvent"
             }
           ],
           "unsupportedProperties": [
@@ -4214,6 +4259,13 @@
               "missingAccessors": [
                 "GetOnRemove"
               ]
+            },
+            {
+              "name": "OnChange",
+              "type": "INotifyEvent",
+              "missingAccessors": [
+                "GetOnChange"
+              ]
             }
           ],
           "diff": {
@@ -4221,7 +4273,7 @@
             "safe": true,
             "projection": "documented-opaque",
             "cppMethodCount": 0,
-            "pascalMethodCount": 21,
+            "pascalMethodCount": 25,
             "methodDiffs": []
           }
         },
@@ -4794,6 +4846,26 @@
               "slot": 12,
               "name": "Reload",
               "signature": "procedure Reload()"
+            },
+            {
+              "slot": 13,
+              "name": "BeginUpdate",
+              "signature": "procedure BeginUpdate()"
+            },
+            {
+              "slot": 14,
+              "name": "EndUpdate",
+              "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 15,
+              "name": "IsUpdating",
+              "signature": "function IsUpdating(): Boolean"
+            },
+            {
+              "slot": 16,
+              "name": "GetOnChange",
+              "signature": "function GetOnChange(): INotifyEvent"
             }
           ],
           "unsupportedProperties": [
@@ -4824,6 +4896,13 @@
               "missingAccessors": [
                 "GetOnRemove"
               ]
+            },
+            {
+              "name": "OnChange",
+              "type": "INotifyEvent",
+              "missingAccessors": [
+                "GetOnChange"
+              ]
             }
           ],
           "diff": {
@@ -4831,7 +4910,7 @@
             "safe": true,
             "projection": "documented-opaque",
             "cppMethodCount": 0,
-            "pascalMethodCount": 13,
+            "pascalMethodCount": 17,
             "methodDiffs": []
           }
         },
@@ -5881,6 +5960,26 @@
               "slot": 15,
               "name": "Reload",
               "signature": "procedure Reload()"
+            },
+            {
+              "slot": 16,
+              "name": "BeginUpdate",
+              "signature": "procedure BeginUpdate()"
+            },
+            {
+              "slot": 17,
+              "name": "EndUpdate",
+              "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 18,
+              "name": "IsUpdating",
+              "signature": "function IsUpdating(): Boolean"
+            },
+            {
+              "slot": 19,
+              "name": "GetOnChange",
+              "signature": "function GetOnChange(): INotifyEvent"
             }
           ],
           "unsupportedProperties": [
@@ -5911,6 +6010,13 @@
               "missingAccessors": [
                 "GetOnRemove"
               ]
+            },
+            {
+              "name": "OnChange",
+              "type": "INotifyEvent",
+              "missingAccessors": [
+                "GetOnChange"
+              ]
             }
           ],
           "diff": {
@@ -5918,7 +6024,7 @@
             "safe": true,
             "projection": "documented-opaque",
             "cppMethodCount": 0,
-            "pascalMethodCount": 16,
+            "pascalMethodCount": 20,
             "methodDiffs": []
           }
         }
@@ -6702,7 +6808,7 @@
         {
           "name": "IMaterials",
           "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
-          "methodCount": 19,
+          "methodCount": 23,
           "propertyCount": 0,
           "methods": [
             "CreateMaterial",
@@ -6723,7 +6829,11 @@
             "GetById",
             "GetOnAdd",
             "GetOnRemove",
-            "Reload"
+            "Reload",
+            "BeginUpdate",
+            "EndUpdate",
+            "IsUpdating",
+            "GetOnChange"
           ],
           "reservedMethods": [],
           "properties": [],
@@ -6731,7 +6841,8 @@
             "Count",
             "Items",
             "OnAdd",
-            "OnRemove"
+            "OnRemove",
+            "OnChange"
           ],
           "unsupportedMethods": [],
           "unsupportedProperties": [],
@@ -6739,8 +6850,8 @@
             "status": "ok",
             "safe": true,
             "projection": "full",
-            "cppMethodCount": 19,
-            "pascalMethodCount": 19,
+            "cppMethodCount": 23,
+            "pascalMethodCount": 23,
             "acceptedAliases": [
               {
                 "index": 6,
@@ -8129,6 +8240,26 @@
               "slot": 20,
               "name": "Reload",
               "signature": "procedure Reload()"
+            },
+            {
+              "slot": 21,
+              "name": "BeginUpdate",
+              "signature": "procedure BeginUpdate()"
+            },
+            {
+              "slot": 22,
+              "name": "EndUpdate",
+              "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 23,
+              "name": "IsUpdating",
+              "signature": "function IsUpdating(): Boolean"
+            },
+            {
+              "slot": 24,
+              "name": "GetOnChange",
+              "signature": "function GetOnChange(): INotifyEvent"
             }
           ],
           "unsupportedProperties": [
@@ -8159,6 +8290,13 @@
               "missingAccessors": [
                 "GetOnRemove"
               ]
+            },
+            {
+              "name": "OnChange",
+              "type": "INotifyEvent",
+              "missingAccessors": [
+                "GetOnChange"
+              ]
             }
           ],
           "diff": {
@@ -8166,7 +8304,7 @@
             "safe": true,
             "projection": "documented-opaque",
             "cppMethodCount": 0,
-            "pascalMethodCount": 21,
+            "pascalMethodCount": 25,
             "methodDiffs": []
           }
         },
@@ -8739,6 +8877,26 @@
               "slot": 12,
               "name": "Reload",
               "signature": "procedure Reload()"
+            },
+            {
+              "slot": 13,
+              "name": "BeginUpdate",
+              "signature": "procedure BeginUpdate()"
+            },
+            {
+              "slot": 14,
+              "name": "EndUpdate",
+              "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 15,
+              "name": "IsUpdating",
+              "signature": "function IsUpdating(): Boolean"
+            },
+            {
+              "slot": 16,
+              "name": "GetOnChange",
+              "signature": "function GetOnChange(): INotifyEvent"
             }
           ],
           "unsupportedProperties": [
@@ -8769,6 +8927,13 @@
               "missingAccessors": [
                 "GetOnRemove"
               ]
+            },
+            {
+              "name": "OnChange",
+              "type": "INotifyEvent",
+              "missingAccessors": [
+                "GetOnChange"
+              ]
             }
           ],
           "diff": {
@@ -8776,7 +8941,7 @@
             "safe": true,
             "projection": "documented-opaque",
             "cppMethodCount": 0,
-            "pascalMethodCount": 13,
+            "pascalMethodCount": 17,
             "methodDiffs": []
           }
         },
@@ -9826,6 +9991,26 @@
               "slot": 15,
               "name": "Reload",
               "signature": "procedure Reload()"
+            },
+            {
+              "slot": 16,
+              "name": "BeginUpdate",
+              "signature": "procedure BeginUpdate()"
+            },
+            {
+              "slot": 17,
+              "name": "EndUpdate",
+              "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 18,
+              "name": "IsUpdating",
+              "signature": "function IsUpdating(): Boolean"
+            },
+            {
+              "slot": 19,
+              "name": "GetOnChange",
+              "signature": "function GetOnChange(): INotifyEvent"
             }
           ],
           "unsupportedProperties": [
@@ -9856,6 +10041,13 @@
               "missingAccessors": [
                 "GetOnRemove"
               ]
+            },
+            {
+              "name": "OnChange",
+              "type": "INotifyEvent",
+              "missingAccessors": [
+                "GetOnChange"
+              ]
             }
           ],
           "diff": {
@@ -9863,7 +10055,7 @@
             "safe": true,
             "projection": "documented-opaque",
             "cppMethodCount": 0,
-            "pascalMethodCount": 16,
+            "pascalMethodCount": 20,
             "methodDiffs": []
           }
         }
@@ -10732,7 +10924,7 @@
         {
           "name": "IMaterials",
           "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
-          "methodCount": 19,
+          "methodCount": 23,
           "propertyCount": 0,
           "methods": [
             "CreateMaterial",
@@ -10753,7 +10945,11 @@
             "GetById",
             "GetOnAdd",
             "GetOnRemove",
-            "Reload"
+            "Reload",
+            "BeginUpdate",
+            "EndUpdate",
+            "IsUpdating",
+            "GetOnChange"
           ],
           "reservedMethods": [],
           "properties": [],
@@ -10761,7 +10957,8 @@
             "Count",
             "Items",
             "OnAdd",
-            "OnRemove"
+            "OnRemove",
+            "OnChange"
           ],
           "unsupportedMethods": [],
           "unsupportedProperties": [],
@@ -10769,8 +10966,8 @@
             "status": "ok",
             "safe": true,
             "projection": "full",
-            "cppMethodCount": 19,
-            "pascalMethodCount": 19,
+            "cppMethodCount": 23,
+            "pascalMethodCount": 23,
             "acceptedAliases": [
               {
                 "index": 6,
@@ -12159,6 +12356,26 @@
               "slot": 20,
               "name": "Reload",
               "signature": "procedure Reload()"
+            },
+            {
+              "slot": 21,
+              "name": "BeginUpdate",
+              "signature": "procedure BeginUpdate()"
+            },
+            {
+              "slot": 22,
+              "name": "EndUpdate",
+              "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 23,
+              "name": "IsUpdating",
+              "signature": "function IsUpdating(): Boolean"
+            },
+            {
+              "slot": 24,
+              "name": "GetOnChange",
+              "signature": "function GetOnChange(): INotifyEvent"
             }
           ],
           "unsupportedProperties": [
@@ -12189,6 +12406,13 @@
               "missingAccessors": [
                 "GetOnRemove"
               ]
+            },
+            {
+              "name": "OnChange",
+              "type": "INotifyEvent",
+              "missingAccessors": [
+                "GetOnChange"
+              ]
             }
           ],
           "diff": {
@@ -12196,7 +12420,7 @@
             "safe": true,
             "projection": "documented-opaque",
             "cppMethodCount": 0,
-            "pascalMethodCount": 21,
+            "pascalMethodCount": 25,
             "methodDiffs": []
           }
         },
@@ -12769,6 +12993,26 @@
               "slot": 12,
               "name": "Reload",
               "signature": "procedure Reload()"
+            },
+            {
+              "slot": 13,
+              "name": "BeginUpdate",
+              "signature": "procedure BeginUpdate()"
+            },
+            {
+              "slot": 14,
+              "name": "EndUpdate",
+              "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 15,
+              "name": "IsUpdating",
+              "signature": "function IsUpdating(): Boolean"
+            },
+            {
+              "slot": 16,
+              "name": "GetOnChange",
+              "signature": "function GetOnChange(): INotifyEvent"
             }
           ],
           "unsupportedProperties": [
@@ -12799,6 +13043,13 @@
               "missingAccessors": [
                 "GetOnRemove"
               ]
+            },
+            {
+              "name": "OnChange",
+              "type": "INotifyEvent",
+              "missingAccessors": [
+                "GetOnChange"
+              ]
             }
           ],
           "diff": {
@@ -12806,7 +13057,7 @@
             "safe": true,
             "projection": "documented-opaque",
             "cppMethodCount": 0,
-            "pascalMethodCount": 13,
+            "pascalMethodCount": 17,
             "methodDiffs": []
           }
         },
@@ -13856,6 +14107,26 @@
               "slot": 15,
               "name": "Reload",
               "signature": "procedure Reload()"
+            },
+            {
+              "slot": 16,
+              "name": "BeginUpdate",
+              "signature": "procedure BeginUpdate()"
+            },
+            {
+              "slot": 17,
+              "name": "EndUpdate",
+              "signature": "procedure EndUpdate()"
+            },
+            {
+              "slot": 18,
+              "name": "IsUpdating",
+              "signature": "function IsUpdating(): Boolean"
+            },
+            {
+              "slot": 19,
+              "name": "GetOnChange",
+              "signature": "function GetOnChange(): INotifyEvent"
             }
           ],
           "unsupportedProperties": [
@@ -13886,6 +14157,13 @@
               "missingAccessors": [
                 "GetOnRemove"
               ]
+            },
+            {
+              "name": "OnChange",
+              "type": "INotifyEvent",
+              "missingAccessors": [
+                "GetOnChange"
+              ]
             }
           ],
           "diff": {
@@ -13893,7 +14171,7 @@
             "safe": true,
             "projection": "documented-opaque",
             "cppMethodCount": 0,
-            "pascalMethodCount": 16,
+            "pascalMethodCount": 20,
             "methodDiffs": []
           }
         }
@@ -14037,5 +14315,5 @@
       ]
     }
   },
-  "generationFingerprint": "3200c63f7b72f04258405aabd9436fee64969c5d86a7104291275d9dc03c9466"
+  "generationFingerprint": "012638434d0b14ce7a70c7de5ed1c97436ad4d6ec868d978cbadb476f34cc2a2"
 }

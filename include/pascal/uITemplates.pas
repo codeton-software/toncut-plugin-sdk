@@ -3,6 +3,7 @@ unit uITemplates;
 interface
 
 uses
+  uINotifyEvent,
   uICommon,
   uITemplate,
   uIFormat,
@@ -34,11 +35,19 @@ type
 
     procedure Reload(); safecall;
 
+    // Nested updates suppress OnAdd/OnRemove; changed batches emit one OnChange.
+    // Balance BeginUpdate with EndUpdate in finally; IsUpdating tracks nesting.
+    procedure BeginUpdate(); safecall;
+    procedure EndUpdate(); safecall;
+    function IsUpdating(): Boolean; safecall;
+    function GetOnChange(): INotifyEvent; safecall;
+
     property Count: Integer read GetCount;
     property Items[aIndex: Cardinal]: ITemplate read GetByIndex; default;
 
     property OnAdd: ITemplateChangeEvent read GetOnAdd;
     property OnRemove: ITemplateChangeEvent read GetOnRemove;
+    property OnChange: INotifyEvent read GetOnChange;
   end;
 
 implementation

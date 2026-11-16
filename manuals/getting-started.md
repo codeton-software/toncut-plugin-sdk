@@ -1,6 +1,6 @@
 # Getting Started
 
-This SDK targets TonCut Desktop 8.5, plugin engine interface version 24
+This SDK targets TonCut Desktop 8.5, plugin engine interface version 25
 (`cEngineVersion`). The full Plugin API reference is at
 https://docs.toncut.com/tc-plugin-sdk/.
 
@@ -16,7 +16,7 @@ https://docs.toncut.com/tc-plugin-sdk/.
   export TonCut resolves.
 - `ITcPlugin.Name` must be unique across all installed plugins and should be
   plain ASCII. A duplicate name aborts loading the remaining plugins.
-- `ITcPlugin.EngineVersion` must return exactly `cEngineVersion` (24). Any
+- `ITcPlugin.EngineVersion` must return exactly `cEngineVersion` (25). Any
   other value is not an error message: TonCut lists the plugin as "Not
   compatible" in Options -> Plugins and never activates it.
 

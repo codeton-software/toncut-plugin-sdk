@@ -3,6 +3,7 @@ unit uIBands;
 interface
 
 uses
+  uINotifyEvent,
   uIBand,
   uIBandChangeEvent,
   uIMaterial,
@@ -39,11 +40,19 @@ type
 
     procedure Reload(); safecall;
 
+    // Nested updates suppress OnAdd/OnRemove; changed batches emit one OnChange.
+    // Balance BeginUpdate with EndUpdate in finally; IsUpdating tracks nesting.
+    procedure BeginUpdate(); safecall;
+    procedure EndUpdate(); safecall;
+    function IsUpdating(): Boolean; safecall;
+    function GetOnChange(): INotifyEvent; safecall;
+
     property Count: Integer read GetCount;
     property Items[aIndex: Cardinal]: IBand read GetByIndex; default;
 
     property OnAdd: IBandChangeEvent read GetOnAdd;
     property OnRemove: IBandChangeEvent read GetOnRemove;
+    property OnChange: INotifyEvent read GetOnChange;
   end;
 
 implementation

@@ -89,7 +89,8 @@ function TcpInitializeV2(const aRegRoot: PChar; aLanguageId: Integer;
 ## Version Gate
 
 - The plugin is activated only when `EngineVersion` equals the host's
-  `cEngineVersion` exactly. This SDK and TonCut Desktop 8.5 use `24`.
+  `cEngineVersion` exactly. This SDK uses `25` and requires a host with the same
+  interface version.
 - A mismatch is silent: no error message. The plugin is listed as "Not
   compatible" in Options -> Plugins and never activated; `UiScale`, `Name`,
   `Title` and `Version` are still called.
@@ -227,8 +228,11 @@ the user later cancels the import. Do not use them in an import, and never
   single project and overwrites `IFormat.Project`. When it is true and a piece
   has no project, TonCut creates a project named after the imported file.
 - `BeginUpdate`/`EndUpdate`/`IsUpdating` exist on `IProjects`, `IFormats`,
-  `ISheets` and `IDevices` (not on `IMaterials`, `IBands`, `IResults` or
-  `ITemplates`). They are optional during `LoadFile` but must be balanced.
+  `ISheets`, `IDevices`, `IMaterials`, `IBands`, `IResults` and `ITemplates`.
+  They are optional during `LoadFile` but must be balanced with `EndUpdate`
+  in a `finally` block. On the four collections added in interface version
+  25, nested updates suppress `OnAdd`/`OnRemove`; a changed batch emits one
+  `OnChange` notification when its outermost update ends.
 - `IFormat.Description` is the piece name shown in TonCut; `Identifier` is a
   code shown by some label modes and in barcodes. `IFormat.Priority` uses
   `cPiecePriorityDefault` (0, inherit the project priority),

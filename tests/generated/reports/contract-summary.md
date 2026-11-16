@@ -1,12 +1,12 @@
 # Contract Summary
 
-Generated: 2026-11-02T15:19:45.923Z
+Generated: 2026-11-16T10:28:23.022Z
 
 - Pascal interfaces: 65
-- Pascal methods: 975
-- Pascal properties: 431
+- Pascal methods: 991
+- Pascal properties: 435
 - C++ header interface types: 44
-- C++ subset methods: 650
+- C++ subset methods: 654
 
 ## Delphi
 
