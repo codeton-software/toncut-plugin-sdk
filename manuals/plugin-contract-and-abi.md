@@ -89,7 +89,7 @@ function TcpInitializeV2(const aRegRoot: PChar; aLanguageId: Integer;
 ## Version Gate
 
 - The plugin is activated only when `EngineVersion` equals the host's
-  `cEngineVersion` exactly. This SDK uses `25` and requires a host with the same
+  `cEngineVersion` exactly. This SDK uses `26` and requires a host with the same
   interface version.
 - A mismatch is silent: no error message. The plugin is listed as "Not
   compatible" in Options -> Plugins and never activated; `UiScale`, `Name`,

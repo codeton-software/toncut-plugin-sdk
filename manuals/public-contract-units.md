@@ -6,7 +6,8 @@ The SDK ships the public Pascal interface units unchanged under:
 
 The current mirror contains 55 units and is byte-for-byte synchronized with
 the canonical TonCut Desktop interface sources. `uITcPluginCommon.pas` sets
-`cEngineVersion = 25`, which adds collection batch updates and retains the
+`cEngineVersion = 26`, which adds the stock minimum cut distance override,
+retains version 25 collection batch updates, and retains the
 version 24 changes: the `ISheet.Priority` break, the
 appended `ISheet.PricePerSqM` slots, the appended `IBand.PreviewColor` and
 `IFormat.PreviewColor` slots, and the `soAllPermutations` stock order described
@@ -82,7 +83,19 @@ other value supplied to `SetPricePerSqM` must be finite and `>= 0`. Because
 the two methods are appended after every earlier method, no existing vtable
 slot moved, but every class implementing `ISheet` must add both methods to
 remain a valid implementation (host-side; plugins only consume `ISheet`). The
-C++ `ISheet` view declares both methods at its end.
+C++ `ISheet` view declares both methods in the same positions.
+
+**Engine version 26.** `ISheet.MinCutDistance: Integer` carries the stock
+item's raw minimum cut distance in the SDK's internal length units
+(`cLengthMultiplier` units per millimetre). `cStockMinCutDistanceAbsent`
+(`-1`) means no stock override: use `IDevice.MinCutDistance`. A nonnegative
+value is an explicit override, including `0`; values below `-1` are invalid.
+Setting `-1` clears the override. The input producer supplies the value;
+the SDK applies no stock-width policy or fixed distance.
+`GetMinCutDistance` and `SetMinCutDistance` are appended after
+`SetPricePerSqM`, preserving the interface GUID and all earlier vtable slots.
+Every `ISheet` implementer must provide both methods. The complete C++ view
+appends the same pair with signed `int` values so it preserves the sentinel.
 
 `IBand` and `IFormat` each gained `GetPreviewColor`/`SetPreviewColor`, appended
 at the end of the interface directly after `EndUpdate`, and a
@@ -124,7 +137,7 @@ The complete C++ `IMaterials` projection appends all four slots. `IBands`,
 `IResults` and `ITemplates` retain their ownership-only C++ projections.
 Implementations of these Pascal interfaces must provide the new methods.
 
-`cEngineVersion` advances to `25` for this SDK. The host's plugin gate refuses a plugin whose reported engine version
+`cEngineVersion` advances to `26` for this SDK. The host's plugin gate refuses a plugin whose reported engine version
 does not match, so a plugin built against an earlier SDK is not loaded, and a
 plugin built against this SDK is not loaded by an older host that lacks the
 new slots. Rebuild every plugin against this SDK.

@@ -6,7 +6,7 @@ uses
   uITonCut;
 
 const
-  cEngineVersion = 25;
+  cEngineVersion = 26;
 
 type
   TTcpResult  = (cprFailed, cprOK, cprNotImplemented, cprException, cprNothing, cprNotInitialized, cprMoreData, cprCancel, cprMaybe, cprNo);

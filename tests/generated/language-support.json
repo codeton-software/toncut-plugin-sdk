@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-11-16T10:28:23.022Z",
+  "generatedAt": "2026-11-16T14:15:36.442Z",
   "totals": {
     "interfaceCount": 65,
-    "methodCount": 991,
-    "propertyCount": 435,
+    "methodCount": 993,
+    "propertyCount": 436,
     "cppInterfaceCount": 44,
-    "cppMethodCount": 654
+    "cppMethodCount": 656
   },
   "lanes": {
     "delphi": {
@@ -1232,8 +1232,8 @@
         {
           "name": "ISheet",
           "file": "SDK/include/pascal/uISheet.pas",
-          "methodCount": 49,
-          "propertyCount": 30,
+          "methodCount": 51,
+          "propertyCount": 31,
           "methods": [
             "GetId",
             "SetId",
@@ -1283,7 +1283,9 @@
             "BeginUpdate",
             "EndUpdate",
             "GetPricePerSqM",
-            "SetPricePerSqM"
+            "SetPricePerSqM",
+            "GetMinCutDistance",
+            "SetMinCutDistance"
           ],
           "properties": [
             "Id",
@@ -1297,6 +1299,7 @@
             "Material",
             "Edging",
             "MinEdgeDistance",
+            "MinCutDistance",
             "Priority",
             "CutShiftHorzLimit",
             "CutShiftVertLimit",
@@ -2996,7 +2999,7 @@
         {
           "name": "ISheet",
           "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
-          "methodCount": 48,
+          "methodCount": 50,
           "propertyCount": 0,
           "methods": [
             "GetId",
@@ -3046,7 +3049,9 @@
             "BeginUpdate",
             "EndUpdate",
             "GetPricePerSqM",
-            "SetPricePerSqM"
+            "SetPricePerSqM",
+            "GetMinCutDistance",
+            "SetMinCutDistance"
           ],
           "reservedMethods": [
             {
@@ -3068,6 +3073,7 @@
             "Material",
             "Edging",
             "MinEdgeDistance",
+            "MinCutDistance",
             "Priority",
             "CutShiftHorzLimit",
             "CutShiftVertLimit",
@@ -3107,8 +3113,8 @@
             "status": "ok",
             "safe": true,
             "projection": "full",
-            "cppMethodCount": 49,
-            "pascalMethodCount": 49,
+            "cppMethodCount": 51,
+            "pascalMethodCount": 51,
             "acceptedAliases": [
               {
                 "index": 32,
@@ -7027,7 +7033,7 @@
         {
           "name": "ISheet",
           "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
-          "methodCount": 48,
+          "methodCount": 50,
           "propertyCount": 0,
           "methods": [
             "GetId",
@@ -7077,7 +7083,9 @@
             "BeginUpdate",
             "EndUpdate",
             "GetPricePerSqM",
-            "SetPricePerSqM"
+            "SetPricePerSqM",
+            "GetMinCutDistance",
+            "SetMinCutDistance"
           ],
           "reservedMethods": [
             {
@@ -7099,6 +7107,7 @@
             "Material",
             "Edging",
             "MinEdgeDistance",
+            "MinCutDistance",
             "Priority",
             "CutShiftHorzLimit",
             "CutShiftVertLimit",
@@ -7138,8 +7147,8 @@
             "status": "ok",
             "safe": true,
             "projection": "full",
-            "cppMethodCount": 49,
-            "pascalMethodCount": 49,
+            "cppMethodCount": 51,
+            "pascalMethodCount": 51,
             "acceptedAliases": [
               {
                 "index": 32,
@@ -11143,7 +11152,7 @@
         {
           "name": "ISheet",
           "file": "SDK/include/cpp/TonCutPluginSdk.hpp",
-          "methodCount": 48,
+          "methodCount": 50,
           "propertyCount": 0,
           "methods": [
             "GetId",
@@ -11193,7 +11202,9 @@
             "BeginUpdate",
             "EndUpdate",
             "GetPricePerSqM",
-            "SetPricePerSqM"
+            "SetPricePerSqM",
+            "GetMinCutDistance",
+            "SetMinCutDistance"
           ],
           "reservedMethods": [
             {
@@ -11215,6 +11226,7 @@
             "Material",
             "Edging",
             "MinEdgeDistance",
+            "MinCutDistance",
             "Priority",
             "CutShiftHorzLimit",
             "CutShiftVertLimit",
@@ -11254,8 +11266,8 @@
             "status": "ok",
             "safe": true,
             "projection": "full",
-            "cppMethodCount": 49,
-            "pascalMethodCount": 49,
+            "cppMethodCount": 51,
+            "pascalMethodCount": 51,
             "acceptedAliases": [
               {
                 "index": 32,
@@ -14315,5 +14327,5 @@
       ]
     }
   },
-  "generationFingerprint": "012638434d0b14ce7a70c7de5ed1c97436ad4d6ec868d978cbadb476f34cc2a2"
+  "generationFingerprint": "663513a16eee65fbf11c5896cc1a294259d7a394da774e5d59190602ba58be41"
 }

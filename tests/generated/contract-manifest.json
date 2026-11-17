@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-11-16T10:28:23.022Z",
+  "generatedAt": "2026-11-16T14:15:36.442Z",
   "sourceRoot": "SDK/include",
   "totals": {
     "interfaceCount": 65,
-    "methodCount": 991,
-    "propertyCount": 435,
+    "methodCount": 993,
+    "propertyCount": 436,
     "cppInterfaceCount": 44,
-    "cppMethodCount": 654
+    "cppMethodCount": 656
   },
   "interfaces": [
     {
@@ -12669,6 +12669,32 @@
           ],
           "order": 48,
           "accessor": true
+        },
+        {
+          "kind": "method",
+          "signature": "function GetMinCutDistance(): Integer",
+          "name": "GetMinCutDistance",
+          "procedureKind": "function",
+          "returnType": "Integer",
+          "parameters": [],
+          "order": 49,
+          "accessor": true
+        },
+        {
+          "kind": "method",
+          "signature": "procedure SetMinCutDistance(aDistance: Integer)",
+          "name": "SetMinCutDistance",
+          "procedureKind": "procedure",
+          "returnType": null,
+          "parameters": [
+            {
+              "name": "aDistance",
+              "modifier": null,
+              "type": "Integer"
+            }
+          ],
+          "order": 50,
+          "accessor": true
         }
       ],
       "properties": [
@@ -12806,6 +12832,18 @@
         },
         {
           "kind": "property",
+          "signature": "property MinCutDistance: Integer read GetMinCutDistance write SetMinCutDistance",
+          "name": "MinCutDistance",
+          "type": "Integer",
+          "parameters": [],
+          "readAccessor": "GetMinCutDistance",
+          "writeAccessor": "SetMinCutDistance",
+          "writable": true,
+          "defaultProperty": false,
+          "order": 11
+        },
+        {
+          "kind": "property",
           "signature": "property Priority: Integer read GetPriority write SetPriority",
           "name": "Priority",
           "type": "Integer",
@@ -12814,7 +12852,7 @@
           "writeAccessor": "SetPriority",
           "writable": true,
           "defaultProperty": false,
-          "order": 11
+          "order": 12
         },
         {
           "kind": "property",
@@ -12826,7 +12864,7 @@
           "writeAccessor": "SetCutShiftHorzLimit",
           "writable": true,
           "defaultProperty": false,
-          "order": 12
+          "order": 13
         },
         {
           "kind": "property",
@@ -12838,7 +12876,7 @@
           "writeAccessor": "SetCutShiftVertLimit",
           "writable": true,
           "defaultProperty": false,
-          "order": 13
+          "order": 14
         },
         {
           "kind": "property",
@@ -12850,7 +12888,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 14
+          "order": 15
         },
         {
           "kind": "property",
@@ -12862,7 +12900,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 15
+          "order": 16
         },
         {
           "kind": "property",
@@ -12874,7 +12912,7 @@
           "writeAccessor": "SetExtractionCost",
           "writable": true,
           "defaultProperty": false,
-          "order": 16
+          "order": 17
         },
         {
           "kind": "property",
@@ -12886,7 +12924,7 @@
           "writeAccessor": "SetPricePerSqM",
           "writable": true,
           "defaultProperty": false,
-          "order": 17
+          "order": 18
         },
         {
           "kind": "property",
@@ -12898,7 +12936,7 @@
           "writeAccessor": "SetCustomData",
           "writable": true,
           "defaultProperty": false,
-          "order": 18
+          "order": 19
         },
         {
           "kind": "property",
@@ -12910,7 +12948,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 19
+          "order": 20
         },
         {
           "kind": "property",
@@ -12922,7 +12960,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 20
+          "order": 21
         },
         {
           "kind": "property",
@@ -12934,7 +12972,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 21
+          "order": 22
         },
         {
           "kind": "property",
@@ -12946,7 +12984,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 22
+          "order": 23
         },
         {
           "kind": "property",
@@ -12958,7 +12996,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 23
+          "order": 24
         },
         {
           "kind": "property",
@@ -12970,7 +13008,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 24
+          "order": 25
         },
         {
           "kind": "property",
@@ -12982,7 +13020,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 25
+          "order": 26
         },
         {
           "kind": "property",
@@ -12994,7 +13032,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 26
+          "order": 27
         },
         {
           "kind": "property",
@@ -13006,7 +13044,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 27
+          "order": 28
         },
         {
           "kind": "property",
@@ -13018,7 +13056,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 28
+          "order": 29
         },
         {
           "kind": "property",
@@ -13030,7 +13068,7 @@
           "writeAccessor": null,
           "writable": false,
           "defaultProperty": false,
-          "order": 29
+          "order": 30
         }
       ]
     },
@@ -25348,6 +25386,28 @@
               "type": "TTcPrice"
             }
           ]
+        },
+        {
+          "name": "GetMinCutDistance",
+          "signature": "HRESULT GetMinCutDistance(int* result)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "result",
+              "type": "int*"
+            }
+          ]
+        },
+        {
+          "name": "SetMinCutDistance",
+          "signature": "HRESULT SetMinCutDistance(int aDistance)",
+          "returnType": "HRESULT",
+          "parameters": [
+            {
+              "name": "aDistance",
+              "type": "int"
+            }
+          ]
         }
       ]
     },
@@ -28032,5 +28092,5 @@
       ]
     }
   ],
-  "generationFingerprint": "012638434d0b14ce7a70c7de5ed1c97436ad4d6ec868d978cbadb476f34cc2a2"
+  "generationFingerprint": "663513a16eee65fbf11c5896cc1a294259d7a394da774e5d59190602ba58be41"
 }

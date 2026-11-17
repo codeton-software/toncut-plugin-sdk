@@ -64,8 +64,8 @@ static_assert(sizeof(TField) == 8, "Delphi TField (Int64) ABI must remain eight 
 static_assert(sizeof(TTcColor) == 4, "Delphi TTcColor (Integer) ABI must remain four bytes");
 
 // Plugin engine interface version. The host activates a plugin only when
-// GetEngineVersion returns exactly this value (25 = collection batch updates).
-constexpr int cEngineVersion = 25;
+// GetEngineVersion returns exactly this value (26 = stock minimum cut distance).
+constexpr int cEngineVersion = 26;
 // Internal length unit: 1 mm = 100 units (0.01 mm), for every length and
 // position in this contract regardless of ITonCut::GetUnits.
 constexpr unsigned cLengthMultiplier = 100;
@@ -88,6 +88,8 @@ constexpr int cStockPriorityNormal = 10;
 constexpr int cStockPriorityMax = 100;
 // ISheet::GetPricePerSqM value meaning "no own price; use the material's".
 constexpr TTcPrice cStockPriceAbsent = -1;
+// ISheet raw distance: -1 inherits the device; nonnegative values override it.
+constexpr int cStockMinCutDistanceAbsent = -1;
 // Special TTcColor values (IFormat::GetPreviewColor / SetPreviewColor).
 constexpr TTcColor clTcNone = -1;
 constexpr TTcColor clTcRandom = -2;
@@ -732,7 +734,7 @@ struct IFormat : IUnknown {
   virtual HRESULT STDMETHODCALLTYPE SetPreviewColor(TTcColor aColor) = 0;
 };
 
-// uISheet.pas {3D92A70F-6B18-45C4-A8E1-7C204F6B9D35}: complete projection, 49 Pascal methods in vtable slots 3-51.
+// uISheet.pas {3D92A70F-6B18-45C4-A8E1-7C204F6B9D35}: complete projection, 51 Pascal methods in vtable slots 3-53.
 struct ISheet : IUnknown {
   virtual HRESULT STDMETHODCALLTYPE GetId(std::int64_t* result) = 0;
   virtual HRESULT STDMETHODCALLTYPE SetId(std::int64_t value) = 0;
@@ -784,6 +786,8 @@ struct ISheet : IUnknown {
   virtual HRESULT STDMETHODCALLTYPE EndUpdate() = 0;
   virtual HRESULT STDMETHODCALLTYPE GetPricePerSqM(TTcPrice* result) = 0;
   virtual HRESULT STDMETHODCALLTYPE SetPricePerSqM(TTcPrice aPrice) = 0;
+  virtual HRESULT STDMETHODCALLTYPE GetMinCutDistance(int* result) = 0;
+  virtual HRESULT STDMETHODCALLTYPE SetMinCutDistance(int aDistance) = 0;
 };
 
 // uIProjects.pas {6A337290-EA4F-408E-9F67-D1ECFEFDEA4B}: complete projection, 23 Pascal methods in vtable slots 3-25.

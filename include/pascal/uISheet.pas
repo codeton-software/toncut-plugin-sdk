@@ -17,6 +17,9 @@ const
   // supplied price is finite and >= 0, so this value cannot collide with
   // one, and an explicit 0 stays a real 0.
   cStockPriceAbsent = -1;
+  // API-only inheritance marker. JSON omission inherits the device; a
+  // supplied JSON length must be nonnegative, including an explicit zero.
+  cStockMinCutDistanceAbsent = -1;
 
 type
   ISheet = interface
@@ -115,6 +118,11 @@ type
     function GetPricePerSqM(): TTcPrice; safecall;
     procedure SetPricePerSqM(aPrice: TTcPrice); safecall;
 
+    // Appended for engine version 26; existing vtable slots are unchanged.
+    // No stock-width policy is applied here: the input producer supplies it.
+    function GetMinCutDistance(): Integer; safecall;
+    procedure SetMinCutDistance(aDistance: Integer); safecall;
+
     property Id: Int64 read GetId write SetId;
     property Width: Cardinal read GetWidth write SetWidth;
     property Length: Cardinal read GetLength write SetLength;
@@ -126,6 +134,7 @@ type
     property Material: IMaterial read GetMaterial write SetMaterial;
     property Edging: IRectangle read GetEdging;
     property MinEdgeDistance: IRectangle read GetMinEdgeDistance;
+    property MinCutDistance: Integer read GetMinCutDistance write SetMinCutDistance;
     property Priority: Integer read GetPriority write SetPriority;
 
     property CutShiftHorzLimit: Integer read GetCutShiftHorzLimit write SetCutShiftHorzLimit;

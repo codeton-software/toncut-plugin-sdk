@@ -64,7 +64,7 @@ Not compiled or tested by the maintainers; provided as-is. If you hit a problem,
    extension must be lowercase `.plg`. The shipped starters need no other
    file.
 3. Start TonCut and open Options -> Plugins. The plugin is listed by its
-   title. "Not compatible" means its `EngineVersion` is not `25`; a load error
+   title. "Not compatible" means its `EngineVersion` is not `26`; a load error
    message means the export or the DLL itself could not be loaded.
 
 ## Notes

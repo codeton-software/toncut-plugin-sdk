@@ -492,6 +492,8 @@ void TouchISheet(toncut::ISheet* aValue) {
   aValue->EndUpdate();
   aValue->GetPricePerSqM(nullptr);
   aValue->SetPricePerSqM({});
+  aValue->GetMinCutDistance(nullptr);
+  aValue->SetMinCutDistance(1);
 }
 
 void TouchISheets(toncut::ISheets* aValue) {

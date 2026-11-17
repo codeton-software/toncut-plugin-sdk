@@ -12,7 +12,7 @@ This folder is the external-facing SDK package for TonCut Desktop plugins. It co
 ## Compatibility
 
 - Supported host: TonCut Desktop 8.5.
-- Plugin engine interface version: 25 (`cEngineVersion` in `include/pascal/uITcPluginCommon.pas`, mirrored in `include/cpp/TonCutPluginSdk.hpp`). The host refuses a plugin that reports a different value, so rebuild every plugin against this SDK.
+- Plugin engine interface version: 26 (`cEngineVersion` in `include/pascal/uITcPluginCommon.pas`, mirrored in `include/cpp/TonCutPluginSdk.hpp`). The host refuses a plugin that reports a different value, so rebuild every plugin against this SDK.
 - Documentation: the Plugin API reference is published at https://docs.toncut.com/tc-plugin-sdk/.
 
 TonCut Desktop is a 32-bit application: every plugin must be a Win32 (x86) DLL named `*.plg` (lowercase) in the `Plugins\` folder next to `TonCut.exe`. The shipped SDK assumes the TonCut Win32 ABI used by the Delphi plugins, including quad-word record alignment. A C# plugin is a native C++ shim; TonCut does not load .NET assemblies directly (see `manuals/support-by-language.md`).
